@@ -1,6 +1,6 @@
 # How to get the plugin's API reference
 
-The API provides an interface (which plugin implements) to access to the API classes, for get it, you must use the `TeamsProvider#get` class's function to obtaing the reference.
+The API provides the `Teams` interface (which plugin implements) to access to the API classes, for get it, you must use the `TeamsProvider#get` class's function to obtaing the reference.
 
 You must notice that if you try to get the API reference when plugin isn't fully enabled yet, the function will throw an `IllegalStateException` error, as well for any of the
 interface's methods, to avoid this, you must call to this function preferably during your plugin's `onEnable` method.
@@ -15,7 +15,8 @@ public final class TestPlugin extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    this.tagAggregateRootRegistry = RegionEventsProvider.get().tagsRegistry();
+    final Teams teams = TeamsProvider.get();
+    this.tagAggregateRootRegistry = teams.tagsRegistry();
   }
 }
 ```
