@@ -1,0 +1,27 @@
+name: AldrTeams
+main: io.github.aivruu.teams.TeamsPlugin
+loader: io.github.aivruu.teams.library.application.TeamsPluginLoader
+authors: [ aivruu ]
+
+api-version: "1.20"
+version: ${version}
+
+permissions:
+  teams.command:
+    default: op
+    description: Allows the player to use the plugin's commands.
+    children:
+      teams.command.help:
+        description: Shows the help-message with the plugin's commands.
+      teams.command.reload:
+        description: Reloads the plugin's configuration.
+      teams.command.create:
+        description: Creates a new tag.
+      teams.command.delete:
+        description: Deletes a tag.
+      teams.command.select:
+        description: Selects a new tag.
+      teams.command.modify:
+        description: Allows to modify tag's prefix or suffix.
+      teams.command.menu:
+        description: Opens tags-selector menu.
