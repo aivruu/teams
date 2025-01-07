@@ -1,0 +1,106 @@
+// This file is part of teams, licensed under the GNU License.
+//
+// Copyright (c) 2024 aivruu
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+package io.github.aivruu.teams.tag.application.registry;
+
+import io.github.aivruu.teams.aggregate.domain.repository.AsyncAggregateRootRepository;
+import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
+import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
+import io.github.aivruu.teams.tag.domain.repository.TagAggregateRootRepository;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegistry {
+  private final TagAggregateRootRepository tagAggregateRootRepository;
+  private final AsyncAggregateRootRepository<TagAggregateRoot> tagAsyncAggregateRootRepository;
+
+  public TagAggregateRootRegistryImpl(
+    final @NotNull TagAggregateRootRepository tagAggregateRootRepository,
+    final @NotNull AsyncAggregateRootRepository<TagAggregateRoot> tagAsyncAggregateRootRepository) {
+    this.tagAggregateRootRepository = tagAggregateRootRepository;
+    this.tagAsyncAggregateRootRepository = tagAsyncAggregateRootRepository;
+  }
+
+  @Override
+  public @Nullable TagAggregateRoot findInCache(final @NotNull String id) {
+    return this.tagAggregateRootRepository.findInCacheSync(id);
+  }
+
+  @Override
+  public @Nullable TagAggregateRoot findInBoth(final @NotNull String id) {
+    TagAggregateRoot tagAggregateRoot = this.tagAggregateRootRepository.findInCacheSync(id);
+    if (tagAggregateRoot != null) {
+      return tagAggregateRoot;
+    }
+    tagAggregateRoot = this.tagAsyncAggregateRootRepository.findInPersistenceAsync(id).join();
+    if (tagAggregateRoot != null) {
+      this.tagAggregateRootRepository.saveSync(tagAggregateRoot);
+    }
+    return tagAggregateRoot;
+  }
+
+  @Override
+  public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findInInfrastructure(final @NotNull String id) {
+    return this.tagAsyncAggregateRootRepository.findInPersistenceAsync(id);
+  }
+
+  @Override
+  public @NotNull Collection<TagAggregateRoot> findAllInCache() {
+    return this.tagAggregateRootRepository.findAllInCacheSync();
+  }
+
+  @Override
+  public boolean existsGlobally(final @NotNull String id) {
+    final boolean existsInInfrastructure = this.existsInInfrastructure(id);
+    return this.tagAggregateRootRepository.findInCacheSync(id) != null && existsInInfrastructure;
+  }
+
+  @Override
+  public boolean existsInCache(final @NotNull String id) {
+    return this.tagAggregateRootRepository.findInCacheSync(id) != null;
+  }
+
+  @Override
+  public boolean existsInInfrastructure(final @NotNull String id) {
+    final AtomicBoolean atomicBoolean = new AtomicBoolean();
+    this.tagAsyncAggregateRootRepository.existsAsync(id).thenAccept(atomicBoolean::set);
+    return atomicBoolean.get();
+  }
+
+  @Override
+  public void register(final @NotNull TagAggregateRoot aggregateRoot) {
+    this.tagAggregateRootRepository.saveSync(aggregateRoot);
+  }
+
+  @Override
+  public @Nullable TagAggregateRoot unregister(final @NotNull String id) {
+    return this.tagAggregateRootRepository.deleteSync(id);
+  }
+
+  @Override
+  public @NotNull CompletableFuture<Boolean> delete(final @NotNull String id) {
+    return this.tagAsyncAggregateRootRepository.deleteAsync(id);
+  }
+
+  @Override
+  public @NotNull CompletableFuture<Boolean> save(final @NotNull TagAggregateRoot aggregateRoot) {
+    return this.tagAsyncAggregateRootRepository.saveAsync(aggregateRoot);
+  }
+}
