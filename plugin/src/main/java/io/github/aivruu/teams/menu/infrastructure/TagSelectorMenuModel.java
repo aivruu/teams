@@ -104,16 +104,8 @@ public final class TagSelectorMenuModel implements MenuModelContract {
     final @NotNull TagsMenuConfigurationModel.ItemSection itemSection,
     final @NotNull ClickType clickType
   ) {
-    if (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT) {
-      for (final String action : itemSection.rightClickActions) {
-        this.actionManager.execute(player, action);
-      }
+    if (!this.processActionType(player, itemSection, clickType)) {
       return;
-    }
-    if (clickType == ClickType.LEFT || clickType == ClickType.SHIFT_LEFT) {
-      for (final String action : itemSection.leftClickActions) {
-        this.actionManager.execute(player, action);
-      }
     }
     if (itemSection.tag.isEmpty()) {
       return;
@@ -122,6 +114,32 @@ public final class TagSelectorMenuModel implements MenuModelContract {
       player.sendMessage(MiniMessageHelper.text(itemSection.permissionMessage));
       return;
     }
+    this.processTagSelection(player, itemSection);
+  }
+
+  private boolean processActionType(
+    final @NotNull Player player,
+    final @NotNull TagsMenuConfigurationModel.ItemSection itemSection,
+    final @NotNull ClickType clickType
+  ) {
+    if (clickType == ClickType.LEFT) {
+      for (final String action : itemSection.leftClickActions) {
+        this.actionManager.execute(player, action);
+      }
+      return true;
+    } else if (clickType == ClickType.RIGHT) {
+      for (final String action : itemSection.rightClickActions) {
+        this.actionManager.execute(player, action);
+      }
+      return false;
+    }
+    return false;
+  }
+
+  private void processTagSelection(
+    final @NotNull Player player,
+    final @NotNull TagsMenuConfigurationModel.ItemSection itemSection
+  ) {
     final MessagesConfigurationModel messages = this.messagesModelContainer.model();
     final byte selectResult = this.playerTagSelectorManager.select(player, itemSection.tag);
     switch (selectResult) {
