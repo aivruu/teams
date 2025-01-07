@@ -12,7 +12,7 @@ in-game easily.
 * Select them trought a customizable-menu.
 * Executable actions for menu-open and items-interaction.
 * Customizable Menu Items (left and right-click actions, glow-effect, permission-required, tag-assigned).
-* NMS usage for tag's scooreboard-team management and visuals.
+* NMS usage for tag's scoreboard-team management and visuals.
 * MiniMessage Support.
 
 # Previews
