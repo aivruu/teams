@@ -6,7 +6,12 @@ plugins {
 }
 
 subprojects {
-  apply(plugin = "java")
+  if (project.name == "${rootProject.name}-api") {
+    apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
+  } else {
+    apply(plugin = "java")
+  }
   apply(plugin = "com.diffplug.spotless")
   apply(plugin = "net.kyori.indra")
   apply(plugin = "io.github.goooler.shadow")
