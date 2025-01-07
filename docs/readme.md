@@ -27,7 +27,7 @@ Some previews of the plugin's features and functionality.
 ## Building
 The plugin's uses Gradle and requires Java 21+ for building.
 ```
-git clone git@github.com:aivruu/homes
-cd homes
+git clone git@github.com:aivruu/teams
+cd teams
 ./gradlew shadowJar
 ```
