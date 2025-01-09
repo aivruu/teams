@@ -114,13 +114,13 @@ public final class TagsCommand implements RegistrableCommandContract {
               final String prefix = ctx.getArgument("prefix", String.class);
               final String suffix = ctx.getArgument("suffix", String.class);
               final MessagesConfigurationModel messages = this.messagesModelContainer.model();
-              if (!this.tagManager.createTag(player, id,
+              if (this.tagManager.createTag(player, id,
                 prefix.isEmpty() ? null : MiniMessageHelper.text(prefix),
                 suffix.isEmpty() ? null : MiniMessageHelper.text(suffix))
               ) {
-                player.sendMessage(MiniMessageHelper.text(messages.alreadyExists));
-              } else {
                 player.sendMessage(MiniMessageHelper.text(messages.created, Placeholder.parsed("tag-id", id)));
+              } else {
+                player.sendMessage(MiniMessageHelper.text(messages.alreadyExists));
               }
               return Command.SINGLE_SUCCESS;
             }))
@@ -147,7 +147,12 @@ public final class TagsCommand implements RegistrableCommandContract {
                 player.sendMessage(MiniMessageHelper.text(messages.unknownTag));
                 return Command.SINGLE_SUCCESS;
               }
-              this.processPrefixModification(player, ctx.getArgument("input", String.class), tagAggregateRoot, messages);
+              final String input = ctx.getArgument("input", String.class);
+              final ValueObjectMutationResult<TagPropertiesValueObject> result = this.tagModifierService.updatePrefix(
+                tagAggregateRoot, input.isEmpty() ? null : MiniMessageHelper.text(input));
+              if (this.processModification(player, result, tagAggregateRoot, messages)) {
+                player.sendMessage(MiniMessageHelper.text(messages.modifiedTagPrefix));
+              }
               return Command.SINGLE_SUCCESS;
             }))
           )
@@ -164,7 +169,12 @@ public final class TagsCommand implements RegistrableCommandContract {
                 player.sendMessage(MiniMessageHelper.text(messages.unknownTag));
                 return Command.SINGLE_SUCCESS;
               }
-              this.processSuffixModification(player, ctx.getArgument("input", String.class), tagAggregateRoot, messages);
+              final String input = ctx.getArgument("input", String.class);
+              final ValueObjectMutationResult<TagPropertiesValueObject> result = this.tagModifierService.updatePrefix(
+                tagAggregateRoot, input.isEmpty() ? null : MiniMessageHelper.text(input));
+              if (this.processModification(player, result, tagAggregateRoot, messages)) {
+                player.sendMessage(MiniMessageHelper.text(messages.modifiedTagSuffix));
+              }
               return Command.SINGLE_SUCCESS;
             }))
           )
@@ -176,54 +186,32 @@ public final class TagsCommand implements RegistrableCommandContract {
           final Player player = (Player) ctx.getSource().getSender();
           final MessagesConfigurationModel messages = this.messagesModelContainer.model();
           final String id = ctx.getArgument("id", String.class);
-          if (!this.tagManager.deleteTag(id)) {
+          if (this.tagManager.deleteTag(id)) {
+            player.sendMessage(MiniMessageHelper.text(messages.deleted, Placeholder.parsed("tag-id", id)));
+          } else {
             player.sendMessage(MiniMessageHelper.text(messages.unknownTag));
-            return Command.SINGLE_SUCCESS;
           }
-          player.sendMessage(MiniMessageHelper.text(messages.deleted, Placeholder.parsed("tag-id", id)));
           return Command.SINGLE_SUCCESS;
         }))
       )
       .build();
   }
 
-  private void processPrefixModification(
+  private boolean processModification(
     final @NotNull Player player,
-    final @NotNull String input,
+    final @NotNull ValueObjectMutationResult<TagPropertiesValueObject> result,
     final @NotNull TagAggregateRoot tagAggregateRoot,
     final @NotNull MessagesConfigurationModel messages
   ) {
-    final ValueObjectMutationResult<TagPropertiesValueObject> result = this.tagModifierService.updatePrefix(
-      tagAggregateRoot, input.isEmpty() ? null : MiniMessageHelper.text(input));
     if (result.wasUnchanged()) {
       player.sendMessage(MiniMessageHelper.text(messages.tagModifyError));
-      return;
+      return false;
     }
     if (result.wasError()) {
       player.sendMessage(MiniMessageHelper.text(messages.tagModifyEventIssue));
-      return;
+      return false;
     }
     tagAggregateRoot.tagComponentProperties(result.result());
-    player.sendMessage(MiniMessageHelper.text(messages.modifiedTagPrefix));
-  }
-
-  private void processSuffixModification(
-    final @NotNull Player player,
-    final @NotNull String input,
-    final @NotNull TagAggregateRoot tagAggregateRoot,
-    final @NotNull MessagesConfigurationModel messages
-  ) {
-    final ValueObjectMutationResult<TagPropertiesValueObject> result = this.tagModifierService.updateSuffix(
-      tagAggregateRoot, input.isEmpty() ? null : MiniMessageHelper.text(input));
-    if (result.wasUnchanged()) {
-      player.sendMessage(MiniMessageHelper.text(messages.tagModifyError));
-      return;
-    }
-    if (result.wasError()) {
-      player.sendMessage(MiniMessageHelper.text(messages.tagModifyEventIssue));
-      return;
-    }
-    tagAggregateRoot.tagComponentProperties(result.result());
-    player.sendMessage(MiniMessageHelper.text(messages.modifiedTagSuffix));
+    return true;
   }
 }
