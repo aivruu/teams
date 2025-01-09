@@ -85,6 +85,7 @@ public final class TagSelectorMenuModel implements MenuModelContract {
         }
       }
     }
+    this.gui.update();
   }
 
   private void configureItem(final @NotNull TagsMenuConfigurationModel.ItemSection itemSection, final byte slot) {
@@ -107,6 +108,7 @@ public final class TagSelectorMenuModel implements MenuModelContract {
     if (!this.processActionType(player, itemSection, clickType)) {
       return;
     }
+    this.gui.close(player);
     if (itemSection.tag.isEmpty()) {
       return;
     }
