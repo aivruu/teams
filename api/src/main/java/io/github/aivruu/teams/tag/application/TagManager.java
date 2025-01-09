@@ -73,7 +73,6 @@ public final class TagManager {
    * @param prefix the tag's prefix, {@code null} for unset.
    * @param suffix the tag's suffix, {@code null} for unset.
    * @return Whether the tag was created.
-   * @see PacketAdaptationContract#existsTeam(String)
    * @see TagAggregateRootRegistry#existsInInfrastructure(String)
    * @since 0.0.1
    */
@@ -83,24 +82,14 @@ public final class TagManager {
     final @Nullable Component prefix,
     final @Nullable Component suffix
   ) {
-    if (this.packetAdaptation.existsTeam(id) || this.tagAggregateRootRegistry.existsInInfrastructure(id)) {
+    if (this.tagAggregateRootRegistry.existsInInfrastructure(id)) {
       return false;
     }
     final TagPropertiesValueObject properties = new TagPropertiesValueObject(prefix, suffix);
     final TagAggregateRoot tagAggregateRoot = new TagAggregateRoot(id, new TagModelEntity(id, properties));
     this.tagAggregateRootRegistry.register(tagAggregateRoot);
     this.packetAdaptation.createTeam(id, properties);
-    this.tagAggregateRootRegistry.save(tagAggregateRoot)
-      .thenAccept(saved -> {
-        if (!saved) {
-          DebugLoggerHelper.write("The tag's aggregate-root information couldn't be saved.");
-        }
-      })
-      .whenComplete((result, exception) -> {
-        if (exception != null) {
-          DebugLoggerHelper.write("Unexpected exception during tag's aggregate-root saving: {}", exception);
-        }
-      });
+    this.handleTagAggregateRootSave(tagAggregateRoot);
     Bukkit.getPluginManager().callEvent(new TagCreateEvent(player, id));
     return true;
   }
@@ -113,14 +102,15 @@ public final class TagManager {
    */
   public void handleTagAggregateRootSave(final @NotNull TagAggregateRoot tagAggregateRoot) {
     this.tagAggregateRootRegistry.save(tagAggregateRoot)
+      .exceptionally(exception -> {
+        DebugLoggerHelper.write("Unexpected exception during tag-aggregate-root saving with id '{}'.", exception);
+        return false;
+      })
       .thenAccept(saved -> {
         if (!saved) {
-          DebugLoggerHelper.write("The tag's information couldn't be saved.");
-        }
-      })
-      .whenComplete((result, exception) -> {
-        if (exception != null) {
-          DebugLoggerHelper.write("Unexpected exception during tag's data saving: {}", exception);
+          DebugLoggerHelper.write("The tag's aggregate-root information couldn't be saved.");
+          // Avoid have unnecessary information in-cache.
+          this.tagAggregateRootRegistry.unregister(tagAggregateRoot.id());
         }
       });
   }
@@ -129,31 +119,25 @@ public final class TagManager {
    * Deletes the tag's information (and scoreboard-team) for the specified id.
    *
    * @param id the tag's id.
-   * @return Whether the tag was deleted.
-   * @see PacketAdaptationContract#deleteTeam(String)
    * @see TagAggregateRootRegistry#existsInInfrastructure(String)
    * @since 0.0.1
    */
   public boolean deleteTag(final @NotNull String id) {
-    if (!this.packetAdaptation.deleteTeam(id)) {
+    this.tagAggregateRootRegistry.unregister(id); // Delete from cache if necessary.
+    this.packetAdaptation.deleteTeam(id); // Delete internal scoreboard-item.
+    if (!this.tagAggregateRootRegistry.existsInInfrastructure(id)) {
       return false;
     }
     Bukkit.getPluginManager().callEvent(new TagDeleteEvent(id));
-    this.tagAggregateRootRegistry.unregister(id);
-    if (!this.tagAggregateRootRegistry.existsInInfrastructure(id)) {
-      return true;
-    }
     // Process from-infrastructure tag deletion.
     this.tagAggregateRootRegistry.delete(id)
-      .thenAccept(deleted -> {
-        if (!deleted) {
-          DebugLoggerHelper.write("The tag's information couldn't be deleted.");
-        }
+      .exceptionally(exception -> {
+        DebugLoggerHelper.write("Unexpected exception during tag deleting with id '{}'.", exception);
+        return false;
       })
-      .whenComplete((result, exception) -> {
-        if (exception != null) {
-          DebugLoggerHelper.write("Unexpected exception during tag deleting: {}", exception);
-        }
+      .thenAccept(deleted -> {
+        if (deleted) DebugLoggerHelper.write("Tag '{}' information has been deleted.");
+        else DebugLoggerHelper.write("The tag's information couldn't be deleted.");
       });
     return true;
   }
