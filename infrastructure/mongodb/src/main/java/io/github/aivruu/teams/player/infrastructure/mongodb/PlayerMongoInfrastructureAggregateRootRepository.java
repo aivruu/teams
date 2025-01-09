@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 public final class PlayerMongoInfrastructureAggregateRootRepository implements InfrastructureAggregateRootRepository<PlayerAggregateRoot> {
   private final MongoClient client;

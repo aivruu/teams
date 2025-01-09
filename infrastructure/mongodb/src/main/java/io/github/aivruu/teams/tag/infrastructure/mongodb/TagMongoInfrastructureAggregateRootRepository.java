@@ -19,7 +19,6 @@ package io.github.aivruu.teams.tag.infrastructure.mongodb;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import io.github.aivruu.teams.shared.infrastructure.ExecutorHelper;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import org.bson.Document;
