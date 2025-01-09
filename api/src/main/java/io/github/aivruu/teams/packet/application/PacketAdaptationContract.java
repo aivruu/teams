@@ -39,42 +39,30 @@ public interface PacketAdaptationContract {
   void createTeam(final @NotNull String team, final @NotNull TagPropertiesValueObject properties);
 
   /**
-   * Checks if a team with the given id exists.
-   *
-   * @param team the team's id.
-   * @return Whether the team exists.
-   * @since 0.0.1
-   */
-  boolean existsTeam(final @NotNull String team);
-
-  /**
    * Deletes the team with the specified id.
    *
    * @param team the team's id.
-   * @return Whether the team existed.
-   * @since 0.0.1
+   * @since 1.1.1
    */
-  boolean deleteTeam(final @NotNull String team);
+  void deleteTeam(final @NotNull String team);
 
   /**
    * Adds the given player to the specified team's players-registry.
    *
    * @param player the player to add.
    * @param team the team's id.
-   * @return Whether the team exists and the player is not member of it.
-   * @since 0.0.1
+   * @since 1.1.1
    */
-  boolean addPlayerToTeam(final @NotNull Player player, final @NotNull String team);
+  void addPlayerToTeam(final @NotNull Player player, final @NotNull String team);
 
   /**
    * Removes the player from the specified team's players-registry.
    *
    * @param player the player to remove.
    * @param team the team's id.
-   * @return Whether the team exists and the player is member of it.
-   * @since 0.0.1
+   * @since 1.1.1
    */
-  boolean removePlayerFromTeam(final @NotNull Player player, final @NotNull String team);
+  void removePlayerFromTeam(final @NotNull Player player, final @NotNull String team);
 
   /**
    * Modifies the team's prefix by the given one.
