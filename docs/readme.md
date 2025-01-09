@@ -1,4 +1,5 @@
 # teams | ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/aivruu/teams/build.yml)
+[![](https://jitpack.io/v/aivruu/teams.svg)](https://jitpack.io/#aivruu/teams)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/b08871d529b147f79ef24a9856abdee1)](https://app.codacy.com/gh/aivruu/teams/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 ![GitHub License](https://img.shields.io/github/license/aivruu/teams)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/t/aivruu/teams)
