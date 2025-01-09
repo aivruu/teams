@@ -29,10 +29,11 @@ public final class ConfigurationConfigurationModel implements ConfigurationInter
   public int threadPoolSize = 2;
 
   @Comment("""
-    Means that during plugin's internal processed (infrastructure-initialization or information-management)
-    the plugin will send debug-messages to the console informing about these processes, this only should be used
-    to debug the plugin on errors-searching and if the developer require it.""")
-  public boolean debugMode = true;
+    Means that during plugin's internal processes such as infrastructure-initialization and management as well
+    in-cache information handling, the plugin will send debug-messages to the console informing about these
+    processes, this only should be used to debug the plugin on errors or inconsistencies-searching and if
+    the developer require it.""")
+  public boolean debugMode = false;
 
   @Comment("""
     The infrastructure-type to use for the players' information storage, there are two options:
