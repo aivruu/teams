@@ -21,6 +21,7 @@ import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.registry.PlayerAggregateRootRegistry;
 import io.github.aivruu.teams.tag.domain.event.TagSelectEvent;
 import io.github.aivruu.teams.tag.domain.event.TagUnselectEvent;
+import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +45,7 @@ public final class PlayerTagSelectorManager {
   /** The tag is already selected by the player. */
   public static final byte TAG_IS_ALREADY_SELECTED = -6;
   private final PlayerAggregateRootRegistry playerAggregateRootRegistry;
+  private final TagAggregateRootRegistry tagAggregateRootRegistry;
   private final PacketAdaptationContract packetAdaptation;
 
   /**
@@ -55,8 +57,10 @@ public final class PlayerTagSelectorManager {
    */
   public PlayerTagSelectorManager(
     final @NotNull PlayerAggregateRootRegistry playerAggregateRootRegistry,
+    final @NotNull TagAggregateRootRegistry tagAggregateRootRegistry,
     final @NotNull PacketAdaptationContract packetAdaptation) {
     this.playerAggregateRootRegistry = playerAggregateRootRegistry;
+    this.tagAggregateRootRegistry = tagAggregateRootRegistry;
     this.packetAdaptation = packetAdaptation;
   }
 
@@ -74,10 +78,12 @@ public final class PlayerTagSelectorManager {
    * <li>{@link #PLAYER_IS_NOT_ONLINE} if the player is not connected to the server.</li>
    * </ul>
    * @see PlayerAggregateRootRegistry#findInCache(String)
-   * @see PacketAdaptationContract#addPlayerToTeam(Player, String)
    * @since 0.0.1
    */
   public byte select(final @NotNull Player player, final @NotNull String tag) {
+    if (!this.tagAggregateRootRegistry.existsInInfrastructure(tag)) {
+      return TAG_SPECIFIED_NOT_EXIST;
+    }
     final PlayerAggregateRoot playerAggregateRoot = this.playerAggregateRootRegistry.findInCache(player.getUniqueId().toString());
     if (playerAggregateRoot == null) {
       return PLAYER_IS_NOT_ONLINE;
@@ -86,10 +92,8 @@ public final class PlayerTagSelectorManager {
     if (currentTag != null && currentTag.equals(tag)) {
       return TAG_IS_ALREADY_SELECTED;
     }
-    if (!this.packetAdaptation.addPlayerToTeam(player, tag)) {
-      return TAG_SPECIFIED_NOT_EXIST;
-    }
     playerAggregateRoot.tag(tag);
+    this.packetAdaptation.addPlayerToTeam(player, tag);
     Bukkit.getPluginManager().callEvent(new TagSelectEvent(player, tag));
     return TAG_SELECTED_CORRECTLY;
   }
@@ -119,7 +123,6 @@ public final class PlayerTagSelectorManager {
       return THERE_IS_NO_TAG_SELECTED;
     }
     playerAggregateRoot.tag(null);
-    // Ignore result from internal PlayerTeam player deletion.
     this.packetAdaptation.removePlayerFromTeam(player, tag);
     Bukkit.getPluginManager().callEvent(new TagUnselectEvent(player, tag));
     return TAG_UNSELECTED_CORRECTLY;
