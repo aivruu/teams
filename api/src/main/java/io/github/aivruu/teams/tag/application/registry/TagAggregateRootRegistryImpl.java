@@ -17,6 +17,7 @@
 package io.github.aivruu.teams.tag.application.registry;
 
 import io.github.aivruu.teams.aggregate.domain.repository.AsyncAggregateRootRepository;
+import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import io.github.aivruu.teams.tag.domain.repository.TagAggregateRootRepository;
@@ -25,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegistry {
   private final TagAggregateRootRepository tagAggregateRootRepository;
@@ -49,7 +49,12 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
     if (tagAggregateRoot != null) {
       return tagAggregateRoot;
     }
-    tagAggregateRoot = this.tagAsyncAggregateRootRepository.findInPersistenceAsync(id).join();
+    tagAggregateRoot = this.tagAsyncAggregateRootRepository.findInPersistenceAsync(id)
+      .exceptionally(exception -> {
+        DebugLoggerHelper.write("Unexpected exception during in-infrastructure tag fetching with id '{}'.", id, exception);
+        return null;
+      })
+      .join();
     if (tagAggregateRoot != null) {
       this.tagAggregateRootRepository.saveSync(tagAggregateRoot);
     }
@@ -79,9 +84,8 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
 
   @Override
   public boolean existsInInfrastructure(final @NotNull String id) {
-    final AtomicBoolean atomicBoolean = new AtomicBoolean();
-    this.tagAsyncAggregateRootRepository.existsAsync(id).thenAccept(atomicBoolean::set);
-    return atomicBoolean.get();
+    // We need to await for async-operation to complete for correct-result getting.
+    return this.tagAsyncAggregateRootRepository.existsAsync(id).join();
   }
 
   @Override
