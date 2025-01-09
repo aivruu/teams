@@ -16,7 +16,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.config.infrastructure;
 
+import io.github.aivruu.teams.TeamsPlugin;
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -27,6 +29,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public record ConfigurationContainer<C>(@NotNull C model, @NotNull HoconConfigurationLoader loader, @NotNull Class<C> modelClass) {
+  private static final ComponentLogger LOGGER = TeamsPlugin.getPlugin(TeamsPlugin.class).getComponentLogger();
+  private static final String CONFIG_HEADER = """
+    AldrTeams | A plugin that gives your players the ability to select customizable-tags and showcase them on
+    their name-tag and tab-list.
+
+    This plugin supports MiniMessage format for all features, menu-configuration, tags' prefixes/suffixes
+    and more, you can customize these tags as you want to implement custom gradient-prefixes or suffixes for
+    special-ranks.
+
+    All this process is handle through a customizable-menu, which provides a highly-customization both for
+    tags-selection as for another items, also, you can trigger actions when a player click on a specific item
+    on the menu (left and right-click actions), all this indications more detailed in the selector_menu file.
+
+    Almost all plugin's executable-actions requires two or more parameters, which are separated with the ';' char.
+    Single-parameter actions doesn't require that.
+    Actions:
+    - [SOUND] <sound-id>;<volume>;<pitch> - Plays a sound at the action's player-executor's location.
+    - [TITLE] <title>;<subtitle>;<fade-in>;<stay>;<fade-out> - Sends a title to the action's player-executor.
+    - [MESSAGE] <message> - Sends a message to the action's player-executor.
+    - [COMMAND] <PLAYER | CONSOLE>;<command> - Executes a command as the action's player-executor.
+    - [BROADCAST <GLOBAL (all server) | LOCAL (world only)>;<message> - Broadcasts a message to all players.""";
+
   public @Nullable ConfigurationContainer<C> reload() {
     try {
       final C updatedModel = this.loader.load().get(this.modelClass);
@@ -46,17 +70,7 @@ public record ConfigurationContainer<C>(@NotNull C model, @NotNull HoconConfigur
     final HoconConfigurationLoader loader = HoconConfigurationLoader.builder()
       .prettyPrinting(true)
       .defaultOptions(opts -> opts
-        .header("""
-          AldrTeams | Create multiple tags with prefixes and suffixes for your players, and manage them across
-          a customizable menu.
-
-          This plugin supports MiniMessage format as well for all features, menu-configuration, tags' prefixes/suffixes
-          and more, you can customize these tags as you want to implement custom gradient-prefixes or suffixes for
-          special-ranks.
-
-          All this process is handle through a customizable-menu, which provides a highly-customization both for
-          tags-selection as for another items, also, you can trigger actions when a player clicks on a specific item
-          on the menu, all this indications more detailed in the selector_menu file.""")
+        .header(CONFIG_HEADER)
         .shouldCopyDefaults(true))
       .path(path)
       .build();
@@ -72,7 +86,7 @@ public record ConfigurationContainer<C>(@NotNull C model, @NotNull HoconConfigur
       }
       return new ConfigurationContainer<>(config, loader, modelClass);
     } catch (final ConfigurateException exception) {
-      exception.printStackTrace();
+      LOGGER.error("Unexpected exception during configuration-file loading/creation.", exception);
       return null;
     }
   }
