@@ -203,7 +203,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
 
     this.playerManager = new PlayerManager(this.playerAggregateRootRegistry);
     this.playerTagSelectorManager = new PlayerTagSelectorManager(
-      this.playerAggregateRootRegistry, this.packetAdaptation);
+      this.playerAggregateRootRegistry, this.tagAggregateRootRegistry, this.packetAdaptation);
     this.logger.info("Initializing action-manager and action-types registering.");
 
     this.actionManager = new ActionManager();
