@@ -18,6 +18,7 @@ package io.github.aivruu.teams.tag.infrastructure;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import io.github.aivruu.teams.tag.application.TagManager;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.repository.TagAggregateRootRepository;
@@ -25,15 +26,16 @@ import io.github.aivruu.teams.tag.infrastructure.cache.TagAggregateRootCacheInva
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Duration;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 public final class TagCacheAggregateRootRepository implements TagAggregateRootRepository {
   private Cache<String, TagAggregateRoot> cache;
 
   public void buildCache(final @NotNull TagManager tagManager) {
     this.cache = Caffeine.newBuilder()
-      .expireAfterWrite(Duration.ofMinutes(5))
+      .expireAfterWrite(5, TimeUnit.MINUTES)
+      .scheduler(Scheduler.systemScheduler())
       .removalListener(new TagAggregateRootCacheInvalidationListener(tagManager))
       .build();
   }
