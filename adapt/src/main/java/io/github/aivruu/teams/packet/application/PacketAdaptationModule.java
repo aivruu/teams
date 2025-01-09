@@ -38,35 +38,31 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
   }
 
   @Override
-  public boolean existsTeam(final @NotNull String team) {
-    return this.scoreboard.getPlayerTeam(team) != null;
-  }
-
-  @Override
-  public boolean deleteTeam(final @NotNull String team) {
+  public void deleteTeam(final @NotNull String team) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(team);
     if (playerTeam == null) {
-      return false;
+      return;
     }
     this.scoreboard.removePlayerTeam(playerTeam);
-    return true;
   }
 
   @Override
-  public boolean addPlayerToTeam(final @NotNull Player player, final @NotNull String team) {
+  public void addPlayerToTeam(final @NotNull Player player, final @NotNull String team) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(team);
-    return playerTeam != null && this.scoreboard.addPlayerToTeam(player.getName(), playerTeam);
-  }
-
-  @Override
-  public boolean removePlayerFromTeam(final @NotNull Player player, final @NotNull String team) {
-    final String playerName = player.getName();
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(team);
-    if (playerTeam == null || !playerTeam.getPlayers().remove(playerName)) {
-      return false;
+    if (playerTeam == null) {
+      return;
     }
-    this.scoreboard.removePlayerFromTeam(playerName, playerTeam);
-    return true;
+    this.scoreboard.addPlayerToTeam(player.getName(), playerTeam);
+  }
+
+  @Override
+  public void removePlayerFromTeam(final @NotNull Player player, final @NotNull String team) {
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(team);
+    final String playerName = player.getName();
+    if (playerTeam == null || this.scoreboard.getPlayersTeam(playerName) != playerTeam) {
+      return;
+    }
+    this.scoreboard.removePlayerFromTeam(player.getName(), playerTeam);
   }
 
   @Override
