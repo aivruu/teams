@@ -22,24 +22,25 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
-import net.minecraft.world.scores.Team;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class PacketAdaptationModule implements PacketAdaptationContract {
+  private static final String PLUGIN_SCOREBOARD_TEAM_IDENTIFIER = "teams-player-team-%s";
   private final Scoreboard scoreboard = MinecraftServer.getServer().getScoreboard();
 
   @Override
   public void createTeam(final @NotNull String team, final @NotNull TagPropertiesValueObject properties) {
-    this.scoreboard.addPlayerTeam(team).setCollisionRule(Team.CollisionRule.NEVER);
+    this.scoreboard.addPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
+    // Update attributes for scoreboard-team.
     this.updateTeamPrefix(team, properties.prefix());
     this.updateTeamSuffix(team, properties.suffix());
   }
 
   @Override
   public void deleteTeam(final @NotNull String team) {
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(team);
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
     if (playerTeam == null) {
       return;
     }
@@ -48,7 +49,7 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
 
   @Override
   public void addPlayerToTeam(final @NotNull Player player, final @NotNull String team) {
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(team);
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
     if (playerTeam == null) {
       return;
     }
@@ -57,17 +58,16 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
 
   @Override
   public void removePlayerFromTeam(final @NotNull Player player, final @NotNull String team) {
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(team);
-    final String playerName = player.getName();
-    if (playerTeam == null || this.scoreboard.getPlayersTeam(playerName) != playerTeam) {
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
+    if (playerTeam == null) {
       return;
     }
-    this.scoreboard.removePlayerFromTeam(player.getName(), playerTeam);
+    this.scoreboard.removePlayerFromTeam(player.getName());
   }
 
   @Override
   public void updateTeamPrefix(final @NotNull String team, final @Nullable Component prefix) {
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(team);
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
     if (playerTeam == null) {
       return;
     }
@@ -76,7 +76,7 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
 
   @Override
   public void updateTeamSuffix(final @NotNull String team, final @Nullable Component suffix) {
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(team);
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
     if (playerTeam == null) {
       return;
     }
