@@ -36,14 +36,8 @@ public final class PlayerTagSelectorManager {
   public static final byte PLAYER_IS_NOT_ONLINE = -1;
   /** The specified tag does not exist. */
   public static final byte TAG_SPECIFIED_NOT_EXIST = -2;
-  /** The tag was selected correctly by the player. */
-  public static final byte TAG_SELECTED_CORRECTLY = -3;
   /** There is no tag selected by the player. */
-  public static final byte THERE_IS_NO_TAG_SELECTED = -4;
-  /** The tag was unselected correctly by the player. */
-  public static final byte TAG_UNSELECTED_CORRECTLY = -5;
-  /** The tag is already selected by the player. */
-  public static final byte TAG_IS_ALREADY_SELECTED = -6;
+  public static final byte THERE_IS_NO_TAG_SELECTED = -3;
   private final PlayerAggregateRootRegistry playerAggregateRootRegistry;
   private final TagAggregateRootRegistry tagAggregateRootRegistry;
   private final PacketAdaptationContract packetAdaptation;
@@ -72,10 +66,10 @@ public final class PlayerTagSelectorManager {
    * @param tag the tag's id.
    * @return A status-code which can be:
    * <ul>
-   * <li>{@link #TAG_SELECTED_CORRECTLY} if the player's tag-selection was made correctly.</li>
-   * <li>{@link #TAG_SPECIFIED_NOT_EXIST} if the tag specified doesn't exist.</li>
-   * <li>{@link #TAG_IS_ALREADY_SELECTED} if the player already has the tag selected.</li>
+   * <li>{@link PlayerAggregateRoot#TAG_HAS_BEEN_CHANGED} if the player's tag-selection was made correctly.</li>
+   * <li>{@link PlayerAggregateRoot#TAG_IS_ALREADY_SELECTED} if the player already has the tag selected.</li>
    * <li>{@link #PLAYER_IS_NOT_ONLINE} if the player is not connected to the server.</li>
+   * <li>{@link #TAG_SPECIFIED_NOT_EXIST} if the tag specified doesn't exist.</li>
    * </ul>
    * @see PlayerAggregateRootRegistry#findInCache(String)
    * @since 0.0.1
@@ -88,14 +82,13 @@ public final class PlayerTagSelectorManager {
     if (playerAggregateRoot == null) {
       return PLAYER_IS_NOT_ONLINE;
     }
-    final String currentTag = playerAggregateRoot.playerModel().tag();
-    if (currentTag != null && currentTag.equals(tag)) {
-      return TAG_IS_ALREADY_SELECTED;
+    // Tag-id provided isn't null, so we shouldn't expect a [TAG_HAS_BEEN_CLEARED] status.
+    if (playerAggregateRoot.tagWithStatus(tag) == PlayerAggregateRoot.TAG_IS_ALREADY_SELECTED) {
+      return PlayerAggregateRoot.TAG_IS_ALREADY_SELECTED;
     }
-    playerAggregateRoot.tag(tag);
     this.packetAdaptation.addPlayerToTeam(player, tag);
     Bukkit.getPluginManager().callEvent(new TagSelectEvent(player, tag));
-    return TAG_SELECTED_CORRECTLY;
+    return PlayerAggregateRoot.TAG_HAS_BEEN_CHANGED;
   }
 
   /**
@@ -105,7 +98,7 @@ public final class PlayerTagSelectorManager {
    * @param player the player.
    * @return A status-code which can be:
    * <ul>
-   * <li>{@link #TAG_UNSELECTED_CORRECTLY} if the tag was unselected correctly.</li>
+   * <li>{@link PlayerAggregateRoot#TAG_HAS_BEEN_CLEARED} if the tag was unselected correctly.</li>
    * <li>{@link #THERE_IS_NO_TAG_SELECTED} if the player has no tag selected.</li>
    * <li>{@link #PLAYER_IS_NOT_ONLINE} if the player is not connected to the server.</li>
    * </ul>
@@ -122,9 +115,9 @@ public final class PlayerTagSelectorManager {
     if (tag == null) {
       return THERE_IS_NO_TAG_SELECTED;
     }
-    playerAggregateRoot.tag(null);
     this.packetAdaptation.removePlayerFromTeam(player, tag);
     Bukkit.getPluginManager().callEvent(new TagUnselectEvent(player, tag));
-    return TAG_UNSELECTED_CORRECTLY;
+    // We should expect a [TAG_HAS_BEEN_CLEARED] status.
+    return playerAggregateRoot.tagWithStatus(null);
   }
 }
