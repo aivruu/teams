@@ -49,12 +49,12 @@ public final class TagAggregateRoot extends AggregateRoot {
     return this.tagModel;
   }
 
-    /**
-     * Sets new properties for the tag-model.
-     *
-     * @param tagComponentProperties the tag's new {@link TagPropertiesValueObject}.
-     * @since 0.0.1
-     */
+  /**
+   * Sets new properties for the tag-model.
+   *
+   * @param tagComponentProperties the tag's new {@link TagPropertiesValueObject}.
+   * @since 0.0.1
+   */
   public void tagComponentProperties(final @NotNull TagPropertiesValueObject tagComponentProperties) {
     this.tagModel.tagComponentProperties(tagComponentProperties);
   }
