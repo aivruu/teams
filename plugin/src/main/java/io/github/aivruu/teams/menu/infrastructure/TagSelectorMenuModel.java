@@ -29,6 +29,7 @@ import io.github.aivruu.teams.menu.application.MenuModelContract;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
+import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
@@ -147,11 +148,11 @@ public final class TagSelectorMenuModel implements MenuModelContract {
     switch (selectResult) {
       case PlayerTagSelectorManager.PLAYER_IS_NOT_ONLINE ->
         player.sendMessage(MiniMessageHelper.text(messages.playerUnknownInfo));
-      case PlayerTagSelectorManager.TAG_IS_ALREADY_SELECTED ->
+      case PlayerAggregateRoot.TAG_IS_ALREADY_SELECTED ->
         player.sendMessage(MiniMessageHelper.text(messages.alreadySelected));
       case PlayerTagSelectorManager.TAG_SPECIFIED_NOT_EXIST ->
         player.sendMessage(MiniMessageHelper.text(messages.unknownTag));
-      case PlayerTagSelectorManager.TAG_SELECTED_CORRECTLY ->
+      case PlayerAggregateRoot.TAG_HAS_BEEN_CHANGED ->
         player.sendMessage(MiniMessageHelper.text(messages.selected, Placeholder.parsed("tag-id", itemSection.tag)));
       default -> throw new UnsupportedOperationException("Unexpected status-code result.");
     }

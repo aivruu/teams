@@ -27,6 +27,7 @@ import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
 import io.github.aivruu.teams.permission.application.Permissions;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
+import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.result.domain.ValueObjectMutationResult;
 import io.github.aivruu.teams.tag.application.TagManager;
 import io.github.aivruu.teams.tag.application.TagModifierService;
@@ -85,7 +86,7 @@ public final class TagsCommand implements RegistrableCommandContract {
               player.sendMessage(MiniMessageHelper.text(messages.playerUnknownInfo));
             case PlayerTagSelectorManager.THERE_IS_NO_TAG_SELECTED ->
               player.sendMessage(MiniMessageHelper.text(messages.noSelectedTag));
-            case PlayerTagSelectorManager.TAG_UNSELECTED_CORRECTLY ->
+            case PlayerAggregateRoot.TAG_HAS_BEEN_CLEARED ->
               player.sendMessage(MiniMessageHelper.text(messages.unselected));
             default -> throw new UnsupportedOperationException("Unexpected status-code for tag-unselection.");
           }
