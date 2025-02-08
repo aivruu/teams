@@ -64,7 +64,6 @@ public final class ActionManager {
    */
   public void execute(final @NotNull Player player, @NotNull String action) {
     if (action.isEmpty()) {
-      DebugLoggerHelper.write("Action input is empty, skipping action-model search.");
       return;
     }
     final ActionModelContract actionModel = this.actions.get(StringUtils.substringBetween(action, "[", "]").toUpperCase(Locale.ROOT));
@@ -72,10 +71,9 @@ public final class ActionManager {
       DebugLoggerHelper.write("Unknown action-type specified, skipping execution.");
       return;
     }
-    if (actionModel.trigger(player, action.substring(actionModel.id().length() + 3).split(";"))) {
-      return;
+    if (!actionModel.trigger(player, action.substring(actionModel.id().length() + 3).split(";"))) {
+      DebugLoggerHelper.write("The action {}'s execution has failed.", actionModel.id());
     }
-    DebugLoggerHelper.write("The action {}'s execution has failed.", actionModel.id());
   }
 
   /**
