@@ -34,6 +34,11 @@ public final class PlayerCacheAggregateRootRepository implements PlayerAggregate
   }
 
   @Override
+  public boolean existsInCacheSync(final @NotNull String id) {
+    return this.cache.containsKey(id);
+  }
+
+  @Override
   public @NotNull Collection<PlayerAggregateRoot> findAllInCacheSync() {
     return this.cache.values();
   }

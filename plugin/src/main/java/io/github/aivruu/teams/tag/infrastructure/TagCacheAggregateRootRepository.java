@@ -46,6 +46,11 @@ public final class TagCacheAggregateRootRepository implements TagAggregateRootRe
   }
 
   @Override
+  public boolean existsInCacheSync(final @NotNull String id) {
+    return this.cache.asMap().containsKey(id);
+  }
+
+  @Override
   public @NotNull Collection<TagAggregateRoot> findAllInCacheSync() {
     return this.cache.asMap().values();
   }

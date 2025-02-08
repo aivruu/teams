@@ -40,6 +40,15 @@ public interface AggregateRootRepository<A extends AggregateRoot> {
   @Nullable A findInCacheSync(final @NotNull String id);
 
   /**
+   * Checks whether the specified {@link AggregateRoot} is in cache.
+   *
+   * @param id the aggregate-root's id.
+   * @return Whether the aggregate-root is cached.
+   * @since 2.3.1
+   */
+  boolean existsInCacheSync(final @NotNull String id);
+
+  /**
    * Returns all the current {@link AggregateRoot} cached in this repository.
    *
    * @return A {@link Collection} of {@link AggregateRoot}s.
