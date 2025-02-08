@@ -18,10 +18,23 @@ package io.github.aivruu.teams.tag.domain.registry;
 
 import io.github.aivruu.teams.aggregate.domain.registry.AggregateRootRegistry;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A {@link AggregateRootRegistry} interface-implementation for {@link TagAggregateRoot}s.
  *
  * @since 0.0.1
  */
-public interface TagAggregateRootRegistry extends AggregateRootRegistry<TagAggregateRoot> {}
+public interface TagAggregateRootRegistry extends AggregateRootRegistry<TagAggregateRoot> {
+  /**
+   * Returns the {@link TagAggregateRoot} specified from the cache-repository if found,
+   * otherwise it will search at infrastructure-repository by aggregate-root's information
+   * and will return it if found.
+   *
+   * @param id the aggregate-root's identifier.
+   * @return The {@link TagAggregateRoot} or {@code null} if not exists.
+   * @since 2.3.1
+   */
+  @Nullable TagAggregateRoot findInBoth(final @NotNull String id);
+}

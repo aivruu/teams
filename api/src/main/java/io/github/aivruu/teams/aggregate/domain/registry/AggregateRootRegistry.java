@@ -41,17 +41,6 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
   @Nullable A findInCache(final @NotNull String id);
 
   /**
-   * Returns the {@link AggregateRoot} specified from the cache-repository if found,
-   * otherwise it will search at infrastructure-repository by aggregate-root's information
-   * and will return it if found.
-   *
-   * @param id the aggregate-root's identifier.
-   * @return The {@link AggregateRoot} or {@code null} if not exists.
-   * @since 0.0.1
-   */
-  @Nullable A findInBoth(final @NotNull String id);
-
-  /**
    * Returns the {@link AggregateRoot} specified from the infrastructure-repository if found.
    *
    * @param id the aggregate-root's identifier.
