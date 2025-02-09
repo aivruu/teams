@@ -23,7 +23,9 @@ import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.domain.registry.PlayerAggregateRootRegistry;
 import io.github.aivruu.teams.player.domain.repository.PlayerAggregateRootRepository;
 import io.github.aivruu.teams.tag.application.TagManager;
+import io.github.aivruu.teams.tag.application.TagModificationContainer;
 import io.github.aivruu.teams.tag.application.TagModifierService;
+import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import io.github.aivruu.teams.tag.domain.repository.TagAggregateRootRepository;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +41,7 @@ public interface Teams {
    * Returns the {@link TagAggregateRootRepository} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return the {@link TagAggregateRootRepository}.
+   * @return The {@link TagAggregateRootRepository}.
    * @since 0.0.1
    */
   @NotNull TagAggregateRootRepository tagCacheRepository();
@@ -48,7 +50,7 @@ public interface Teams {
    * Returns the {@link TagAggregateRootRegistry} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return the {@link TagAggregateRootRegistry}.
+   * @return The {@link TagAggregateRootRegistry}.
    * @since 0.0.1
    */
   @NotNull TagAggregateRootRegistry tagsRegistry();
@@ -57,7 +59,7 @@ public interface Teams {
    * Returns the {@link TagManager} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return the {@link TagManager}.
+   * @return The {@link TagManager}.
    * @since 0.0.1
    */
   @NotNull TagManager tagManager();
@@ -66,16 +68,34 @@ public interface Teams {
    * Returns the {@link TagModifierService} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return the {@link TagModifierService}.
+   * @return The {@link TagModifierService}.
    * @since 0.0.1
    */
   @NotNull TagModifierService tagModifierService();
 
   /**
+   * Returns the {@link TagModificationContainer} instance, will throw an {@link IllegalStateException}
+   * if the instance is not initialized.
+   *
+   * @return The {@link TagModificationContainer}.
+   * @since 2.3.1
+   */
+  @NotNull TagModificationContainer tagModificationContainer();
+
+  /**
+   * Returns the {@link TagModificationProcessor} instance, will throw an {@link IllegalStateException}
+   * if the instance is not initialized.
+   *
+   * @return The {@link TagModificationProcessor}.
+   * @since 2.3.1
+   */
+  @NotNull TagModificationProcessor tagModificationProcessor();
+
+  /**
    * Returns the {@link PlayerAggregateRootRepository} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return the {@link PlayerAggregateRootRepository}.
+   * @return The {@link PlayerAggregateRootRepository}.
    * @since 0.0.1
    */
   @NotNull PlayerAggregateRootRepository playerCacheRepository();
@@ -84,7 +104,7 @@ public interface Teams {
    * Returns the {@link PlayerAggregateRootRegistry} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return the {@link PlayerAggregateRootRegistry}.
+   * @return The {@link PlayerAggregateRootRegistry}.
    * @since 0.0.1
    */
   @NotNull PlayerAggregateRootRegistry playersRegistry();
@@ -93,7 +113,7 @@ public interface Teams {
    * Returns the {@link PlayerManager} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return the {@link PlayerManager}.
+   * @return The {@link PlayerManager}.
    * @since 0.0.1
    */
   @NotNull PlayerManager playerManager();
@@ -102,7 +122,7 @@ public interface Teams {
    * Returns the {@link PlayerTagSelectorManager} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return the {@link PlayerTagSelectorManager}.
+   * @return The {@link PlayerTagSelectorManager}.
    * @since 0.0.1
    */
   @NotNull PlayerTagSelectorManager playerTagSelectorManager();
@@ -111,7 +131,7 @@ public interface Teams {
    * Returns the {@link MenuManagerService} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return the {@link MenuManagerService}.
+   * @return The {@link MenuManagerService}.
    * @since 0.0.1
    */
   @NotNull MenuManagerService menuManagerService();
@@ -120,7 +140,7 @@ public interface Teams {
    * Returns the {@link ActionManager} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return the {@link ActionManager}.
+   * @return The {@link ActionManager}.
    * @since 0.0.1
    */
   @NotNull ActionManager actionManager();
