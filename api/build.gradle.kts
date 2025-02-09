@@ -1,5 +1,6 @@
 dependencies {
   compileOnlyApi(libs.paper)
+  compileOnlyApi(libs.caffeine)
 }
 
 publishing {
