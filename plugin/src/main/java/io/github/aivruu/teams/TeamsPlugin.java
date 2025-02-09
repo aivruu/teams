@@ -29,11 +29,12 @@ import io.github.aivruu.teams.command.application.MainCommand;
 import io.github.aivruu.teams.command.application.TagsCommand;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationContainer;
 import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigurationModel;
+import io.github.aivruu.teams.config.infrastructure.object.TagEditorMenuConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.TagsMenuConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import io.github.aivruu.teams.menu.application.MenuManagerService;
-import io.github.aivruu.teams.menu.application.MenuModelContract;
+import io.github.aivruu.teams.menu.infrastructure.TagEditorMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.TagSelectorMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
@@ -49,16 +50,21 @@ import io.github.aivruu.teams.player.domain.repository.PlayerAggregateRootReposi
 import io.github.aivruu.teams.player.infrastructure.PlayerCacheAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.ExecutorHelper;
 import io.github.aivruu.teams.tag.application.TagManager;
+import io.github.aivruu.teams.tag.application.TagModificationContainer;
 import io.github.aivruu.teams.tag.application.TagModifierService;
+import io.github.aivruu.teams.tag.application.listener.TagModificationChatInputListener;
+import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
 import io.github.aivruu.teams.tag.application.registry.TagAggregateRootRegistryImpl;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import io.github.aivruu.teams.tag.domain.repository.TagAggregateRootRepository;
 import io.github.aivruu.teams.tag.infrastructure.TagCacheAggregateRootRepository;
+import io.github.aivruu.teams.tag.infrastructure.modification.SimpleTagModificationProcessor;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,6 +76,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
   private ConfigurationContainer<ConfigurationConfigurationModel> configurationModelContainer;
   private ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer;
   private ConfigurationContainer<TagsMenuConfigurationModel> tagsMenuModelContainer;
+  private ConfigurationContainer<TagEditorMenuConfigurationModel> tagEditorMenuModelContainer;
   private TagAggregateRootRepository tagAggregateRootRepository;
   private InfrastructureRepositoryController infrastructureRepositoryController;
   private TagAggregateRootRegistry tagAggregateRootRegistry;
@@ -81,6 +88,8 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
   private PlayerTagSelectorManager playerTagSelectorManager;
   private ActionManager actionManager;
   private MenuManagerService menuManagerService;
+  private TagModificationContainer tagModificationContainer;
+  private TagModificationProcessor tagModificationProcessor;
 
   @Override
   public @NotNull TagAggregateRootRepository tagCacheRepository() {
@@ -112,6 +121,22 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
       throw new IllegalStateException("The tags' modifier-service has not been initialized yet.");
     }
     return this.tagModifierService;
+  }
+
+  @Override
+  public @NotNull TagModificationContainer tagModificationContainer() {
+    if (this.tagModificationContainer == null) {
+      throw new IllegalStateException("The tags' modification-container has not been initialized yet.");
+    }
+    return this.tagModificationContainer;
+  }
+
+  @Override
+  public @NotNull TagModificationProcessor tagModificationProcessor() {
+    if (this.tagModificationProcessor == null) {
+      throw new IllegalStateException("The tags' modification-processor has not been initialized yet.");
+    }
+    return this.tagModificationProcessor;
   }
 
   @Override
@@ -168,7 +193,9 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.configurationModelContainer = ConfigurationContainer.of(dataFolder, "config", ConfigurationConfigurationModel.class);
     this.messagesModelContainer = ConfigurationContainer.of(dataFolder, "messages", MessagesConfigurationModel.class);
     this.tagsMenuModelContainer = ConfigurationContainer.of(dataFolder, "selector_menu", TagsMenuConfigurationModel.class);
-    if (this.configurationModelContainer == null || this.messagesModelContainer == null || this.tagsMenuModelContainer == null) {
+    this.tagEditorMenuModelContainer = ConfigurationContainer.of(dataFolder, "editor_menu", TagEditorMenuConfigurationModel.class);
+    if (this.configurationModelContainer == null || this.messagesModelContainer == null ||
+      this.tagsMenuModelContainer == null || this.tagEditorMenuModelContainer == null) {
       this.logger.error("The configurations couldn't be loaded correctly, the plugin won't keep the start-up process.");
       return;
     }
@@ -192,10 +219,12 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.tagAggregateRootRepository = new TagCacheAggregateRootRepository();
     this.tagAggregateRootRegistry = new TagAggregateRootRegistryImpl(
       this.tagAggregateRootRepository, this.infrastructureRepositoryController.tagInfrastructureAggregateRootRepository());
+    this.tagModificationContainer = new TagModificationContainer();
 
     this.tagManager = new TagManager(this.tagAggregateRootRegistry, this.packetAdaptation);
     ((TagCacheAggregateRootRepository) this.tagAggregateRootRepository).buildCache(this.tagManager);
     this.tagModifierService = new TagModifierService(this.packetAdaptation);
+    this.tagModificationProcessor = new SimpleTagModificationProcessor(this, this.tagAggregateRootRegistry, this.tagModifierService, this.messagesModelContainer);
 
     this.logger.info("Initializing player-management services and registries.");
     this.playerAggregateRootRegistry = new PlayerAggregateRootRegistryImpl(
@@ -219,43 +248,55 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.menuManagerService = new MenuManagerService();
     this.menuManagerService.register(new TagSelectorMenuModel(this.actionManager, this.messagesModelContainer,
       this.tagsMenuModelContainer, this.playerTagSelectorManager));
-    this.logger.info("Registered tags-selector menu successfully.");
+    this.menuManagerService.register(new TagEditorMenuModel(this.tagModificationContainer, this.actionManager,
+      this.messagesModelContainer, this.tagEditorMenuModelContainer));
+    this.logger.info("Registered menus successfully.");
 
     this.logger.info("Registering plugin event-listener and commands.");
     // Commands and listener registration and API initialize.
-    super.getServer().getPluginManager().registerEvents(new PlayerRegistryListener(this.playerManager), this);
+    final PluginManager pluginManager = super.getServer().getPluginManager();
+    pluginManager.registerEvents(new PlayerRegistryListener(this.playerManager, this.tagModificationContainer), this);
+    pluginManager.registerEvents(new TagModificationChatInputListener(this.tagModificationContainer, this.tagModificationProcessor), this);
     this.registerCommands(
       new MainCommand(this, this.messagesModelContainer),
       new TagsCommand(this.messagesModelContainer, this.tagManager, this.menuManagerService, this.playerTagSelectorManager,
-        this.tagModifierService)
+        this.tagModificationContainer)
     );
     TeamsProvider.set(this);
     this.logger.info("The plugin has been enabled successfully!");
   }
 
   public boolean reload() {
-    final ConfigurationContainer<ConfigurationConfigurationModel> updatedConfigurationContainer = this.configurationModelContainer.reload();
-    final ConfigurationContainer<MessagesConfigurationModel> updatedMessagesContainer = this.messagesModelContainer.reload();
-    final ConfigurationContainer<TagsMenuConfigurationModel> updatedMenuContainer = this.tagsMenuModelContainer.reload();
-    if (updatedConfigurationContainer == null || updatedMessagesContainer == null || updatedMenuContainer == null) {
+    final ConfigurationContainer<ConfigurationConfigurationModel> updatedConfigurationContainer = this.configurationModelContainer.reload().join();
+    final ConfigurationContainer<MessagesConfigurationModel> updatedMessagesContainer = this.messagesModelContainer.reload().join();
+    final ConfigurationContainer<TagsMenuConfigurationModel> updatedSelectorMenuContainer = this.tagsMenuModelContainer.reload().join();
+    final ConfigurationContainer<TagEditorMenuConfigurationModel> updatedEditorMenuContainer = this.tagEditorMenuModelContainer.reload().join();
+    if (updatedConfigurationContainer == null || updatedMessagesContainer == null ||
+      updatedSelectorMenuContainer == null || updatedEditorMenuContainer == null) {
       this.logger.error("Failed to reload the configuration files.");
       return false;
     }
     this.configurationModelContainer = updatedConfigurationContainer;
     DebugLoggerHelper.enable(this.configurationModelContainer.model().debugMode);
     this.messagesModelContainer = updatedMessagesContainer;
-    this.tagsMenuModelContainer = updatedMenuContainer;
-    final MenuModelContract menuModel = this.menuManagerService.menuModelOf(MenuConstants.TAGS_MENU_ID);
-    // We make sure that menu is loaded.
-    if (menuModel == null) {
-      this.logger.info("Tags-selector menu isn't available for reloading.");
+    this.tagsMenuModelContainer = updatedSelectorMenuContainer;
+    this.tagEditorMenuModelContainer = updatedEditorMenuContainer;
+    final TagSelectorMenuModel tagSelectorMenu = (TagSelectorMenuModel) this.menuManagerService.menuModelOf(MenuConstants.TAGS_MENU_ID);
+    if (tagSelectorMenu == null) {
+      this.logger.info("Tags-selector menu isn't available for reloading, skipping it.");
     } else {
-      // We know that this menu-model's implementation, so we can cast it without problems.
-      final TagSelectorMenuModel tagSelectorMenu = (TagSelectorMenuModel) menuModel;
       // Menu's configuration and messages-container update, and re-build menu's GUI's content.
       tagSelectorMenu.messagesConfiguration(this.messagesModelContainer);
       tagSelectorMenu.menuConfiguration(this.tagsMenuModelContainer);
       tagSelectorMenu.build();
+    }
+    final TagEditorMenuModel tagEditorMenu = (TagEditorMenuModel) this.menuManagerService.menuModelOf(MenuConstants.TAGS_EDITOR_ID);
+    if (tagEditorMenu == null) {
+      this.logger.info("Tags-editor menu isn't available for reloading, skipping it.");
+    } else {
+      tagEditorMenu.messagesConfiguration(this.messagesModelContainer);
+      tagEditorMenu.menuConfiguration(this.tagEditorMenuModelContainer);
+      tagEditorMenu.build();
     }
     return true;
   }
@@ -289,6 +330,9 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     }
     if (this.tagAggregateRootRepository != null) {
       this.tagAggregateRootRepository.clearAllSync();
+    }
+    if (this.tagModificationContainer != null) {
+      this.tagModificationContainer.clearModifications();
     }
     if (this.actionManager != null) {
       this.actionManager.unregisterAll();
