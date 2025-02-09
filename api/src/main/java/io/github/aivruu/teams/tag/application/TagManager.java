@@ -25,6 +25,7 @@ import io.github.aivruu.teams.tag.domain.event.TagCreateEvent;
 import io.github.aivruu.teams.tag.domain.event.TagDeleteEvent;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -66,6 +67,18 @@ public final class TagManager {
   }
 
   /**
+   * Checks whether the specified {@link TagAggregateRoot}'s information exists in the infrastructure.
+   *
+   * @param id the tag's id.
+   * @return Whether the {@link TagAggregateRoot} exists.
+   * @see TagAggregateRootRegistry#existsInInfrastructure(String)
+   * @since 2.3.1
+   */
+  public boolean exists(final @NotNull String id) {
+    return this.tagAggregateRootRegistry.existsInInfrastructure(id);
+  }
+
+  /**
    * Creates a new tag (and scoreboard-team) with the specified parameters.
    *
    * @param player the player who creates the tag.
@@ -80,12 +93,13 @@ public final class TagManager {
     final @NotNull Player player,
     final @NotNull String id,
     final @Nullable Component prefix,
-    final @Nullable Component suffix
+    final @Nullable Component suffix,
+    final @NotNull NamedTextColor color
   ) {
     if (this.tagAggregateRootRegistry.existsInInfrastructure(id)) {
       return false;
     }
-    final TagPropertiesValueObject properties = new TagPropertiesValueObject(prefix, suffix);
+    final TagPropertiesValueObject properties = new TagPropertiesValueObject(prefix, suffix, color);
     final TagAggregateRoot tagAggregateRoot = new TagAggregateRoot(id, new TagModelEntity(id, properties));
     this.tagAggregateRootRegistry.register(tagAggregateRoot);
     this.packetAdaptation.createTeam(id, properties);
