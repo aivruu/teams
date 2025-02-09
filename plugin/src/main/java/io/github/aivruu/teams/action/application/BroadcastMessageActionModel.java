@@ -33,17 +33,19 @@ public final class BroadcastMessageActionModel implements ActionModelContract {
       return false;
     }
     final Component message = MiniMessageHelper.text(parameters[1]);
-    if (parameters[0].equals("GLOBAL")) {
+    final String type = parameters[0];
+    if (type.equals("GLOBAL")) {
       for (final Player serverPlayer : player.getServer().getOnlinePlayers()) {
         serverPlayer.sendMessage(message);
       }
-    } else if (parameters[0].equals("LOCAL")) {
+      return true;
+    }
+    if (type.equals("LOCAL")) {
       for (final Player worldPlayer : player.getWorld().getPlayers()) {
         worldPlayer.sendMessage(message);
       }
-    } else {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
 }
