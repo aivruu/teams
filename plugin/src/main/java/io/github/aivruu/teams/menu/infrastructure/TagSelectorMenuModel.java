@@ -80,10 +80,10 @@ public final class TagSelectorMenuModel implements MenuModelContract {
     for (final TagsMenuConfigurationModel.ItemSection itemSection : menu.items) {
       if (itemSection.slots.length == 1) {
         this.configureItem(itemSection, itemSection.slots[0]);
-      } else {
-        for (final byte slot : itemSection.slots) {
-          this.configureItem(itemSection, slot);
-        }
+        continue;
+      }
+      for (final byte slot : itemSection.slots) {
+        this.configureItem(itemSection, slot);
       }
     }
     this.gui.update();
@@ -92,7 +92,10 @@ public final class TagSelectorMenuModel implements MenuModelContract {
   private void configureItem(final @NotNull TagsMenuConfigurationModel.ItemSection itemSection, final byte slot) {
     gui.addSlotAction(slot, event -> {
       final ItemStack clickedItem = event.getCurrentItem();
-      if (clickedItem == null || clickedItem.getPersistentDataContainer().get(MENU_ITEM_NBT_KEY, PersistentDataType.STRING) == null) {
+      if (clickedItem == null || !clickedItem.getPersistentDataContainer().has(MENU_ITEM_NBT_KEY)) {
+        return;
+      }
+      if (itemSection.checkCustomModelData && clickedItem.getItemMeta().getCustomModelData() != itemSection.data) {
         return;
       }
       event.setCancelled(true);
@@ -109,6 +112,7 @@ public final class TagSelectorMenuModel implements MenuModelContract {
     if (!this.processActionType(player, itemSection, clickType)) {
       return;
     }
+    // Just close the gui if the click-type was for a tag-selection.
     this.gui.close(player);
     if (itemSection.tag.isEmpty()) {
       return;
@@ -125,16 +129,17 @@ public final class TagSelectorMenuModel implements MenuModelContract {
     final @NotNull TagsMenuConfigurationModel.ItemSection itemSection,
     final @NotNull ClickType clickType
   ) {
+    if (clickType != ClickType.LEFT && clickType != ClickType.RIGHT) {
+      return false;
+    }
     if (clickType == ClickType.LEFT) {
       for (final String action : itemSection.leftClickActions) {
         this.actionManager.execute(player, action);
       }
       return true;
-    } else if (clickType == ClickType.RIGHT) {
-      for (final String action : itemSection.rightClickActions) {
-        this.actionManager.execute(player, action);
-      }
-      return false;
+    }
+    for (final String action : itemSection.rightClickActions) {
+      this.actionManager.execute(player, action);
     }
     return false;
   }
@@ -144,8 +149,8 @@ public final class TagSelectorMenuModel implements MenuModelContract {
     final @NotNull TagsMenuConfigurationModel.ItemSection itemSection
   ) {
     final MessagesConfigurationModel messages = this.messagesModelContainer.model();
-    final byte selectResult = this.playerTagSelectorManager.select(player, itemSection.tag);
-    switch (selectResult) {
+    // Process status-code provided by the select-operation.
+    switch (this.playerTagSelectorManager.select(player, itemSection.tag)) {
       case PlayerTagSelectorManager.PLAYER_IS_NOT_ONLINE ->
         player.sendMessage(MiniMessageHelper.text(messages.playerUnknownInfo));
       case PlayerAggregateRoot.TAG_IS_ALREADY_SELECTED ->
@@ -160,8 +165,10 @@ public final class TagSelectorMenuModel implements MenuModelContract {
 
   @Override
   public void open(final @NotNull Player player) {
-    for (final String action : this.tagsMenuModelConfiguration.model().openActions) {
-      this.actionManager.execute(player, action);
+    if (this.tagsMenuModelConfiguration.model().useOpenActions) {
+      for (final String action : this.tagsMenuModelConfiguration.model().openActions) {
+        this.actionManager.execute(player, action);
+      }
     }
     this.gui.open(player);
   }
