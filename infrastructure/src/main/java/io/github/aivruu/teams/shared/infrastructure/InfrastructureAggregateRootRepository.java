@@ -40,13 +40,6 @@ public interface InfrastructureAggregateRootRepository<A extends AggregateRoot> 
   boolean start();
 
   /**
-   * Executes this repository its shutdown logic.
-   *
-   * @since 0.0.1
-   */
-  void close();
-
-  /**
    * An enum representing the type of infrastructure-repositories available.
    *
    * @since 0.0.1
