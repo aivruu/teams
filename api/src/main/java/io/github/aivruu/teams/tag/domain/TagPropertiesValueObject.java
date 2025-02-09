@@ -17,6 +17,8 @@
 package io.github.aivruu.teams.tag.domain;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -24,6 +26,9 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param prefix the prefix {@link Component} or {@code null} if no have.
  * @param suffix the suffix {@link Component} or {@code null} if no have.
+ * @param color the tag's color.
  * @since 0.0.1
  */
-public record TagPropertiesValueObject(@Nullable Component prefix, @Nullable Component suffix) {}
+public record TagPropertiesValueObject(
+  @Nullable Component prefix, @Nullable Component suffix, @NotNull NamedTextColor color
+) {}
