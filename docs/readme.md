@@ -19,11 +19,11 @@ in-game easily.
 ## Previews
 Some previews of the plugin's features and functionality.
 
-![join-tag-view](https://github.com/aivruu/teams/blob/main/previews/join-tag-view.gif)
-![menu-viewer](https://github.com/aivruu/teams/blob/main/previews/menu-viewer.gif)
-![tag-editing](https://github.com/aivruu/teams/blob/main/previews/tag-editing.gif)
-![tag-right-click-preview](https://github.com/aivruu/teams/blob/main/previews/tag-right-click-preview.gif)
-![tag-selection](https://github.com/aivruu/teams/blob/main/previews/tag-selection.gif)
+![join-tag-view](https://github.com/aivruu/teams/blob/main/assets/previews/join-tag-view.gif)
+![menu-viewer](https://github.com/aivruu/teams/blob/main/assets/previews/menu-viewer.gif)
+![tag-editing](https://github.com/aivruu/teams/blob/main/assets/previews/tag-editing.gif)
+![tag-right-click-preview](https://github.com/aivruu/teams/blob/main/assets/previews/tag-right-click-preview.gif)
+![tag-selection](https://github.com/aivruu/teams/blob/main/assets/previews/tag-selection.gif)
 ![property-cleanup](https://github.com/aivruu/teams/blob/main/assets/previews/prefix-clear.gif)
 ![color-modifying](https://github.com/aivruu/teams/blob/main/assets/previews/color-edit.gif)
 ![edition-cancel](https://github.com/aivruu/teams/blob/main/assets/previews/editing-cancel.gif)
