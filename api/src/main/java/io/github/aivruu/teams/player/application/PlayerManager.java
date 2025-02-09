@@ -76,7 +76,7 @@ public final class PlayerManager {
       })
       .whenComplete((result, exception) -> {
         if (exception != null) {
-          DebugLoggerHelper.write("Unexpected exception during player's information search in infrastructure: {}", exception);
+          DebugLoggerHelper.write("Unexpected exception during player's information search in infrastructure.", exception);
         }
       });
   }
@@ -90,14 +90,10 @@ public final class PlayerManager {
   public void handlePlayerAggregateRootSave(final @NotNull PlayerAggregateRoot playerAggregateRoot) {
     this.playerAggregateRootRegistry.save(playerAggregateRoot)
       .thenAccept(saved -> {
-        if (!saved) {
-          DebugLoggerHelper.write("The player's information couldn't be saved.");
-        }
+        if (!saved) DebugLoggerHelper.write("The player's information couldn't be saved.");
       })
       .whenComplete((result, exception) -> {
-        if (exception != null) {
-          DebugLoggerHelper.write("Unexpected exception during player's data saving: {}", exception);
-        }
+        if (exception != null) DebugLoggerHelper.write("Unexpected exception during player's data saving.", exception);
       });
   }
 
