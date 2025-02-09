@@ -18,6 +18,7 @@ package io.github.aivruu.teams.config.infrastructure;
 
 import io.github.aivruu.teams.TeamsPlugin;
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.shared.infrastructure.ExecutorHelper;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +28,7 @@ import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 
 public record ConfigurationContainer<C>(@NotNull C model, @NotNull HoconConfigurationLoader loader, @NotNull Class<C> modelClass) {
   private static final ComponentLogger LOGGER = TeamsPlugin.getPlugin(TeamsPlugin.class).getComponentLogger();
@@ -49,16 +51,36 @@ public record ConfigurationContainer<C>(@NotNull C model, @NotNull HoconConfigur
     - [TITLE] <title>;<subtitle>;<fade-in>;<stay>;<fade-out> - Sends a title to the action's player-executor.
     - [MESSAGE] <message> - Sends a message to the action's player-executor.
     - [COMMAND] <PLAYER | CONSOLE>;<command> - Executes a command as the action's player-executor.
-    - [BROADCAST <GLOBAL (all server) | LOCAL (world only)>;<message> - Broadcasts a message to all players.""";
+    - [BROADCAST <GLOBAL (all server) | LOCAL (world only)>;<message> - Broadcasts a message to all players.
 
-  public @Nullable ConfigurationContainer<C> reload() {
-    try {
-      final C updatedModel = this.loader.load().get(this.modelClass);
-      return (updatedModel == null) ? null : new ConfigurationContainer<>(updatedModel, this.loader, this.modelClass);
-    } catch (final ConfigurateException exception) {
-      DebugLoggerHelper.write("Unexpected exception during configuration reload: {}", exception);
-      return null;
-    }
+    List of available-colors for tags, these names can be used as input when modifying a tag's color in-game:
+    - black
+    - dark_blue
+    - dark_green
+    - dark_aqua
+    - dark_red
+    - dark_purple
+    - gold
+    - gray
+    - dark_gray
+    - blue
+    - green
+    - aqua
+    - red
+    - light_purple
+    - yellow
+    - white""";
+
+  public @NotNull CompletableFuture<@Nullable ConfigurationContainer<C>> reload() {
+    return CompletableFuture.supplyAsync(() -> {
+      try {
+        final C updatedModel = this.loader.load().get(this.modelClass);
+        return (updatedModel == null) ? null : new ConfigurationContainer<>(updatedModel, this.loader, this.modelClass);
+      } catch (final ConfigurateException exception) {
+        DebugLoggerHelper.write("Unexpected exception during configuration reload: {}", exception);
+        return null;
+      }
+    }, ExecutorHelper.pool());
   }
 
   public static <C extends ConfigurationInterface> @Nullable ConfigurationContainer<C> of(
