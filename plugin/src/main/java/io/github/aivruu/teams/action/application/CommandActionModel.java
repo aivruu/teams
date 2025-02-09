@@ -31,10 +31,12 @@ public final class CommandActionModel implements ActionModelContract {
     if (parameters.length < 2) {
       return false;
     }
-    if (parameters[0].equals("PLAYER")) {
-      player.performCommand(parameters[1]);
-    } else if (parameters[0].equals("CONSOLE")) {
-      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parameters[1]);
+    final String type = parameters[0];
+    final String command = parameters[1];
+    if (type.equals("PLAYER")) {
+      player.performCommand(command);
+    } else if (type.equals("CONSOLE")) {
+      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     } else {
       return false;
     }
