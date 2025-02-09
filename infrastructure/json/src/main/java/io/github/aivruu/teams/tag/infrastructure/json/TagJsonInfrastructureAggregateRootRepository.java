@@ -48,11 +48,6 @@ public final class TagJsonInfrastructureAggregateRootRepository implements Infra
   }
 
   @Override
-  public void close() {
-    // Json implementations doesn't require to close or perform anything logic here.
-  }
-
-  @Override
   public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findInPersistenceAsync(final @NotNull String id) {
     return CompletableFuture.supplyAsync(() -> {
       final Path file = this.directory.resolve(id + ".json");
