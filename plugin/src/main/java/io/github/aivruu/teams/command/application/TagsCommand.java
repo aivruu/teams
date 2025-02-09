@@ -18,7 +18,6 @@ package io.github.aivruu.teams.command.application;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationContainer;
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
@@ -28,37 +27,34 @@ import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
 import io.github.aivruu.teams.permission.application.Permissions;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
-import io.github.aivruu.teams.result.domain.ValueObjectMutationResult;
 import io.github.aivruu.teams.tag.application.TagManager;
-import io.github.aivruu.teams.tag.application.TagModifierService;
-import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
-import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
+import io.github.aivruu.teams.tag.application.TagModificationContainer;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class TagsCommand implements RegistrableCommandContract {
-  private static final RequiredArgumentBuilder<CommandSourceStack, String> INPUT_ARGUMENT = Commands.argument("input", StringArgumentType.string());
   private final ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer;
   private final TagManager tagManager;
   private final MenuManagerService menuManagerService;
   private final PlayerTagSelectorManager playerTagSelectorManager;
-  private final TagModifierService tagModifierService;
+  private final TagModificationContainer tagModificationContainer;
 
   public TagsCommand(
     final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer,
     final @NotNull TagManager tagManager,
     final @NotNull MenuManagerService menuManagerService,
     final @NotNull PlayerTagSelectorManager playerTagSelectorManager,
-    final @NotNull TagModifierService tagModifierService) {
+    final @NotNull TagModificationContainer tagModificationContainer) {
     this.messagesModelContainer = messagesModelContainer;
     this.tagManager = tagManager;
     this.menuManagerService = menuManagerService;
     this.playerTagSelectorManager = playerTagSelectorManager;
-    this.tagModifierService = tagModifierService;
+    this.tagModificationContainer = tagModificationContainer;
   }
 
   @Override
@@ -69,14 +65,17 @@ public final class TagsCommand implements RegistrableCommandContract {
   @Override
   public @NotNull LiteralCommandNode<CommandSourceStack> register() {
     return Commands.literal("tags")
-      .requires(src -> src.getSender() instanceof Player player && player.hasPermission(Permissions.SELECT.node()))
-      .executes(ctx -> {
-        final Player player = (Player) ctx.getSource().getSender();
-        // We ignore the boolean-result due that this menu always exists for the menu-manager.
-        this.menuManagerService.openMenu(player, MenuConstants.TAGS_MENU_ID);
-        player.sendMessage(MiniMessageHelper.text(this.messagesModelContainer.model().openedMenu));
-        return Command.SINGLE_SUCCESS;
-      })
+      .requires(src -> src.getSender() instanceof Player)
+      .then(Commands.literal("selector")
+        .requires(src -> src.getSender().hasPermission(Permissions.SELECT.node()))
+        .executes(ctx -> {
+          final Player player = (Player) ctx.getSource().getSender();
+          // We ignore the boolean-result due that this menu always exists for the menu-manager.
+          this.menuManagerService.openMenu(player, MenuConstants.TAGS_MENU_ID);
+          player.sendMessage(MiniMessageHelper.text(this.messagesModelContainer.model().openedMenu));
+          return Command.SINGLE_SUCCESS;
+        })
+      )
       .then(Commands.literal("unselect")
         .executes(ctx -> {
           final Player player = (Player) ctx.getSource().getSender();
@@ -115,10 +114,10 @@ public final class TagsCommand implements RegistrableCommandContract {
               final String prefix = ctx.getArgument("prefix", String.class);
               final String suffix = ctx.getArgument("suffix", String.class);
               final MessagesConfigurationModel messages = this.messagesModelContainer.model();
-              if (this.tagManager.createTag(player, id,
+              final boolean wasCreated =  this.tagManager.createTag(player, id,
                 prefix.isEmpty() ? null : MiniMessageHelper.text(prefix),
-                suffix.isEmpty() ? null : MiniMessageHelper.text(suffix))
-              ) {
+                suffix.isEmpty() ? null : MiniMessageHelper.text(suffix), NamedTextColor.WHITE);
+              if (wasCreated) {
                 player.sendMessage(MiniMessageHelper.text(messages.created, Placeholder.parsed("tag-id", id)));
               } else {
                 player.sendMessage(MiniMessageHelper.text(messages.alreadyExists));
@@ -128,57 +127,26 @@ public final class TagsCommand implements RegistrableCommandContract {
           )
         )
       )
-      .then(Commands.literal("modify")
+      .then(Commands.literal("edit")
         .requires(src -> src.getSender().hasPermission(Permissions.MODIFY.node()))
         .then(Commands.argument("id", StringArgumentType.word())
           .executes(ctx -> {
-            ctx.getSource().getSender().sendMessage(MiniMessageHelper.text(this.messagesModelContainer.model().modifyUsage));
+            final Player player = (Player) ctx.getSource().getSender();
+            final String tag = ctx.getArgument("id", String.class);
+            if (!this.tagManager.exists(tag)) {
+              player.sendMessage(MiniMessageHelper.text(this.messagesModelContainer.model().unknownTag));
+              return Command.SINGLE_SUCCESS;
+            }
+            final boolean modificationRegistered = this.tagModificationContainer.registerModification(player.getUniqueId().toString(), tag);
+            if (!modificationRegistered) {
+              player.sendMessage(MiniMessageHelper.text(this.messagesModelContainer.model().alreadyInModification));
+            } else {
+              // We ignore the boolean-result due that this menu always exists for the menu-manager.
+              this.menuManagerService.openMenu(player, MenuConstants.TAGS_EDITOR_ID);
+              player.sendMessage(MiniMessageHelper.text(this.messagesModelContainer.model().openedMenu));
+            }
             return Command.SINGLE_SUCCESS;
           })
-          .then(Commands.literal("prefix")
-            .executes(ctx -> {
-              ctx.getSource().getSender().sendMessage(MiniMessageHelper.text(this.messagesModelContainer.model().modifyUsage));
-              return Command.SINGLE_SUCCESS;
-            })
-            .then(INPUT_ARGUMENT.executes(ctx -> {
-              final Player player = (Player) ctx.getSource().getSender();
-              final MessagesConfigurationModel messages = this.messagesModelContainer.model();
-              final TagAggregateRoot tagAggregateRoot = this.tagManager.tagAggregateRootOf(ctx.getArgument("id", String.class));
-              if (tagAggregateRoot == null) {
-                player.sendMessage(MiniMessageHelper.text(messages.unknownTag));
-                return Command.SINGLE_SUCCESS;
-              }
-              final String input = ctx.getArgument("input", String.class);
-              final ValueObjectMutationResult<TagPropertiesValueObject> result = this.tagModifierService.updatePrefix(
-                tagAggregateRoot, input.isEmpty() ? null : MiniMessageHelper.text(input));
-              if (this.processModification(player, result, tagAggregateRoot, messages)) {
-                player.sendMessage(MiniMessageHelper.text(messages.modifiedTagPrefix));
-              }
-              return Command.SINGLE_SUCCESS;
-            }))
-          )
-          .then(Commands.literal("suffix")
-            .executes(ctx -> {
-              ctx.getSource().getSender().sendMessage(MiniMessageHelper.text(this.messagesModelContainer.model().modifyUsage));
-              return Command.SINGLE_SUCCESS;
-            })
-            .then(INPUT_ARGUMENT.executes(ctx -> {
-              final Player player = (Player) ctx.getSource().getSender();
-              final MessagesConfigurationModel messages = this.messagesModelContainer.model();
-              final TagAggregateRoot tagAggregateRoot = this.tagManager.tagAggregateRootOf(ctx.getArgument("id", String.class));
-              if (tagAggregateRoot == null) {
-                player.sendMessage(MiniMessageHelper.text(messages.unknownTag));
-                return Command.SINGLE_SUCCESS;
-              }
-              final String input = ctx.getArgument("input", String.class);
-              final ValueObjectMutationResult<TagPropertiesValueObject> result = this.tagModifierService.updatePrefix(
-                tagAggregateRoot, input.isEmpty() ? null : MiniMessageHelper.text(input));
-              if (this.processModification(player, result, tagAggregateRoot, messages)) {
-                player.sendMessage(MiniMessageHelper.text(messages.modifiedTagSuffix));
-              }
-              return Command.SINGLE_SUCCESS;
-            }))
-          )
         )
       )
       .then(Commands.literal("delete")
@@ -196,23 +164,5 @@ public final class TagsCommand implements RegistrableCommandContract {
         }))
       )
       .build();
-  }
-
-  private boolean processModification(
-    final @NotNull Player player,
-    final @NotNull ValueObjectMutationResult<TagPropertiesValueObject> result,
-    final @NotNull TagAggregateRoot tagAggregateRoot,
-    final @NotNull MessagesConfigurationModel messages
-  ) {
-    if (result.wasUnchanged()) {
-      player.sendMessage(MiniMessageHelper.text(messages.tagModifyError));
-      return false;
-    }
-    if (result.wasError()) {
-      player.sendMessage(MiniMessageHelper.text(messages.tagModifyEventIssue));
-      return false;
-    }
-    tagAggregateRoot.tagComponentProperties(result.result());
-    return true;
   }
 }
