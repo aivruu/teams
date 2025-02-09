@@ -24,6 +24,12 @@ Some previews of the plugin's features and functionality.
 ![tag-editing](https://github.com/aivruu/teams/blob/main/previews/tag-editing.gif)
 ![tag-right-click-preview](https://github.com/aivruu/teams/blob/main/previews/tag-right-click-preview.gif)
 ![tag-selection](https://github.com/aivruu/teams/blob/main/previews/tag-selection.gif)
+![property-cleanup](https://github.com/aivruu/teams/blob/main/assets/previews/prefix-clear.gif)
+![color-modifying](https://github.com/aivruu/teams/blob/main/assets/previews/color-edit.gif)
+![edition-cancel](https://github.com/aivruu/teams/blob/main/assets/previews/editing-cancel.gif)
+
+## Extra
+If you want to use the menu-configurations shown in the previews either as guide or anything else, you can got them [here](https://github.com/aivruu/teams/blob/main/assets/configs)
 
 ## Building
 The plugin's uses Gradle and requires Java 21+ for building.
