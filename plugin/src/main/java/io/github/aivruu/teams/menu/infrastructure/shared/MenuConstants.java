@@ -18,8 +18,9 @@ package io.github.aivruu.teams.menu.infrastructure.shared;
 
 public final class MenuConstants {
   public static final String TAGS_MENU_ID = "tags-menu";
+  public static final String TAGS_EDITOR_ID = "tags-editor-menu";
 
   private MenuConstants() {
-    throw new UnsupportedOperationException("This class is for utility.");
+    throw new UnsupportedOperationException("This class shouldn't be initialized.");
   }
 }
