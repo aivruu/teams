@@ -16,7 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.domain.event;
 
-import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
+import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Called when a player is about to modify a property of a tag, fired only after all necessary
  * checking.
- * <p></p>
+ * <br><br>
  * It should be said that this event will be fired before modification-processing take
  * place, so the event could have been fired, but modifications could were cancelled due to
  * equality between requested property and modification given.
@@ -34,46 +34,20 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class TagPropertyChangeEvent extends Event implements Cancellable {
   private static final HandlerList HANDLER_LIST = new HandlerList();
-  private final TagPropertiesValueObject currentProperties;
-  private final TagPropertiesValueObject newProperties;
   private final String tag;
+  private final ModificationContext context;
   private boolean cancelled;
 
   /**
    * Creates a new {@link TagPropertyChangeEvent} with the provided parameters.
    *
-   * @param currentProperties the current properties of the tag.
-   * @param newProperties the new properties of the tag.
    * @param tag the modified tag's id.
+   * @param context the modification's context.
    * @since 0.0.1
    */
-  public TagPropertyChangeEvent(
-    final @NotNull TagPropertiesValueObject currentProperties,
-    final @NotNull TagPropertiesValueObject newProperties,
-    final @NotNull String tag) {
-    this.currentProperties = currentProperties;
-    this.newProperties = newProperties;
+  public TagPropertyChangeEvent(final @NotNull String tag, final @NotNull ModificationContext context) {
     this.tag = tag;
-  }
-
-  /**
-   * Returns the current properties of the tag.
-   *
-   * @return The current {@link TagPropertiesValueObject} of the tag.
-   * @since 0.0.1
-   */
-  public @NotNull TagPropertiesValueObject currentProperties() {
-    return this.currentProperties;
-  }
-
-  /**
-   * Returns the new properties of the tag.
-   *
-   * @return The new {@link TagPropertiesValueObject} of the tag.
-   * @since 0.0.1
-   */
-  public @NotNull TagPropertiesValueObject newProperties() {
-    return this.newProperties;
+    this.context = context;
   }
 
   /**
@@ -84,6 +58,16 @@ public final class TagPropertyChangeEvent extends Event implements Cancellable {
    */
   public @NotNull String tag() {
     return this.tag;
+  }
+
+  /**
+   * Returns the modification's context.
+   *
+   * @return The involved {@link ModificationContext}.
+   * @since 2.3.1
+   */
+  public @NotNull ModificationContext context() {
+    return this.context;
   }
 
   @Override
