@@ -19,7 +19,7 @@ package io.github.aivruu.teams.tag.application;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
-import io.github.aivruu.teams.tag.application.modification.ModificationOnCurseValueObject;
+import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,14 +27,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class is used as cache-container for any {@link ModificationOnCurseValueObject} object.
+ * This class is used as cache-container for any {@link ModificationInProgressValueObject} object.
  *
  * @since 2.3.1
  */
 public final class TagModificationContainer {
   // We set 15 seconds as max-duration for a modification in case that a player closes
   // the menu without select an editor first, so the object is removed automatically.
-  private final Cache<String, ModificationOnCurseValueObject> modificationsOnCurse = Caffeine.newBuilder()
+  private final Cache<String, ModificationInProgressValueObject> modificationsOnCurse = Caffeine.newBuilder()
     .expireAfterWrite(15, TimeUnit.SECONDS)
     .scheduler(Scheduler.systemScheduler())
     .build();
@@ -62,12 +62,12 @@ public final class TagModificationContainer {
     if (this.modificationsOnCurse.asMap().containsKey(playerId)) {
       return false;
     }
-    this.modificationsOnCurse.put(playerId, new ModificationOnCurseValueObject(tag, ModificationContext.NONE));
+    this.modificationsOnCurse.put(playerId, new ModificationInProgressValueObject(tag, ModificationContext.NONE));
     return true;
   }
 
   /**
-   * Updates the in-cache {@link ModificationOnCurseValueObject}'s {@link ModificationContext}.
+   * Updates the in-cache {@link ModificationInProgressValueObject}'s {@link ModificationContext}.
    *
    * @param playerId the player's id.
    * @param modificationContext the new {@link ModificationContext}.
@@ -75,22 +75,22 @@ public final class TagModificationContainer {
    */
   public void updateModificationContext(final @NotNull String playerId, final @NotNull ModificationContext modificationContext) {
     this.modificationsOnCurse.asMap().computeIfPresent(playerId, (key, context) ->
-      new ModificationOnCurseValueObject(context.tag(), modificationContext));
+      new ModificationInProgressValueObject(context.tag(), modificationContext));
   }
 
   /**
-   * Removes the {@link ModificationOnCurseValueObject} for the specified player from the cache.
+   * Removes the {@link ModificationInProgressValueObject} for the specified player from the cache.
    *
    * @param playerId the player's id.
-   * @return The removed {@link ModificationOnCurseValueObject} or {@code null} if the player is not modifying a tag.
+   * @return The removed {@link ModificationInProgressValueObject} or {@code null} if the player is not modifying a tag.
    * @since 2.3.1
    */
-  public @Nullable ModificationOnCurseValueObject unregisterModification(final @NotNull String playerId) {
+  public @Nullable ModificationInProgressValueObject unregisterModification(final @NotNull String playerId) {
     return this.modificationsOnCurse.asMap().remove(playerId);
   }
 
   /**
-   * Removes all the current {@link ModificationOnCurseValueObject}s from cache.
+   * Removes all the current {@link ModificationInProgressValueObject}s from cache.
    *
    * @since 2.3.1
    */

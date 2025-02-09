@@ -17,7 +17,7 @@
 package io.github.aivruu.teams.tag.application.listener;
 
 import io.github.aivruu.teams.tag.application.TagModificationContainer;
-import io.github.aivruu.teams.tag.application.modification.ModificationOnCurseValueObject;
+import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
 import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.event.EventHandler;
@@ -37,7 +37,7 @@ public final class TagModificationChatInputListener implements Listener {
 
   @EventHandler
   public void onAsyncChat(final @NotNull AsyncChatEvent event) {
-    final ModificationOnCurseValueObject modificationOnCurse = this.tagModificationContainer.unregisterModification(event.getPlayer().getUniqueId().toString());
+    final ModificationInProgressValueObject modificationOnCurse = this.tagModificationContainer.unregisterModification(event.getPlayer().getUniqueId().toString());
     if (modificationOnCurse == null) {
       return;
     }

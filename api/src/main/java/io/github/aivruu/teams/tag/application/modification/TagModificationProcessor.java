@@ -64,7 +64,7 @@ public abstract class TagModificationProcessor {
    * processed.
    *
    * @param player the player who is modifying the tag.
-   * @param modificationOnCurse the {@link ModificationOnCurseValueObject} for the tag's modification.
+   * @param modificationOnCurse the {@link ModificationInProgressValueObject} for the tag's modification.
    * @param message the edit-mode's input for modification.
    * @return The {@link ModificationContext} processed, which can be.
    * <ul>
@@ -75,7 +75,7 @@ public abstract class TagModificationProcessor {
    * @see #processContext(ModificationContext, TagAggregateRoot, String)
    * @since 2.3.1
    */
-  public @NotNull ModificationContext process(final @NotNull Player player, final @NotNull ModificationOnCurseValueObject modificationOnCurse, final @NotNull Component message) {
+  public @NotNull ModificationContext process(final @NotNull Player player, final @NotNull ModificationInProgressValueObject modificationOnCurse, final @NotNull Component message) {
     final TagPropertyChangeEvent tagPropertyChangeEvent = new TagPropertyChangeEvent(modificationOnCurse.tag(), modificationOnCurse.context());
     // Avoid IllegalStateException due to asynchronous event-firing.
     Bukkit.getScheduler().runTask(this.plugin, () -> Bukkit.getPluginManager().callEvent(tagPropertyChangeEvent));

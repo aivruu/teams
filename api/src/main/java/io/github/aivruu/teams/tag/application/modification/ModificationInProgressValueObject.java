@@ -25,4 +25,4 @@ import org.jetbrains.annotations.NotNull;
  * @param context the modification's context.
  * @since 2.3.1
  */
-public record ModificationOnCurseValueObject(@NotNull String tag, @NotNull ModificationContext context) {}
+public record ModificationInProgressValueObject(@NotNull String tag, @NotNull ModificationContext context) {}

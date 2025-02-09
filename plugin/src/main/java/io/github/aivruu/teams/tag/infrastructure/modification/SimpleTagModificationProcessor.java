@@ -21,7 +21,7 @@ import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationContainer;
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
 import io.github.aivruu.teams.tag.application.TagModifierService;
-import io.github.aivruu.teams.tag.application.modification.ModificationOnCurseValueObject;
+import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
@@ -42,7 +42,7 @@ public final class SimpleTagModificationProcessor extends TagModificationProcess
   }
 
   @Override
-  public @NotNull ModificationContext process(final @NotNull Player player, final @NotNull ModificationOnCurseValueObject modificationOnCurse, final @NotNull Component message) {
+  public @NotNull ModificationContext process(final @NotNull Player player, final @NotNull ModificationInProgressValueObject modificationOnCurse, final @NotNull Component message) {
     final ModificationContext processedModificationContext = super.process(player, modificationOnCurse, message);
     final MessagesConfigurationModel messages = this.messagesModelContainer.model();
     switch (processedModificationContext) {
