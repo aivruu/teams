@@ -23,6 +23,7 @@ import io.github.aivruu.teams.persistence.infrastructure.utils.MongoClientHelper
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.infrastructure.json.PlayerJsonInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.player.infrastructure.mongodb.PlayerMongoInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.CloseableInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.infrastructure.json.TagJsonInfrastructureAggregateRootRepository;
@@ -90,10 +91,12 @@ public final class InfrastructureRepositoryController {
 
   public void close() {
     if (this.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
-      this.playerInfrastructureAggregateRootRepository.close();
+      ((CloseableInfrastructureAggregateRootRepository<PlayerAggregateRoot>) this.playerInfrastructureAggregateRootRepository)
+        .close();
     }
     if (this.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
-      this.tagInfrastructureAggregateRootRepository.close();
+      ((CloseableInfrastructureAggregateRootRepository<TagAggregateRoot>) this.tagInfrastructureAggregateRootRepository)
+        .close();
     }
   }
 
