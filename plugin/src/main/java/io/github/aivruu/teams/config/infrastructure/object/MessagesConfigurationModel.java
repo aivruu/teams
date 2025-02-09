@@ -26,11 +26,11 @@ public final class MessagesConfigurationModel implements ConfigurationInterface 
     "",
     "<gray> - <yellow>/aldrteams help</yellow> Shows this messages.",
     "<gray> - <yellow>/aldrteams reload</yellow> Reloads the plugin's configurations.",
-    "<gray> - <yellow>/tags</yellow> Opens the tags-selector menu.",
+    "<gray> - <yellow>/tags selector</yellow> Opens the tags-selector menu.",
     "<gray> - <yellow>/tags unselect</yellow> Unselects the current tag.",
     "<gray> - <yellow>/tags create <id> <prefix> <suffix></yellow> Creates a new tag with the given properties.",
     "<gray> - <yellow>/tags delete <id></yellow> Deletes the tag with that ID.",
-    "<gray> - <yellow>/tags modify <id> <prefix|suffix> <input></yellow> Modify the tag's prefix or suffix."
+    "<gray> - <yellow>/tags edit <id></yellow> Opens the editor-menu for the specified tag."
   };
 
   public String modifyUsage = "<blue>[AldrTeams] <dark_gray><b>></b> <red>Correct usage for modifications: <id> <prefix> <suffix><br><yellow>You can let the fields empty if you want to modify just one value.";
@@ -45,13 +45,26 @@ public final class MessagesConfigurationModel implements ConfigurationInterface 
 
   public String openedMenu = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The menu has been opened.";
 
+  public String[] enteredEditMode = {
+    "<green>You have enabled the edit-mode for the selected tag, insert the input that will be used for the property",
+    "<gray>Currently, you're modifying the property <green><type></green>.",
+    "<gray>If you want to cancel the modification, type <red>cancel",
+    "<gray>Type <white>clear</white> to clear the property-to-modify current content."
+  };
+
+  public String cancelledEditMode = "<yellow>The tag-modification has been cancelled by the user.";
+
+  public String alreadyInModification = "<blue>[AldrTeams] <dark_gray><b>></b> <red>You're already in a modification process, wait 15 seconds.";
+
   public String modifiedTagPrefix = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The tag's prefix has been modified.";
+
+  public String clearedTagProperty = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The property's content has been cleared.";
 
   public String modifiedTagSuffix = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The tag's suffix has been modified.";
 
-  public String tagModifyError = "<blue>[AldrTeams] <dark_gray><b>></b> <red>Seems that this property is the same that the current one.";
+  public String modifiedTagColor = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The tag's color has been modified.";
 
-  public String tagModifyEventIssue = "<blue>[AldrTeams] <dark_gray><b>></b> <red>Seems that tag-modification event was cancelled.";
+  public String tagModifyError = "<blue>[AldrTeams] <dark_gray><b>></b> <red>Something went wrong during property-modification, may event was cancelled, or value is already set.";
 
   public String deleted = "<blue>[AldrTeams] <dark_gray><b>></b> <red>The tag <tag-id> has been deleted.";
 
