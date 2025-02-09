@@ -16,31 +16,38 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.packet.application;
 
+import io.github.aivruu.teams.packet.application.minecraft.MinecraftColorHelper;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import io.papermc.paper.adventure.AdventureComponent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.Team;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class PacketAdaptationModule implements PacketAdaptationContract {
-  private static final String PLUGIN_SCOREBOARD_TEAM_IDENTIFIER = "teams-player-team-%s";
+  private static final String PLUGIN_SCOREBOARD_TEAM_IDENTIFIER = "teams-player-team-";
   private final Scoreboard scoreboard = MinecraftServer.getServer().getScoreboard();
 
   @Override
   public void createTeam(final @NotNull String team, final @NotNull TagPropertiesValueObject properties) {
-    this.scoreboard.addPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
+    final PlayerTeam playerTeam = this.scoreboard.addPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     // Update attributes for scoreboard-team.
-    this.updateTeamPrefix(team, properties.prefix());
-    this.updateTeamSuffix(team, properties.suffix());
+    playerTeam.setCollisionRule(Team.CollisionRule.NEVER);
+    // Shouldn't be null.
+    playerTeam.setColor(MinecraftColorHelper.minecraft(properties.color()));
+    playerTeam.setPlayerPrefix((properties.prefix() == null) ? null : new AdventureComponent(properties.prefix()));
+    playerTeam.setPlayerSuffix((properties.suffix() == null) ? null : new AdventureComponent(properties.suffix()));
   }
 
   @Override
   public void deleteTeam(final @NotNull String team) {
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     if (playerTeam == null) {
       return;
     }
@@ -49,7 +56,7 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
 
   @Override
   public void addPlayerToTeam(final @NotNull Player player, final @NotNull String team) {
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     if (playerTeam == null) {
       return;
     }
@@ -58,7 +65,7 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
 
   @Override
   public void removePlayerFromTeam(final @NotNull Player player, final @NotNull String team) {
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     if (playerTeam == null) {
       return;
     }
@@ -67,7 +74,7 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
 
   @Override
   public void updateTeamPrefix(final @NotNull String team, final @Nullable Component prefix) {
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     if (playerTeam == null) {
       return;
     }
@@ -76,10 +83,20 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
 
   @Override
   public void updateTeamSuffix(final @NotNull String team, final @Nullable Component suffix) {
-    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER.formatted(team));
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     if (playerTeam == null) {
       return;
     }
     playerTeam.setPlayerSuffix((suffix == null) ? null : new AdventureComponent(suffix));
+  }
+
+  @Override
+  public void updateTeamColor(final @NotNull String team, final @NotNull NamedTextColor namedTextColor) {
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
+    if (playerTeam == null) {
+      return;
+    }
+    final ChatFormatting chatFormatting = MinecraftColorHelper.minecraft(namedTextColor);
+    playerTeam.setColor((chatFormatting == null) ? ChatFormatting.WHITE : chatFormatting);
   }
 }
