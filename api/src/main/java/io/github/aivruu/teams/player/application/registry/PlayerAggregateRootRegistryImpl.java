@@ -44,11 +44,6 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
   }
 
   @Override
-  public @Nullable PlayerAggregateRoot findInBoth(final @NotNull String id) {
-    return null;
-  }
-
-  @Override
   public @NotNull CompletableFuture<PlayerAggregateRoot> findInInfrastructure(final @NotNull String id) {
     return this.playerAsyncAggregateRootRepository.findInPersistenceAsync(id);
   }
@@ -60,13 +55,12 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
 
   @Override
   public boolean existsGlobally(final @NotNull String id) {
-    final boolean existsInInfrastructure = this.existsInInfrastructure(id);
-    return this.playerAggregateRootRepository.findInCacheSync(id) != null && existsInInfrastructure;
+    return this.playerAggregateRootRepository.existsInCacheSync(id) || this.existsInInfrastructure(id);
   }
 
   @Override
   public boolean existsInCache(final @NotNull String id) {
-    return this.playerAggregateRootRepository.findInCacheSync(id) != null;
+    return this.playerAggregateRootRepository.existsInCacheSync(id);
   }
 
   @Override
