@@ -20,14 +20,13 @@ import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.result.domain.ValueObjectMutationResult;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
-import io.github.aivruu.teams.tag.domain.event.TagPropertyChangeEvent;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * This class is used as service for modifcations for the tags.
+ * This class is used as service for modifications for the tags.
  *
  * @since 0.0.1
  */
@@ -56,10 +55,6 @@ public final class TagModifierService {
    *   {@link ValueObjectMutationResult#result()} isn't {@code null}.
    * </li>
    * <li>
-   *   {@link ValueObjectMutationResult#error()} if the event was cancelled.
-   *   {@link ValueObjectMutationResult#result()} is {@code null}.
-   * </li>
-   * <li>
    *   {@link ValueObjectMutationResult#unchanged()} if the prefix is the same as before.
    *   {@link ValueObjectMutationResult#result()} is {@code null}.
    * </li>
@@ -71,18 +66,12 @@ public final class TagModifierService {
     final @Nullable Component prefix
   ) {
     final TagPropertiesValueObject properties = tagAggregateRoot.tagModel().tagComponentProperties();
-    if (prefix != null && prefix.equals(properties.prefix())) {
+    final Component currentPrefix = properties.prefix();
+    if ((prefix != null && currentPrefix != null) && prefix.equals(currentPrefix)) {
       return ValueObjectMutationResult.unchanged();
     }
-    final TagPropertiesValueObject propertiesWithNewPrefix = new TagPropertiesValueObject(prefix, properties.suffix());
-    final TagPropertyChangeEvent tagPropertyChangeEvent = new TagPropertyChangeEvent(
-      properties, propertiesWithNewPrefix, tagAggregateRoot.id());
-    Bukkit.getPluginManager().callEvent(tagPropertyChangeEvent);
-    if (tagPropertyChangeEvent.isCancelled()) {
-      return ValueObjectMutationResult.error();
-    }
     this.packetAdaptation.updateTeamPrefix(tagAggregateRoot.id(), prefix);
-    return ValueObjectMutationResult.mutated(propertiesWithNewPrefix);
+    return ValueObjectMutationResult.mutated(new TagPropertiesValueObject(prefix, properties.suffix(), properties.color()));
   }
 
   /**
@@ -97,10 +86,6 @@ public final class TagModifierService {
    *   {@link ValueObjectMutationResult#result()} isn't {@code null}.
    * </li>
    * <li>
-   *   {@link ValueObjectMutationResult#error()} if the event was cancelled.
-   *   {@link ValueObjectMutationResult#result()} is {@code null}.
-   * </li>
-   * <li>
    *   {@link ValueObjectMutationResult#unchanged()} if the suffix is the same as before.
    *   {@link ValueObjectMutationResult#result()} is {@code null}.
    * </li>
@@ -112,17 +97,41 @@ public final class TagModifierService {
     final @Nullable Component suffix
   ) {
     final TagPropertiesValueObject properties = tagAggregateRoot.tagModel().tagComponentProperties();
-    if (suffix != null && suffix.equals(properties.suffix())) {
+    final Component currentSuffix = properties.suffix();
+    if ((suffix != null && currentSuffix != null) && suffix.equals(currentSuffix)) {
       return ValueObjectMutationResult.unchanged();
     }
-    final TagPropertiesValueObject propertiesWithNewSuffix = new TagPropertiesValueObject(properties.prefix(), suffix);
-    final TagPropertyChangeEvent tagPropertyChangeEvent = new TagPropertyChangeEvent(
-      properties, propertiesWithNewSuffix, tagAggregateRoot.id());
-    Bukkit.getPluginManager().callEvent(tagPropertyChangeEvent);
-    if (tagPropertyChangeEvent.isCancelled()) {
-      return ValueObjectMutationResult.error();
-    }
     this.packetAdaptation.updateTeamSuffix(tagAggregateRoot.id(), suffix);
-    return ValueObjectMutationResult.mutated(properties);
+    return ValueObjectMutationResult.mutated(new TagPropertiesValueObject(properties.prefix(), suffix, properties.color()));
+  }
+
+  /**
+   * Updates the color-property for the tag's team.
+   *
+   * @param tagAggregateRoot the {@link TagAggregateRoot} to update.
+   * @param color the new color for the tag.
+   * @return A {@link ValueObjectMutationResult} with the status-code which can be:
+   * <ul>
+   * <li>
+   *   {@link ValueObjectMutationResult#mutated(Object)} if the color was updated.
+   *   {@link ValueObjectMutationResult#result()} isn't {@code null}.
+   * </li>
+   * <li>
+   *   {@link ValueObjectMutationResult#unchanged()} if the color is the same as before.
+   *   {@link ValueObjectMutationResult#result()} is {@code null}.
+   * </li>
+   * </ul>
+   * @since 2.3.1
+   */
+  public @NotNull ValueObjectMutationResult<@Nullable TagPropertiesValueObject> updateColor(
+    final @NotNull TagAggregateRoot tagAggregateRoot,
+    final @NotNull NamedTextColor color
+  ) {
+    final TagPropertiesValueObject properties = tagAggregateRoot.tagModel().tagComponentProperties();
+    if (color == properties.color()) {
+      return ValueObjectMutationResult.unchanged();
+    }
+    this.packetAdaptation.updateTeamColor(tagAggregateRoot.id(), color);
+    return ValueObjectMutationResult.mutated(new TagPropertiesValueObject(properties.prefix(), properties.suffix(), color));
   }
 }
