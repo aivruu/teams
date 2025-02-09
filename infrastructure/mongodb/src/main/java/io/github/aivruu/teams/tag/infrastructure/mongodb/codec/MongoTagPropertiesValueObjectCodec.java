@@ -19,6 +19,7 @@ package io.github.aivruu.teams.tag.infrastructure.mongodb.codec;
 import io.github.aivruu.teams.plain.application.PlainComponentHelper;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
@@ -35,7 +36,9 @@ public enum MongoTagPropertiesValueObjectCodec implements Codec<TagPropertiesVal
     final String suffix = reader.readString("suffix");
     return new TagPropertiesValueObject(
       prefix.isEmpty() ? null : PlainComponentHelper.modern(prefix),
-      suffix.isEmpty() ? null : PlainComponentHelper.modern(suffix)
+      suffix.isEmpty() ? null : PlainComponentHelper.modern(suffix),
+      // This will never be null.
+      NamedTextColor.namedColor(reader.readInt32("color-value"))
     );
   }
 
@@ -45,6 +48,7 @@ public enum MongoTagPropertiesValueObjectCodec implements Codec<TagPropertiesVal
     writer.writeString("prefix", (prefix == null) ? "" : PlainComponentHelper.plain(prefix));
     final Component suffix = properties.suffix();
     writer.writeString("suffix", (suffix == null) ? "" : PlainComponentHelper.plain(suffix));
+    writer.writeInt32("color-value", properties.color().value());
   }
 
   @Override

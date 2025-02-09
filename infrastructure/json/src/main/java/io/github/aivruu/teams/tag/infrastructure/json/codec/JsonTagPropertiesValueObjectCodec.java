@@ -26,6 +26,7 @@ import com.google.gson.JsonSerializer;
 import io.github.aivruu.teams.plain.application.PlainComponentHelper;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -40,7 +41,9 @@ public enum JsonTagPropertiesValueObjectCodec implements JsonSerializer<TagPrope
     final String suffix = jsonObject.get("suffix").getAsString();
     return new TagPropertiesValueObject(
       prefix.isEmpty() ? null : PlainComponentHelper.modern(prefix),
-      suffix.isEmpty() ? null : PlainComponentHelper.modern(suffix)
+      suffix.isEmpty() ? null : PlainComponentHelper.modern(suffix),
+      // This will never be null.
+      NamedTextColor.namedColor(jsonObject.get("color-value").getAsInt())
     );
   }
 
@@ -51,6 +54,7 @@ public enum JsonTagPropertiesValueObjectCodec implements JsonSerializer<TagPrope
     jsonObject.addProperty("prefix", (prefix == null) ? "" : PlainComponentHelper.plain(prefix));
     final Component suffix = properties.suffix();
     jsonObject.addProperty("suffix", (suffix == null) ? "" : PlainComponentHelper.plain(suffix));
+    jsonObject.addProperty("color-value", properties.color().value());
     return jsonObject;
   }
 }
