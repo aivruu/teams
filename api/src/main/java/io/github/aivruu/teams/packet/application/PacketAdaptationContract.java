@@ -18,6 +18,7 @@ package io.github.aivruu.teams.packet.application;
 
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -81,4 +82,13 @@ public interface PacketAdaptationContract {
    * @since 0.0.1
    */
   void updateTeamSuffix(final @NotNull String team, final @Nullable Component suffix);
+
+  /**
+   * Updates the team's color by the given one.
+   *
+   * @param team the team's id.
+   * @param namedTextColor the new color.
+   * @since 1.4.1
+   */
+  void updateTeamColor(final @NotNull String team, final @NotNull NamedTextColor namedTextColor);
 }
