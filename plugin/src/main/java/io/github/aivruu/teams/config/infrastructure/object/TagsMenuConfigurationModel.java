@@ -26,6 +26,9 @@ public final class TagsMenuConfigurationModel implements ConfigurationInterface 
   @Comment("The title for this menu.")
   public String title = "<dark_gray>Menu > Tags > Management";
 
+  @Comment("Whether the open-actions should be triggered.")
+  public boolean useOpenActions = true;
+
   @Comment("The actions to execute when a player opens this menu.")
   public String[] openActions = {
     "[SOUND] minecraft:block.note_block.pling;1;1"
@@ -71,6 +74,9 @@ public final class TagsMenuConfigurationModel implements ConfigurationInterface 
 
     @Comment("Enables the glow-effect on this item.")
     public boolean glow = true;
+
+    @Comment("Means that besides the item's nbt-key, the plugin will check its custom-model-data.")
+    public boolean checkCustomModelData = false;
 
     @Comment("The custom-model-data for this item. '0' to disable it.")
     public int data = 0;
