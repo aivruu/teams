@@ -49,9 +49,10 @@ public record ConfigurationContainer<C>(@NotNull C model, @NotNull HoconConfigur
     Actions:
     - [SOUND] <sound-id>;<volume>;<pitch> - Plays a sound at the action's player-executor's location.
     - [TITLE] <title>;<subtitle>;<fade-in>;<stay>;<fade-out> - Sends a title to the action's player-executor.
+    - [ACTION_BAR] <message> - Sends an action-bar message to the action's player-executor.
     - [MESSAGE] <message> - Sends a message to the action's player-executor.
     - [COMMAND] <PLAYER | CONSOLE>;<command> - Executes a command as the action's player-executor.
-    - [BROADCAST <GLOBAL (all server) | LOCAL (world only)>;<message> - Broadcasts a message to all players.
+    - [BROADCAST] <GLOBAL (all server) | LOCAL (world only)>;<message> - Broadcasts a message to all players.
 
     List of available-colors for tags, these names can be used as input when modifying a tag's color in-game:
     - black
