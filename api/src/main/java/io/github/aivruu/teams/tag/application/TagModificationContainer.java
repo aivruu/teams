@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 public final class TagModificationContainer {
   // We set 15 seconds as max-duration for a modification in case that a player closes
   // the menu without select an editor first, so the object is removed automatically.
-  private final Cache<String, ModificationInProgressValueObject> modificationsOnCurse = Caffeine.newBuilder()
+  private final Cache<String, ModificationInProgressValueObject> modificationsInProgress = Caffeine.newBuilder()
     .expireAfterWrite(15, TimeUnit.SECONDS)
     .scheduler(Scheduler.systemScheduler())
     .build();
@@ -47,7 +47,7 @@ public final class TagModificationContainer {
    * @since 2.3.1
    */
   public boolean isModifying(final @NotNull String playerId) {
-    return this.modificationsOnCurse.asMap().containsKey(playerId);
+    return this.modificationsInProgress.asMap().containsKey(playerId);
   }
 
   /**
@@ -59,10 +59,10 @@ public final class TagModificationContainer {
    * @since 2.3.1
    */
   public boolean registerModification(final @NotNull String playerId, final @NotNull String tag) {
-    if (this.modificationsOnCurse.asMap().containsKey(playerId)) {
+    if (this.modificationsInProgress.asMap().containsKey(playerId)) {
       return false;
     }
-    this.modificationsOnCurse.put(playerId, new ModificationInProgressValueObject(tag, ModificationContext.NONE));
+    this.modificationsInProgress.put(playerId, new ModificationInProgressValueObject(tag, ModificationContext.NONE));
     return true;
   }
 
@@ -74,7 +74,10 @@ public final class TagModificationContainer {
    * @since 2.3.1
    */
   public void updateModificationContext(final @NotNull String playerId, final @NotNull ModificationContext modificationContext) {
-    this.modificationsOnCurse.asMap().computeIfPresent(playerId, (key, context) ->
+    // As before update the context we check if there's a modification for this player, we safely know that the
+    // modification is still cached and we can proceed.
+    this.modificationsInProgress.asMap().compute(playerId, (key, context) ->
+      // Value will not be null.
       new ModificationInProgressValueObject(context.tag(), modificationContext));
   }
 
@@ -86,7 +89,7 @@ public final class TagModificationContainer {
    * @since 2.3.1
    */
   public @Nullable ModificationInProgressValueObject unregisterModification(final @NotNull String playerId) {
-    return this.modificationsOnCurse.asMap().remove(playerId);
+    return this.modificationsInProgress.asMap().remove(playerId);
   }
 
   /**
@@ -95,6 +98,6 @@ public final class TagModificationContainer {
    * @since 2.3.1
    */
   public void clearModifications() {
-    this.modificationsOnCurse.invalidateAll();
+    this.modificationsInProgress.invalidateAll();
   }
 }
