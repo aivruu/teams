@@ -1,5 +1,5 @@
 /**
- * Provides main API-model and instance-provider, as well packages for all the API classes.
+ * Provides main API interface-contract and instance-provider, as well packages for all the API classes.
  *
  * @since 0.0.1
  */
