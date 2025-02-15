@@ -1,3 +1,7 @@
+plugins {
+  alias(libs.plugins.blossom)
+}
+
 tasks {
   compileJava {
     options.encoding = "UTF-8"
@@ -6,6 +10,16 @@ tasks {
   processResources {
     filesMatching("paper-plugin.yml") {
       expand("version" to project.version)
+    }
+  }
+}
+
+sourceSets {
+  main {
+    blossom {
+      javaSources {
+        property("version", project.version.toString())
+      }
     }
   }
 }
@@ -20,5 +34,6 @@ dependencies {
   compileOnlyApi(libs.configurate)
   compileOnlyApi(libs.caffeine)
 
-  api(libs.gui)
+  compileOnlyApi(libs.placeholder.legacy)
+  compileOnlyApi(libs.placeholder.modern)
 }
