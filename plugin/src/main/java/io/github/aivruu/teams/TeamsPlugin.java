@@ -34,12 +34,16 @@ import io.github.aivruu.teams.config.infrastructure.object.TagsMenuConfiguration
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import io.github.aivruu.teams.menu.application.MenuManagerService;
+import io.github.aivruu.teams.menu.application.listener.MenuInteractionListener;
 import io.github.aivruu.teams.menu.infrastructure.TagEditorMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.TagSelectorMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.packet.application.PacketAdaptationModule;
 import io.github.aivruu.teams.persistence.infrastructure.InfrastructureRepositoryController;
+import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
+import io.github.aivruu.teams.placeholder.application.impl.MiniPlaceholdersHookImpl;
+import io.github.aivruu.teams.placeholder.application.impl.PlaceholderAPIHookImpl;
 import io.github.aivruu.teams.player.application.PlayerManager;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.application.listener.PlayerRegistryListener;
@@ -253,15 +257,19 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.logger.info("Registered menus successfully.");
 
     this.logger.info("Registering plugin event-listener and commands.");
-    // Commands and listener registration and API initialize.
+    // Commands, listeners and hooks registration and API initialization.
     final PluginManager pluginManager = super.getServer().getPluginManager();
     pluginManager.registerEvents(new PlayerRegistryListener(this.playerManager, this.tagModificationContainer), this);
     pluginManager.registerEvents(new TagModificationChatInputListener(this.tagModificationContainer, this.tagModificationProcessor), this);
+    pluginManager.registerEvents(new MenuInteractionListener(), this);
     this.registerCommands(
       new MainCommand(this, this.messagesModelContainer),
       new TagsCommand(this.messagesModelContainer, this.tagManager, this.menuManagerService, this.playerTagSelectorManager,
         this.tagModificationContainer)
     );
+    this.registerHooks(
+      new PlaceholderAPIHookImpl(this.playerManager, this.tagManager),
+      new MiniPlaceholdersHookImpl(this.playerManager, this.tagManager));
     TeamsProvider.set(this);
     this.logger.info("The plugin has been enabled successfully!");
   }
@@ -317,6 +325,17 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
         this.logger.info("Registered '{}' command", command.id());
       }
     });
+  }
+
+  private void registerHooks(final @NotNull PlaceholderHookContract... placeholderHooks) {
+    for (final PlaceholderHookContract placeholderHook : placeholderHooks) {
+      final String hookName = placeholderHook.hookName();
+      if (placeholderHook.hook()) {
+        this.logger.info("Hooked {} correctly", hookName);
+      } else {
+        this.logger.info("Not found {} for hook", hookName);
+      }
+    }
   }
 
   @Override
