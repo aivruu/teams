@@ -54,6 +54,25 @@ public record ConfigurationContainer<C>(@NotNull C model, @NotNull HoconConfigur
     - [COMMAND] <PLAYER | CONSOLE>;<command> - Executes a command as the action's player-executor.
     - [BROADCAST] <GLOBAL (all server) | LOCAL (world only)>;<message> - Broadcasts a message to all players.
 
+    The plugin provides its own placeholders (for PlaceholderAPI and MiniPlaceholders) to check player's selected-tag
+    properties, or check another tags globally:
+    - PlaceholderAPI:
+      %aldrteams_tag% - Returns the player's selected-tag's id.
+      %aldrteams_prefix% - Returns the prefix for the player's selected-tag.
+      %aldrteams_suffix% - Returns the suffix for the player's selected-tag.
+      %aldrteams_color% - Returns the color for the player's selected-tag.
+      %aldrteams_<tag-id>_prefix% - Returns the prefix for the specified tag-id.
+      %aldrteams_<tag-id>_suffix% - Returns the suffix for the specified tag-id.
+      %aldrteams_<tag-id>_color% - Returns the color for the specified tag-id.
+    - MiniPlaceholders:
+      <aldrteams_tag> - Returns the player's selected-tag's id.
+      <aldrteams_prefix> - Returns the prefix for the player's selected-tag.
+      <aldrteams_suffix> - Returns the suffix for the player's selected-tag.
+      <aldrteams_color> - Returns the color for the player's selected-tag.
+      <aldrteams_prefix:<tag-id> - Returns the prefix for the specified tag-id.
+      <aldrteams_suffix:<tag-id> - Returns the suffix for the specified tag-id.
+      <aldrteams_color:<tag-id> - Returns the color for the specified tag-id.
+
     List of available-colors for tags, these names can be used as input when modifying a tag's color in-game:
     - black
     - dark_blue
