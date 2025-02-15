@@ -55,7 +55,8 @@ public final class MinecraftColorHelper {
    * @see ChatFormatting#getByHexValue(int)
    * @since 2.3.1
    */
-  public static @Nullable ChatFormatting minecraft(final @NotNull NamedTextColor namedTextColor) {
+  public static @NotNull ChatFormatting minecraft(final @NotNull NamedTextColor namedTextColor) {
+    // If its color is provided by a [NamedTextColor] instance, it shouldn't be null never.
     return ChatFormatting.getByHexValue(namedTextColor.value());
   }
 
