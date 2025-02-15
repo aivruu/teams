@@ -16,7 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.action.application;
 
-import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
+import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,8 @@ public final class BroadcastMessageActionModel implements ActionModelContract {
     if (parameters.length < 2) {
       return false;
     }
-    final Component message = MiniMessageHelper.text(parameters[1]);
+    // Properly specific-to-player placeholders shouldn't be used for this kind of message.
+    final Component message = PlaceholderHelper.parseBoth(player, parameters[1]);
     final String type = parameters[0];
     if (type.equals("GLOBAL")) {
       for (final Player serverPlayer : player.getServer().getOnlinePlayers()) {

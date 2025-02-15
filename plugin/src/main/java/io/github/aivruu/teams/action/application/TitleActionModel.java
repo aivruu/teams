@@ -16,7 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.action.application;
 
-import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
+import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
 import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -44,12 +44,14 @@ public final class TitleActionModel implements ActionModelContract {
     } catch (final NumberFormatException exception) {
       return false;
     }
-    player.showTitle(Title.title(MiniMessageHelper.text(parameters[0]), MiniMessageHelper.text(parameters[1]),
+    player.showTitle(Title.title(
+      PlaceholderHelper.parseBoth(player, parameters[0]),
+      PlaceholderHelper.parseBoth(player, parameters[1]),
       Title.Times.times(
         Duration.ofSeconds(fadeIn),
         Duration.ofSeconds(stay),
         Duration.ofSeconds(fadeOut)
       )));
-    return false;
+    return true;
   }
 }

@@ -16,7 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.action.application;
 
-import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
+import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,7 @@ public final class MessageActionModel implements ActionModelContract {
 
   @Override
   public boolean trigger(final @NotNull Player player, final @NotNull String[] parameters) {
-    player.sendMessage(MiniMessageHelper.text(parameters[0]));
+    player.sendMessage(PlaceholderHelper.parseBoth(player, parameters[0]));
     return true;
   }
 }

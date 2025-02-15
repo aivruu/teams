@@ -5,6 +5,16 @@ authors: [ aivruu ]
 
 api-version: "1.20"
 version: ${version}
+dependencies:
+  server:
+    PlaceholderAPI:
+      join-classpath: true
+      required: false
+      load: BEFORE
+    MiniPlaceholders:
+      join-classpath: true
+      required: false
+      load: BEFORE
 
 permissions:
   teams.command:

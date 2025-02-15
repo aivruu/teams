@@ -16,6 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.action.application;
 
+import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +33,9 @@ public final class CommandActionModel implements ActionModelContract {
       return false;
     }
     final String type = parameters[0];
-    final String command = parameters[1];
+    // May message could include specific message or placeholders.
+    // Not available MiniPlaceholders support here, by now.
+    final String command = PlaceholderHelper.parseLegacy(player, parameters[1]);
     if (type.equals("PLAYER")) {
       player.performCommand(command);
     } else if (type.equals("CONSOLE")) {
