@@ -23,38 +23,38 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * This class is used to proportionate {@link MenuModelContract}s management.
+ * This class is used to proportionate {@link AbstractMenuModel}s management.
  *
  * @since 0.0.1
  */
 public final class MenuManagerService {
-  private final Object2ObjectMap<String, MenuModelContract> menus = new Object2ObjectOpenHashMap<>();
+  private final Object2ObjectMap<String, AbstractMenuModel> menus = new Object2ObjectOpenHashMap<>();
 
   /**
-   * Returns a {@link MenuModelContract} based on the given identifier.
+   * Returns a {@link AbstractMenuModel} based on the given identifier.
    *
    * @param id the identifier of the menu.
-   * @return The {@link MenuModelContract} or {@code null} if not exist.
+   * @return The {@link AbstractMenuModel} or {@code null} if not exist.
    * @since 0.0.1
    */
-  public @Nullable MenuModelContract menuModelOf(final @NotNull String id) {
+  public @Nullable AbstractMenuModel menuModelOf(final @NotNull String id) {
     return this.menus.get(id);
   }
 
   /**
-   * Registers a new {@link MenuModelContract} to the manager and builds it.
+   * Registers a new {@link AbstractMenuModel} to the manager and builds it.
    *
    * @param menu the menu to be registered.
    * @since 0.0.1
    */
-  public void register(final @NotNull MenuModelContract menu) {
+  public void register(final @NotNull AbstractMenuModel menu) {
     this.menus.put(menu.id(), menu);
     // Prepare menu's [GUI] and configure its items and actions.
     menu.build();
   }
 
   /**
-   * Unregisters a {@link MenuModelContract} from the manager.
+   * Unregisters an {@link AbstractMenuModel} from the manager.
    *
    * @param id the menu's id.
    * @return Whether the menu was successfully unregistered (if it exists).
@@ -73,7 +73,7 @@ public final class MenuManagerService {
    * @since 0.0.1
    */
   public boolean openMenu(final @NotNull Player player, final @NotNull String menu) {
-    final MenuModelContract menuModel = this.menus.get(menu);
+    final AbstractMenuModel menuModel = this.menus.get(menu);
     if (menuModel == null) {
       return false;
     }
@@ -90,7 +90,7 @@ public final class MenuManagerService {
    * @since 0.0.1
    */
   public boolean closeMenu(final @NotNull Player player, final @NotNull String menu) {
-    final MenuModelContract menuModel = this.menus.get(menu);
+    final AbstractMenuModel menuModel = this.menus.get(menu);
     if (menuModel == null) {
       return false;
     }
