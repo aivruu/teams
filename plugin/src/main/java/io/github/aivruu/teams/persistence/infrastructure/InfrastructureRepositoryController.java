@@ -37,39 +37,17 @@ public final class InfrastructureRepositoryController {
   private final ConfigurationConfigurationModel configuration;
   private InfrastructureAggregateRootRepository<PlayerAggregateRoot> playerInfrastructureAggregateRootRepository;
   private InfrastructureAggregateRootRepository<TagAggregateRoot> tagInfrastructureAggregateRootRepository;
-  private InfrastructureAggregateRootRepository.Type playerInfrastructureRepositoryType;
-  private InfrastructureAggregateRootRepository.Type tagInfrastructureRepositoryType;
 
   public InfrastructureRepositoryController(final @NotNull Path dataFolder, final @NotNull ConfigurationConfigurationModel configuration) {
     this.dataFolder = dataFolder;
     this.configuration = configuration;
   }
 
-  private void validateInfrastructureType() {
-    // Players infrastructure-repository type validation.
-    if (this.configuration.playerInfrastructureRepositoryType.equals("JSON")) {
-      this.playerInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
-    } else if (this.configuration.playerInfrastructureRepositoryType.equals("MONGODB")) {
-      this.playerInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.MONGODB;
-    } else {
-      this.playerInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
-    }
-    // Tags infrastructure-repository type validation.
-    if (this.configuration.tagInfrastructureRepositoryType.equals("JSON")) {
-      this.tagInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
-    } else if (this.configuration.playerInfrastructureRepositoryType.equals("MONGODB")) {
-      this.tagInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.MONGODB;
-    } else {
-      this.tagInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
-    }
-  }
-
   public boolean selectAndInitialize() {
-    this.validateInfrastructureType();
     MongoClient client = null;
     // MongoClient instance initialization if any repository require it.
-    if (this.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB ||
-      this.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB
+    if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB ||
+      this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB
     ) {
       DebugLoggerHelper.write("Initializing mongo-client instance with configuration's parameters.");
       MongoClientHelper.buildClient(this.configuration.mongoHost, this.configuration.mongoUsername, this.configuration.mongoDatabase, this.configuration.mongoPassword);
@@ -80,21 +58,21 @@ public final class InfrastructureRepositoryController {
         return false;
       }
     }
-    this.playerInfrastructureAggregateRootRepository = (this.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON)
+    this.playerInfrastructureAggregateRootRepository = (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON)
       ? new PlayerJsonInfrastructureAggregateRootRepository(this.dataFolder.resolve(this.configuration.playerCollectionAndDirectoryName))
       : new PlayerMongoInfrastructureAggregateRootRepository(client, this.configuration.mongoDatabase, this.configuration.playerCollectionAndDirectoryName);
-    this.tagInfrastructureAggregateRootRepository = (this.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON)
+    this.tagInfrastructureAggregateRootRepository = (this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON)
       ? new TagJsonInfrastructureAggregateRootRepository(this.dataFolder.resolve(this.configuration.tagCollectionAndDirectoryName))
       : new TagMongoInfrastructureAggregateRootRepository(client, this.configuration.mongoDatabase, this.configuration.tagCollectionAndDirectoryName);
     return this.playerInfrastructureAggregateRootRepository.start() && this.tagInfrastructureAggregateRootRepository.start();
   }
 
   public void close() {
-    if (this.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
+    if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
       ((CloseableInfrastructureAggregateRootRepository<PlayerAggregateRoot>) this.playerInfrastructureAggregateRootRepository)
         .close();
     }
-    if (this.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
+    if (this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
       ((CloseableInfrastructureAggregateRootRepository<TagAggregateRoot>) this.tagInfrastructureAggregateRootRepository)
         .close();
     }
