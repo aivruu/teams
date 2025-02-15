@@ -17,6 +17,7 @@
 package io.github.aivruu.teams.config.infrastructure.object;
 
 import io.github.aivruu.teams.config.infrastructure.ConfigurationInterface;
+import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -24,9 +25,11 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 public final class ConfigurationConfigurationModel implements ConfigurationInterface {
   @Comment("""
     Represents the amount of threads that plugin's Executor will be able to use, this threads
-    are used for asynchronous-operations for the plugin's infrastructure, such as load or save information into
-    persistent-storage. If you don't know about this, don't touch it""")
-  public int threadPoolSize = 2;
+    are used for heavy-operations for the plugin's functions, such as in the infrastructure for
+    load and save information into persistent-storage, as well for menus' items-building operations.
+
+    Be carefully with the amount of threads you assign to it.""")
+  public int threadPoolSize = 4;
 
   @Comment("""
     Means that during plugin's internal processes such as infrastructure-initialization and management as well
@@ -39,13 +42,13 @@ public final class ConfigurationConfigurationModel implements ConfigurationInter
     The infrastructure-type to use for the players' information storage, there are two options:
     - MONGODB: Uses the database to store the information.
     - JSON: Uses json-files for information storing at pre-defined directories.""")
-  public String playerInfrastructureRepositoryType = "JSON";
+  public InfrastructureAggregateRootRepository.Type playerInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
 
   @Comment("""
     The infrastructure-type to use for the tags' information storage, there are two options:
     - MONGODB: Uses the database to store the information.
     - JSON: Uses json-files for information storing at pre-defined directories.""")
-  public String tagInfrastructureRepositoryType = "JSON";
+  public InfrastructureAggregateRootRepository.Type tagInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
 
   @Comment("""
     The name of the MongoDB's database's collection or the directory's name where the players' information
