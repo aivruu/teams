@@ -21,7 +21,6 @@ import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import io.papermc.paper.adventure.AdventureComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.ChatFormatting;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
@@ -96,7 +95,6 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
     if (playerTeam == null) {
       return;
     }
-    final ChatFormatting chatFormatting = MinecraftColorHelper.minecraft(namedTextColor);
-    playerTeam.setColor((chatFormatting == null) ? ChatFormatting.WHITE : chatFormatting);
+    playerTeam.setColor(MinecraftColorHelper.minecraft(namedTextColor));
   }
 }
