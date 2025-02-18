@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class PlaceholderHelper {
-  private static final TagResolver GLOBAL_PLACEHOLDERS;
+  private static final TagResolver MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS;
   private static final boolean legacyPlaceholdersHooked;
   private static final boolean modernPlaceholdersHooked;
 
@@ -39,9 +39,9 @@ public final class PlaceholderHelper {
     modernPlaceholdersHooked = (pluginManager.getPlugin("MiniPlaceholders") != null && pluginManager.isPluginEnabled("MiniPlaceholders"));
     // Initialize until this moment MiniPlaceholders its global-placeholders.
     if (modernPlaceholdersHooked) {
-      GLOBAL_PLACEHOLDERS = MiniPlaceholders.getGlobalPlaceholders();
+      MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS = MiniPlaceholders.getGlobalPlaceholders();
     } else {
-      GLOBAL_PLACEHOLDERS = TagResolver.empty();
+      MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS = TagResolver.empty();
     }
   }
 
@@ -61,16 +61,11 @@ public final class PlaceholderHelper {
     return components;
   }
 
-  public static @NotNull Component parseGlobalBoth(final @NotNull String text) {
-    return MiniMessageHelper.text(parseLegacy(null, text));
-  }
-
   public static @NotNull TagResolver parseModern(final @Nullable Player player) {
     if (!modernPlaceholdersHooked) {
       return TagResolver.empty();
     }
-    final TagResolver.Builder builder = TagResolver.builder();
-    builder.resolver(GLOBAL_PLACEHOLDERS);
+    final TagResolver.Builder builder = TagResolver.builder().resolver(MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS);
     // Should for audience specific-placeholders be included?
     if (player != null) {
       builder.resolver(MiniPlaceholders.getAudiencePlaceholders(player));
