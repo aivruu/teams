@@ -31,10 +31,10 @@ public final class MenuInteractionListener implements Listener {
     if (!(event.getInventory().getHolder() instanceof AbstractMenuModel menuModel)) {
       return;
     }
-    if (menuModel.handleClickLogic((Player) event.getWhoClicked(), event.getCurrentItem(), event.getClick()) == null) {
-      return;
+    // Check if clicked-item has a [MENU_ITEM_NBT_KEY] id assigned.
+    if (menuModel.handleClickLogic((Player) event.getWhoClicked(), event.getCurrentItem(), event.getClick()) != null) {
+      event.setCancelled(true);
     }
-    event.setCancelled(true);
   }
 
   @EventHandler
