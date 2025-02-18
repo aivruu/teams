@@ -24,8 +24,8 @@ import org.jetbrains.annotations.Nullable;
 public final class LegacyComponentHelper {
   private static final LegacyComponentSerializer LEGACY_COMPONENT_SERIALIZER = LegacyComponentSerializer.legacyAmpersand();
 
-  public static @NotNull String legacy(final @Nullable Component component) {
-    return (component == null) ? "" : LEGACY_COMPONENT_SERIALIZER.serialize(component);
+  public static @Nullable String legacy(final @Nullable Component component) {
+    return (component == null) ? null : LEGACY_COMPONENT_SERIALIZER.serialize(component);
   }
 
   public static @NotNull Component modern(final @NotNull String legacy) {
