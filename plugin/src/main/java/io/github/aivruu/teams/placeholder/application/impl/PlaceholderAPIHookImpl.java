@@ -82,36 +82,36 @@ public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implement
       // Shouldn't be null if the player has it selected, but the tag could have been deleted prior
       // to placeholder-request.
       return (tagAggregateRoot == null)
-        ? "" : this.validateTagPlaceholder(tagAggregateRoot.tagModel().tagComponentProperties(), args[1]);
+        ? null : this.validateTagPlaceholder(tagAggregateRoot.tagModel().tagComponentProperties(), args[1]);
     }
     if (player == null) {
-      return "";
+      return null;
     }
     // At this point the player's information should be loaded into the cache, so the model won't be null.
     final String tagId = this.playerManager.playerAggregateRootOf(player.getUniqueId().toString())
       .playerModel()
       .tag();
     if (params.equals("tag")) {
-      return tagId;
+      return (tagId == null) ? "" : tagId;
     }
     if (tagId == null) {
-      return "";
+      return null;
     }
     final TagAggregateRoot tagAggregateRoot = this.tagManager.tagAggregateRootOf(tagId);
     // Shouldn't be null if the player has it selected, but the tag could have been deleted prior
     // to placeholder-request.
     return (tagAggregateRoot == null)
-      ? "" : this.validateTagPlaceholder(tagAggregateRoot.tagModel().tagComponentProperties(), params);
+      ? null : this.validateTagPlaceholder(tagAggregateRoot.tagModel().tagComponentProperties(), params);
   }
 
-  private @NotNull String validateTagPlaceholder(final @NotNull TagPropertiesValueObject properties, final @NotNull String params) {
+  private @Nullable String validateTagPlaceholder(final @NotNull TagPropertiesValueObject properties, final @NotNull String params) {
     return switch (params) {
       case "prefix" -> LegacyComponentHelper.legacy(properties.prefix());
       case "suffix" -> LegacyComponentHelper.legacy(properties.suffix());
       case "color" -> LegacyComponentHelper.legacy(Component.text()
         .style(builder -> builder.color(properties.color()))
         .build());
-      default -> "";
+      default -> null;
     };
   }
 }

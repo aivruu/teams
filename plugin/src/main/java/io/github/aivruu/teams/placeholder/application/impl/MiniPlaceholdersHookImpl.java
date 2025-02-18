@@ -28,10 +28,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
-  // Used when player doesn't have a selected tag, or tag doesn't exist.
-  private static final Tag EMPTY_TAG = Tag.selfClosingInserting(Component.empty());
   private final PlayerManager playerManager;
   private final TagManager tagManager;
 
@@ -53,45 +52,39 @@ public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
     }
     final Expansion expansion = Expansion.builder("aldrteams")
       .filter(Player.class)
-      .globalPlaceholder("prefix", (queue, ctx) -> {
-        if (!queue.hasNext()) return EMPTY_TAG;
-        return this.validateTagPlaceholder(queue.pop().value(), "prefix");
-      })
-      .globalPlaceholder("suffix", (queue, ctx) -> {
-        if (!queue.hasNext()) return EMPTY_TAG;
-        return this.validateTagPlaceholder(queue.pop().value(), "suffix");
-      })
-      .globalPlaceholder("color", (queue, ctx) -> {
-        if (!queue.hasNext()) return EMPTY_TAG;
-        return this.validateTagPlaceholder(queue.pop().value(), "color");
-      })
+      .globalPlaceholder("other-prefix", (queue, ctx) ->
+        this.validateTagPlaceholder(queue.popOr("Missing tag-id.").value(), "prefix"))
+      .globalPlaceholder("other-suffix", (queue, ctx) ->
+        this.validateTagPlaceholder(queue.popOr("Missing tag-id.").value(), "suffix"))
+      .globalPlaceholder("other-color", (queue, ctx) ->
+        this.validateTagPlaceholder(queue.popOr("Missing tag-id").value(), "color"))
       .audiencePlaceholder("tag", (audience, queue, ctx) -> {
         // At this point the player's information should be loaded into the cache, so the model won't be null.
         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
           .playerModel()
           .tag();
-        return (tagId == null) ? EMPTY_TAG : Tag.selfClosingInserting(Component.text(tagId));
+        return (tagId == null) ? null : Tag.selfClosingInserting(Component.text(tagId));
       })
       .audiencePlaceholder("prefix", (audience, queue, ctx) -> {
         // At this point the player's information should be loaded into the cache, so the model won't be null.
         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
           .playerModel()
           .tag();
-        return (tagId == null) ? EMPTY_TAG : this.validateTagPlaceholder(tagId, "prefix");
+        return (tagId == null) ? null : this.validateTagPlaceholder(tagId, "prefix");
       })
       .audiencePlaceholder("suffix", (audience, queue, ctx) -> {
         // At this point the player's information should be loaded into the cache, so the model won't be null.
         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
           .playerModel()
           .tag();
-        return (tagId == null) ? EMPTY_TAG : this.validateTagPlaceholder(tagId, "suffix");
+        return (tagId == null) ? null : this.validateTagPlaceholder(tagId, "suffix");
       })
       .audiencePlaceholder("color", (audience, queue, ctx) -> {
         // At this point the player's information should be loaded into the cache, so the model won't be null.
         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
           .playerModel()
           .tag();
-        return (tagId == null) ? EMPTY_TAG : this.validateTagPlaceholder(tagId, "color");
+        return (tagId == null) ? null : this.validateTagPlaceholder(tagId, "color");
       })
       .build();
     // Register the expansion to MiniPlaceholders.
@@ -99,19 +92,19 @@ public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
     return true;
   }
 
-  private @NotNull Tag validateTagPlaceholder(final @NotNull String tagId, final @NotNull String type) {
+  private @Nullable Tag validateTagPlaceholder(final @NotNull String tagId, final @NotNull String type) {
     final TagAggregateRoot tagAggregateRoot = this.tagManager.tagAggregateRootOf(tagId);
     // Shouldn't be null if the player has it selected, but the tag could have been deleted prior
     // to placeholder-request.
     if (tagAggregateRoot == null) {
-      return EMPTY_TAG;
+      return null;
     }
     final TagPropertiesValueObject properties = tagAggregateRoot.tagModel().tagComponentProperties();
     return switch (type) {
-      case "prefix" -> (properties.prefix() == null) ? EMPTY_TAG : Tag.selfClosingInserting(properties.prefix());
-      case "suffix" -> (properties.suffix() == null) ? EMPTY_TAG : Tag.selfClosingInserting(properties.suffix());
+      case "prefix" -> (properties.prefix() == null) ? null : Tag.selfClosingInserting(properties.prefix());
+      case "suffix" -> (properties.suffix() == null) ? null : Tag.selfClosingInserting(properties.suffix());
       case "color" -> Tag.styling(builder -> builder.color(tagAggregateRoot.tagModel().tagComponentProperties().color()));
-      default -> EMPTY_TAG;
+      default -> null;
     };
   }
 }
