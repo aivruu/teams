@@ -31,8 +31,10 @@ public final class MenuInteractionListener implements Listener {
     if (!(event.getInventory().getHolder() instanceof AbstractMenuModel menuModel)) {
       return;
     }
+    if (menuModel.handleClickLogic((Player) event.getWhoClicked(), event.getCurrentItem(), event.getClick()) == null) {
+      return;
+    }
     event.setCancelled(true);
-    menuModel.handleClickLogic((Player) event.getWhoClicked(), event.getCurrentItem(), event.getClick());
   }
 
   @EventHandler
