@@ -20,6 +20,7 @@ import io.github.aivruu.teams.tag.application.TagModificationContainer;
 import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
 import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
@@ -37,12 +38,13 @@ public final class TagModificationChatInputListener implements Listener {
 
   @EventHandler
   public void onAsyncChat(final @NotNull AsyncChatEvent event) {
-    final ModificationInProgressValueObject modificationOnCurse = this.tagModificationContainer.unregisterModification(event.getPlayer().getUniqueId().toString());
-    if (modificationOnCurse == null) {
+    final Player player = event.getPlayer();
+    final ModificationInProgressValueObject modification = this.tagModificationContainer.unregisterModification(player.getUniqueId().toString());
+    if (modification == null) {
       return;
     }
     event.setCancelled(true);
     // Delegate input-processing logic for validation before actual tag's property-modification.
-    this.tagModificationProcessor.process(event.getPlayer(), modificationOnCurse, event.message());
+    this.tagModificationProcessor.process(player, modification, event.message());
   }
 }
