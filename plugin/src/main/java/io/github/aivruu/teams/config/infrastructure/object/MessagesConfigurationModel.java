@@ -56,13 +56,9 @@ public final class MessagesConfigurationModel implements ConfigurationInterface 
 
   public String alreadyInModification = "<blue>[AldrTeams] <dark_gray><b>></b> <red>You're already in a modification process, wait 15 seconds.";
 
-  public String modifiedTagPrefix = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The tag's prefix has been modified.";
-
   public String clearedTagProperty = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The property's content has been cleared.";
 
-  public String modifiedTagSuffix = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The tag's suffix has been modified.";
-
-  public String modifiedTagColor = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The tag's color has been modified.";
+  public String modifiedTagProperty = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The tag's property <property> has been modified successfully.";
 
   public String tagModifyError = "<blue>[AldrTeams] <dark_gray><b>></b> <red>Something went wrong during property-modification, may event was cancelled, or value is already set.";
 
