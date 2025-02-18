@@ -252,7 +252,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.menuManagerService = new MenuManagerService();
     this.menuManagerService.register(new TagSelectorMenuModel(this.actionManager, this.messagesModelContainer,
       this.tagsMenuModelContainer, this.playerTagSelectorManager));
-    this.menuManagerService.register(new TagEditorMenuModel(this.tagModificationContainer, this.actionManager,
+    this.menuManagerService.register(new TagEditorMenuModel(this.actionManager, this.tagModificationContainer,
       this.messagesModelContainer, this.tagEditorMenuModelContainer));
     this.logger.info("Registered menus successfully.");
 
@@ -290,18 +290,14 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.tagsMenuModelContainer = updatedSelectorMenuContainer;
     this.tagEditorMenuModelContainer = updatedEditorMenuContainer;
     final TagSelectorMenuModel tagSelectorMenu = (TagSelectorMenuModel) this.menuManagerService.menuModelOf(MenuConstants.TAGS_MENU_ID);
-    if (tagSelectorMenu == null) {
-      this.logger.info("Tags-selector menu isn't available for reloading, skipping it.");
-    } else {
+    if (tagSelectorMenu != null) {
       // Menu's configuration and messages-container update, and re-build menu's GUI's content.
       tagSelectorMenu.messagesConfiguration(this.messagesModelContainer);
       tagSelectorMenu.menuConfiguration(this.tagsMenuModelContainer);
       tagSelectorMenu.build();
     }
     final TagEditorMenuModel tagEditorMenu = (TagEditorMenuModel) this.menuManagerService.menuModelOf(MenuConstants.TAGS_EDITOR_ID);
-    if (tagEditorMenu == null) {
-      this.logger.info("Tags-editor menu isn't available for reloading, skipping it.");
-    } else {
+    if (tagEditorMenu != null) {
       tagEditorMenu.messagesConfiguration(this.messagesModelContainer);
       tagEditorMenu.menuConfiguration(this.tagEditorMenuModelContainer);
       tagEditorMenu.build();
@@ -329,12 +325,8 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
 
   private void registerHooks(final @NotNull PlaceholderHookContract... placeholderHooks) {
     for (final PlaceholderHookContract placeholderHook : placeholderHooks) {
-      final String hookName = placeholderHook.hookName();
-      if (placeholderHook.hook()) {
-        this.logger.info("Hooked {} correctly", hookName);
-      } else {
-        this.logger.info("Not found {} for hook", hookName);
-      }
+      if (!placeholderHook.hook()) continue;
+      this.logger.info("Hooked {} successfully", placeholderHook.hookName());
     }
   }
 
