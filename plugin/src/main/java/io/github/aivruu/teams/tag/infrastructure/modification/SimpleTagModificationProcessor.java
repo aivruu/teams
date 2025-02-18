@@ -26,6 +26,7 @@ import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,9 +50,8 @@ public final class SimpleTagModificationProcessor extends TagModificationProcess
       case CANCELLED -> player.sendMessage(MiniMessageHelper.text(messages.cancelledEditMode));
       case FAILED -> player.sendMessage(MiniMessageHelper.text(messages.tagModifyError));
       case CLEARED -> player.sendMessage(MiniMessageHelper.text(messages.clearedTagProperty));
-      case PREFIX -> player.sendMessage(MiniMessageHelper.text(messages.modifiedTagPrefix));
-      case SUFFIX -> player.sendMessage(MiniMessageHelper.text(messages.modifiedTagSuffix));
-      case COLOR -> player.sendMessage(MiniMessageHelper.text(messages.modifiedTagColor));
+      case PREFIX, SUFFIX, COLOR ->
+        player.sendMessage(MiniMessageHelper.text(messages.modifiedTagProperty, Placeholder.parsed("property", processedModificationContext.name())));
     }
     return processedModificationContext;
   }
