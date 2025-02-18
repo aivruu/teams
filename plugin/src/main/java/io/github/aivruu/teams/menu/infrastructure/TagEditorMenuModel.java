@@ -34,7 +34,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,18 +42,16 @@ import java.util.Arrays;
 
 public final class TagEditorMenuModel extends AbstractMenuModel {
   private final TagModificationContainer tagModificationContainer;
-  private final ActionManager actionManager;
   private ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer;
   private ConfigurationContainer<TagEditorMenuConfigurationModel> tagsMenuModelConfiguration;
 
   public TagEditorMenuModel(
-    final @NotNull TagModificationContainer tagModificationContainer,
     final @NotNull ActionManager actionManager,
+    final @NotNull TagModificationContainer tagModificationContainer,
     final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer,
     final @NotNull ConfigurationContainer<TagEditorMenuConfigurationModel> tagEditorMenuModelConfiguration) {
-    super(MenuConstants.TAGS_EDITOR_ID);
+    super(MenuConstants.TAGS_EDITOR_ID, actionManager);
     this.tagModificationContainer = tagModificationContainer;
-    this.actionManager = actionManager;
     this.messagesModelContainer = messagesModelContainer;
     this.tagsMenuModelConfiguration = tagEditorMenuModelConfiguration;
   }
@@ -79,23 +76,25 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
   }
 
   @Override
-  public boolean handleClickLogic(final @NotNull Player player, final @Nullable ItemStack clicked, final @NotNull ClickType clickType) {
-    if (!super.handleClickLogic(player, clicked, clickType)) {
-      return false;
+  public @Nullable String handleClickLogic(
+    final @NotNull Player player, final @Nullable ItemStack clicked, final @NotNull ClickType clickType
+  ) {
+    final String itemNbtKey = super.handleClickLogic(player, clicked, clickType);
+    if (itemNbtKey == null) {
+      return null;
     }
     // At this point the item won't be null as null-checks and pdc-checks are made on superclass' base method-logic.
-    final ItemMeta meta = clicked.getItemMeta();
-    final String itemKey = clicked.getPersistentDataContainer().get(AbstractMenuModel.MENU_ITEM_NBT_KEY, PersistentDataType.STRING);
+    final int customModelData = clicked.getItemMeta().getCustomModelData();
     for (final TagEditorMenuConfigurationModel.ItemSection itemSection : this.tagsMenuModelConfiguration.model().items) {
-      if (!itemKey.equals(itemSection.id)) {
+      if (!itemNbtKey.equals(itemSection.id)) {
         continue;
       }
-      if (itemSection.checkCustomModelData && meta.getCustomModelData() != itemSection.data) {
+      if (itemSection.checkCustomModelData && customModelData != itemSection.data) {
         continue;
       }
       this.processInput(player, itemSection, clickType);
     }
-    return true;
+    return itemNbtKey;
   }
 
   private void processInput(
@@ -103,7 +102,9 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
     final @NotNull TagEditorMenuConfigurationModel.ItemSection itemSection,
     final @NotNull ClickType clickType
   ) {
-    if (!this.processActionType(player, itemSection, clickType)) {
+    // Execute item's actions and check if it should stop execution-flow.
+    super.processItemActions(player, clickType, itemSection.leftClickActions, itemSection.rightClickActions);
+    if (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT) {
       return;
     }
     super.close(player);
@@ -123,32 +124,12 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
     this.tagModificationContainer.updateModificationContext(playerId, itemSection.inputTypeRequired);
   }
 
-  private boolean processActionType(
-    final @NotNull Player player,
-    final @NotNull TagEditorMenuConfigurationModel.ItemSection itemSection,
-    final @NotNull ClickType clickType
-  ) {
-    if (clickType != ClickType.LEFT && clickType != ClickType.RIGHT) {
-      return false;
-    }
-    if (clickType == ClickType.LEFT) {
-      for (final String action : itemSection.leftClickActions) {
-        this.actionManager.execute(player, action);
-      }
-      return true;
-    }
-    for (final String action : itemSection.rightClickActions) {
-      this.actionManager.execute(player, action);
-    }
-    return false;
-  }
-
   @Override
   public void open(final @NotNull Player player) {
     final TagEditorMenuConfigurationModel menu = this.tagsMenuModelConfiguration.model();
     if (menu.useOpenActions) {
       for (final String action : menu.openActions) {
-        this.actionManager.execute(player, action);
+        super.actionManager.execute(player, action);
       }
     }
     super.open(player);

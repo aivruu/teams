@@ -16,6 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.menu.application;
 
+import io.github.aivruu.teams.action.application.ActionManager;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -36,16 +37,19 @@ public abstract class AbstractMenuModel implements InventoryHolder {
   /** The {@link NamespacedKey} used for identify any menu-model implementation's items. */
   public static final NamespacedKey MENU_ITEM_NBT_KEY = NamespacedKey.minecraft("teams_menu_item");
   private final String id;
+  protected final ActionManager actionManager;
   protected Inventory inventory;
 
   /**
    * Creates a new {@link AbstractMenuModel} with the given id.
    *
    * @param id this inventory's id.
+   * @param actionManager the {@link ActionManager} reference.
    * @since 3.4.1
    */
-  protected AbstractMenuModel(final @NotNull String id) {
+  protected AbstractMenuModel(final @NotNull String id, final @NotNull ActionManager actionManager) {
     this.id = id;
+    this.actionManager = actionManager;
   }
 
   /**
@@ -71,14 +75,35 @@ public abstract class AbstractMenuModel implements InventoryHolder {
    * @param player the player who clicked the item.
    * @param clicked the item clicked, {@code null} if none.
    * @param clickType the {@link ClickType} of the interaction.
-   * @return Whether the item is valid, and have the {@link #MENU_ITEM_NBT_KEY} key.
-   * @since 2.4.1
+   * @return The {@link #MENU_ITEM_NBT_KEY} key assigned to the clicked-item, {@code null} if it doesn't
+   * have.
+   * @since 3.4.1
    */
-  public boolean handleClickLogic(final @NotNull Player player, final @Nullable ItemStack clicked, final @NotNull ClickType clickType) {
-    if (clicked == null) {
-      return false;
+  public @Nullable String handleClickLogic(
+    final @NotNull Player player, final @Nullable ItemStack clicked, final @NotNull ClickType clickType
+  ) {
+    return (clicked == null)
+      ? null : clicked.getItemMeta().getPersistentDataContainer().get(MENU_ITEM_NBT_KEY, PersistentDataType.STRING);
+  }
+
+  /**
+   * Executes the menu's clicked-item item's actions depending on the click-type involved in the event.
+   *
+   * @param player the player who executed the actions.
+   * @param clickType the event's {@link ClickType}.
+   * @param leftClickActions the item's left-click actions.
+   * @param rightClickActions the item's right-click actions.
+   * @since 3.4.1
+   */
+  public final void processItemActions(
+    final @NotNull Player player,
+    final @NotNull ClickType clickType,
+    final @NotNull String[] leftClickActions,
+    final @NotNull String[] rightClickActions
+  ) {
+    for (final String action : (clickType == ClickType.LEFT || clickType == ClickType.SHIFT_LEFT) ? leftClickActions : rightClickActions) {
+      this.actionManager.execute(player, action);
     }
-    return clicked.getItemMeta().getPersistentDataContainer().has(MENU_ITEM_NBT_KEY, PersistentDataType.STRING);
   }
 
   /**

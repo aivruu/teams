@@ -33,7 +33,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +40,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public final class TagSelectorMenuModel extends AbstractMenuModel {
-  private final ActionManager actionManager;
   private final PlayerTagSelectorManager playerTagSelectorManager;
   private ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer;
   private ConfigurationContainer<TagsMenuConfigurationModel> tagsMenuModelConfiguration;
@@ -51,8 +49,7 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
     final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer,
     final @NotNull ConfigurationContainer<TagsMenuConfigurationModel> tagsMenuModelConfiguration,
     final @NotNull PlayerTagSelectorManager playerTagSelectorManager) {
-    super(MenuConstants.TAGS_MENU_ID);
-    this.actionManager = actionManager;
+    super(MenuConstants.TAGS_MENU_ID, actionManager);
     this.messagesModelContainer = messagesModelContainer;
     this.tagsMenuModelConfiguration = tagsMenuModelConfiguration;
     this.playerTagSelectorManager = playerTagSelectorManager;
@@ -78,23 +75,25 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
   }
 
   @Override
-  public boolean handleClickLogic(final @NotNull Player player, final @Nullable ItemStack clicked, final @NotNull ClickType clickType) {
-    if (!super.handleClickLogic(player, clicked, clickType)) {
-      return false;
+  public @Nullable String handleClickLogic(
+    final @NotNull Player player, final @Nullable ItemStack clicked, final @NotNull ClickType clickType
+  ) {
+    final String itemNbtKey = super.handleClickLogic(player, clicked, clickType);
+    if (itemNbtKey == null) {
+      return null;
     }
     // At this point the item won't be null as null-checks and pdc-checks are made on superclass' base method-logic.
-    final ItemMeta meta = clicked.getItemMeta();
-    final String itemKey = clicked.getPersistentDataContainer().get(AbstractMenuModel.MENU_ITEM_NBT_KEY, PersistentDataType.STRING);
+    final int customModelData = clicked.getItemMeta().getCustomModelData();
     for (final TagsMenuConfigurationModel.ItemSection itemSection : this.tagsMenuModelConfiguration.model().items) {
-      if (!itemKey.equals(itemSection.id)) {
+      if (!itemNbtKey.equals(itemSection.id)) {
         continue;
       }
-      if (itemSection.checkCustomModelData && meta.getCustomModelData() != itemSection.data) {
+      if (itemSection.checkCustomModelData && customModelData != itemSection.data) {
         continue;
       }
       this.processInput(player, itemSection, clickType);
     }
-    return true;
+    return itemNbtKey;
   }
 
   private void processInput(
@@ -102,7 +101,9 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
     final @NotNull TagsMenuConfigurationModel.ItemSection itemSection,
     final @NotNull ClickType clickType
   ) {
-    if (!this.processActionType(player, itemSection, clickType)) {
+    // Execute item's actions and check if it should stop execution-flow.
+    super.processItemActions(player, clickType, itemSection.leftClickActions, itemSection.rightClickActions);
+    if (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT) {
       return;
     }
     // Just close the gui if the click-type was for a tag-selection.
@@ -115,26 +116,6 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
       return;
     }
     this.processTagSelection(player, itemSection);
-  }
-
-  private boolean processActionType(
-    final @NotNull Player player,
-    final @NotNull TagsMenuConfigurationModel.ItemSection itemSection,
-    final @NotNull ClickType clickType
-  ) {
-    if (clickType != ClickType.LEFT && clickType != ClickType.RIGHT) {
-      return false;
-    }
-    if (clickType == ClickType.LEFT) {
-      for (final String action : itemSection.leftClickActions) {
-        this.actionManager.execute(player, action);
-      }
-      return true;
-    }
-    for (final String action : itemSection.rightClickActions) {
-      this.actionManager.execute(player, action);
-    }
-    return false;
   }
 
   private void processTagSelection(
