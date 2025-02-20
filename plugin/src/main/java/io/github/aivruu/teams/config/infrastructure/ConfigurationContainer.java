@@ -69,9 +69,6 @@ public record ConfigurationContainer<C>(@NotNull C model, @NotNull HoconConfigur
       <aldrteams_prefix> - Returns the prefix for the player's selected-tag.
       <aldrteams_suffix> - Returns the suffix for the player's selected-tag.
       <aldrteams_color> - Returns the color for the player's selected-tag.
-      <aldrteams_prefix:<tag-id> - Returns the prefix for the specified tag-id.
-      <aldrteams_suffix:<tag-id> - Returns the suffix for the specified tag-id.
-      <aldrteams_color:<tag-id> - Returns the color for the specified tag-id.
 
     List of available-colors for tags, these names can be used as input when modifying a tag's color in-game:
     - black
