@@ -52,12 +52,6 @@ public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
     }
     final Expansion expansion = Expansion.builder("aldrteams")
       .filter(Player.class)
-      .globalPlaceholder("other-prefix", (queue, ctx) ->
-        this.validateTagPlaceholder(queue.popOr("Missing tag-id.").value(), "prefix"))
-      .globalPlaceholder("other-suffix", (queue, ctx) ->
-        this.validateTagPlaceholder(queue.popOr("Missing tag-id.").value(), "suffix"))
-      .globalPlaceholder("other-color", (queue, ctx) ->
-        this.validateTagPlaceholder(queue.popOr("Missing tag-id").value(), "color"))
       .audiencePlaceholder("tag", (audience, queue, ctx) -> {
         // At this point the player's information should be loaded into the cache, so the model won't be null.
         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
