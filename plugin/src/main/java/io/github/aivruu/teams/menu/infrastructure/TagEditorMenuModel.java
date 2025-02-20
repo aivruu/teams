@@ -34,6 +34,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -83,8 +84,9 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
     if (itemNbtKey == null) {
       return null;
     }
-    // At this point the item won't be null as null-checks and pdc-checks are made on superclass' base method-logic.
-    final int customModelData = clicked.getItemMeta().getCustomModelData();
+    // After that we know the item is valid and has the key assigned.
+    final ItemMeta meta = clicked.getItemMeta();
+    final int customModelData = meta.hasCustomModelData() ? meta.getCustomModelData() : 0;
     for (final TagEditorMenuConfigurationModel.ItemSection itemSection : this.tagsMenuModelConfiguration.model().items) {
       if (!itemNbtKey.equals(itemSection.id)) {
         continue;
