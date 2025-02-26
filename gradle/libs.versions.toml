@@ -7,7 +7,7 @@ paperweight = "1.7.7"
 blossom = "2.1.0"
 
 paper = "1.21.3-R0.1-SNAPSHOT"
-configurate = "4.1.2"
+configurate = "4.2.0"
 
 placeholder-legacy = "2.11.6"
 placeholder-modern = "2.2.3"
