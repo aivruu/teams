@@ -97,7 +97,7 @@ public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
     return switch (type) {
       case "prefix" -> (properties.prefix() == null) ? null : Tag.selfClosingInserting(properties.prefix());
       case "suffix" -> (properties.suffix() == null) ? null : Tag.selfClosingInserting(properties.suffix());
-      case "color" -> Tag.styling(builder -> builder.color(tagAggregateRoot.tagModel().tagComponentProperties().color()));
+      case "color" -> Tag.styling(builder -> builder.color(properties.color()));
       default -> null;
     };
   }
