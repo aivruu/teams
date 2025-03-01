@@ -57,6 +57,8 @@ public final class MiniMessageHelper {
   public static @NotNull Component list(final @NotNull String[] content) {
     if (content.length == 0) {
       return Component.empty();
+    } else if (content.length == 1) { // Deserialize it single line directly instead of create a new builder.
+      return MINI_MESSAGE.deserialize(content[0]);
     }
     final TextComponent.Builder componentBuilder = Component.text();
     for (final String line : content) {
