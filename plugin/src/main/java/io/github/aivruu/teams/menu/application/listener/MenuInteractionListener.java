@@ -38,7 +38,7 @@ public final class MenuInteractionListener implements Listener {
   }
 
   @EventHandler
-  public void onInventoryDrag(final @NotNull InventoryMoveItemEvent event) {
+  public void onInventoryMove(final @NotNull InventoryMoveItemEvent event) {
     if (!(event.getInitiator().getHolder() instanceof AbstractMenuModel) || !(event.getDestination().getHolder() instanceof AbstractMenuModel)) {
       return;
     }
