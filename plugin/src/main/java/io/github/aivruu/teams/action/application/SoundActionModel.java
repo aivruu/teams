@@ -16,6 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.action.application;
 
+import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +36,8 @@ public final class SoundActionModel implements ActionModelContract {
     try {
       volume = Integer.parseInt(parameters[1]);
       pitch = Integer.parseInt(parameters[2]);
-    } catch (final NumberFormatException e) {
+    } catch (final NumberFormatException exception) {
+      DebugLoggerHelper.write("Unexpected exception when trying to parse-to-int volume and pitch values.", exception);
       return false;
     }
     player.playSound(player.getLocation(), parameters[0], volume, pitch);

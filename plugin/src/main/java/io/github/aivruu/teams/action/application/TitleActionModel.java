@@ -16,6 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.action.application;
 
+import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
 import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
@@ -42,6 +43,7 @@ public final class TitleActionModel implements ActionModelContract {
       stay = Integer.parseInt(parameters[3]);
       fadeOut = Integer.parseInt(parameters[4]);
     } catch (final NumberFormatException exception) {
+      DebugLoggerHelper.write("Unexpected exception when trying to parse-to-int title's time-values.", exception);
       return false;
     }
     player.showTitle(Title.title(
