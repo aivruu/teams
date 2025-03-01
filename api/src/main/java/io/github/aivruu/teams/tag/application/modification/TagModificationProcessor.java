@@ -64,7 +64,7 @@ public abstract class TagModificationProcessor {
    * processed.
    *
    * @param player the player who is modifying the tag.
-   * @param modificationOnCurse the {@link ModificationInProgressValueObject} for the tag's modification.
+   * @param modification the {@link ModificationInProgressValueObject} for the tag's modification.
    * @param message the edit-mode's input for modification.
    * @return The {@link ModificationContext} processed, which can be.
    * <ul>
@@ -75,8 +75,10 @@ public abstract class TagModificationProcessor {
    * @see #processContext(ModificationContext, TagAggregateRoot, String)
    * @since 2.3.1
    */
-  public @NotNull ModificationContext process(final @NotNull Player player, final @NotNull ModificationInProgressValueObject modificationOnCurse, final @NotNull Component message) {
-    final TagPropertyChangeEvent tagPropertyChangeEvent = new TagPropertyChangeEvent(modificationOnCurse.tag(), modificationOnCurse.context());
+  public @NotNull ModificationContext process(final @NotNull Player player, final @NotNull ModificationInProgressValueObject modification, final @NotNull Component message) {
+    final ModificationContext context = modification.context();
+    final String tag = modification.tag();
+    final TagPropertyChangeEvent tagPropertyChangeEvent = new TagPropertyChangeEvent(tag, context);
     // Avoid IllegalStateException due to asynchronous event-firing.
     Bukkit.getScheduler().runTask(this.plugin, () -> Bukkit.getPluginManager().callEvent(tagPropertyChangeEvent));
     if (tagPropertyChangeEvent.isCancelled()) {
@@ -86,10 +88,9 @@ public abstract class TagModificationProcessor {
     if (input.equals("cancel")) {
       return ModificationContext.CANCELLED;
     }
-    return this.processContext(
-      modificationOnCurse.context(),
+    return this.processContext(context,
       // Tag-existing validation is made previously during editor's command-execution, so the tag should exist.
-      this.tagAggregateRootRegistry.findInBoth(modificationOnCurse.tag()), input);
+      this.tagAggregateRootRegistry.findInBoth(tag), input);
   }
 
   /**
