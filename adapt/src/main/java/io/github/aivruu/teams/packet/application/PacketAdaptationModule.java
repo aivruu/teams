@@ -63,12 +63,20 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
   }
 
   @Override
+  @Deprecated
   public void removePlayerFromTeam(final @NotNull Player player, final @NotNull String team) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     if (playerTeam == null) {
       return;
     }
     this.scoreboard.removePlayerFromTeam(player.getName());
+  }
+
+  @Override
+  public void removePlayerFromTeam(final @NotNull Player player) {
+    final String name = player.getName();
+    // When this method is called, the player's PlayerTeam object should never be null.
+    this.scoreboard.removePlayerFromTeam(name, this.scoreboard.getPlayersTeam(name));
   }
 
   @Override
