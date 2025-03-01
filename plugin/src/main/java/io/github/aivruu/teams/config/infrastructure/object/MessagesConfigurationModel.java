@@ -49,7 +49,7 @@ public final class MessagesConfigurationModel implements ConfigurationInterface 
     "<green>You have enabled the edit-mode for the selected tag, insert the input that will be used for the property",
     "<gray>Currently, you're modifying the property <green><type></green>.",
     "<gray>If you want to cancel the modification, type <red>cancel",
-    "<gray>Type <white>clear</white> to clear the property-to-modify current content."
+    "<gray>Type <white>clear</white> to clear the property-to-modify current content, only for <white>prefix & suffix</white>."
   };
 
   public String cancelledEditMode = "<yellow>The tag-modification has been cancelled by the user.";
