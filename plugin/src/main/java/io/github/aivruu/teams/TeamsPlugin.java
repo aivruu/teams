@@ -208,7 +208,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     ExecutorHelper.createPool(config.threadPoolSize);
     this.infrastructureRepositoryController = new InfrastructureRepositoryController(dataFolder, this.configurationModelContainer.model());
     if (!this.infrastructureRepositoryController.selectAndInitialize()) {
-      this.logger.error("The infrastructure repository-controller couldn't be initialized correctly, the plugin won't start correctly.");
+      this.logger.error("One, or both infrastructure-repositories couldn't be initialized correctly, the plugin won't continue with start-up process!");
       return;
     }
     this.playerAggregateRootRepository = new PlayerCacheAggregateRootRepository();
