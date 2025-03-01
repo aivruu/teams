@@ -33,7 +33,7 @@ public final class CommandActionModel implements ActionModelContract {
       return false;
     }
     final String type = parameters[0];
-    // May message could include specific message or placeholders.
+    // The message could include specific message or placeholders.
     // Not available MiniPlaceholders support here, by now.
     final String command = PlaceholderHelper.parseLegacy(player, parameters[1]);
     if (type.equals("PLAYER")) {
