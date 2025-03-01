@@ -71,7 +71,9 @@ public final class PlayerTagSelectorManager {
    * <li>{@link #PLAYER_IS_NOT_ONLINE} if the player is not connected to the server.</li>
    * <li>{@link #TAG_SPECIFIED_NOT_EXIST} if the tag specified doesn't exist.</li>
    * </ul>
+   * @see io.github.aivruu.teams.aggregate.domain.registry.AggregateRootRegistry#existsInInfrastructure(String)
    * @see PlayerAggregateRootRegistry#findInCache(String)
+   * @see PlayerAggregateRoot#tagWithStatus(String)
    * @since 0.0.1
    */
   public byte select(final @NotNull Player player, final @NotNull String tag) {
@@ -115,7 +117,7 @@ public final class PlayerTagSelectorManager {
     if (tag == null) {
       return THERE_IS_NO_TAG_SELECTED;
     }
-    this.packetAdaptation.removePlayerFromTeam(player, tag);
+    this.packetAdaptation.removePlayerFromTeam(player);
     Bukkit.getPluginManager().callEvent(new TagUnselectEvent(player, tag));
     // We should expect a [TAG_HAS_BEEN_CLEARED] status.
     return playerAggregateRoot.tagWithStatus(null);
