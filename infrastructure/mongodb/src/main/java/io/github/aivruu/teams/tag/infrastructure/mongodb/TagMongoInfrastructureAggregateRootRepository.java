@@ -44,13 +44,14 @@ public final class TagMongoInfrastructureAggregateRootRepository implements Clos
 
   @Override
   public boolean start() {
+    final MongoDatabase database;
     try {
-      final MongoDatabase database = this.client.getDatabase(this.databaseName);
-      this.tagAggregateRootMongoCollection = database.getCollection(this.collectionName, TagAggregateRoot.class);
-      return true;
+      database = this.client.getDatabase(this.databaseName);
     } catch (final IllegalArgumentException exception) {
       return false;
     }
+    this.tagAggregateRootMongoCollection = database.getCollection(this.collectionName, TagAggregateRoot.class);
+    return true;
   }
 
   @Override

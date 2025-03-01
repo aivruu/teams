@@ -44,13 +44,14 @@ public final class PlayerMongoInfrastructureAggregateRootRepository implements C
 
   @Override
   public boolean start() {
+    final MongoDatabase database;
     try {
-      final MongoDatabase database = this.client.getDatabase(this.databaseName);
-      this.playerAggregateRootMongoCollection = database.getCollection(this.collectionName, PlayerAggregateRoot.class);
-      return true;
+      database = this.client.getDatabase(this.databaseName);
     } catch (final IllegalArgumentException exception) {
       return false;
     }
+    this.playerAggregateRootMongoCollection = database.getCollection(this.collectionName, PlayerAggregateRoot.class);
+    return true;
   }
 
   @Override
