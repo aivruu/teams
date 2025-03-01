@@ -29,6 +29,7 @@ import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -139,18 +140,22 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
 
   private @NotNull ItemStack prepareItem(final @NotNull TagEditorMenuConfigurationModel.ItemSection itemSection) {
     final ItemStack item = new ItemStack(itemSection.material);
-    item.editMeta(meta -> {
-      meta.itemName(PlaceholderHelper.parseBoth(null, itemSection.displayName));
-      meta.lore(Arrays.asList(PlaceholderHelper.parseBoth(null, itemSection.lore)));
-      if (itemSection.data > 0) {
-        meta.setCustomModelData(itemSection.data);
-      }
-      if (itemSection.glow) {
-        meta.addEnchant(Enchantment.LURE, 1, false);
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-      }
-      meta.getPersistentDataContainer().set(AbstractMenuModel.MENU_ITEM_NBT_KEY, PersistentDataType.STRING, itemSection.id);
-    });
+    // Air material-type for an item in the menu shouldn't have any custom-information.
+    if (itemSection.material != Material.AIR){
+      item.editMeta(meta -> {
+        // Provide support for support only for legacy and modern global-placeholders.
+        meta.itemName(PlaceholderHelper.parseBoth(null, itemSection.displayName));
+        meta.lore(Arrays.asList(PlaceholderHelper.parseBoth(null, itemSection.lore)));
+        if (itemSection.data > 0) {
+          meta.setCustomModelData(itemSection.data);
+        }
+        if (itemSection.glow) {
+          meta.addEnchant(Enchantment.LURE, 1, false);
+          meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
+        meta.getPersistentDataContainer().set(AbstractMenuModel.MENU_ITEM_NBT_KEY, PersistentDataType.STRING, itemSection.id);
+      });
+    }
     return item;
   }
 }
