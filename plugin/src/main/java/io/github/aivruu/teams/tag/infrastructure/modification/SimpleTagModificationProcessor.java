@@ -43,16 +43,16 @@ public final class SimpleTagModificationProcessor extends TagModificationProcess
   }
 
   @Override
-  public @NotNull ModificationContext process(final @NotNull Player player, final @NotNull ModificationInProgressValueObject modificationOnCurse, final @NotNull Component message) {
-    final ModificationContext processedModificationContext = super.process(player, modificationOnCurse, message);
+  public @NotNull ModificationContext process(final @NotNull Player player, final @NotNull ModificationInProgressValueObject modification, final @NotNull Component message) {
+    final ModificationContext context = super.process(player, modification, message);
     final MessagesConfigurationModel messages = this.messagesModelContainer.model();
-    switch (processedModificationContext) {
+    switch (context) {
       case CANCELLED -> player.sendMessage(MiniMessageHelper.text(messages.cancelledEditMode));
       case FAILED -> player.sendMessage(MiniMessageHelper.text(messages.tagModifyError));
       case CLEARED -> player.sendMessage(MiniMessageHelper.text(messages.clearedTagProperty));
       case PREFIX, SUFFIX, COLOR ->
-        player.sendMessage(MiniMessageHelper.text(messages.modifiedTagProperty, Placeholder.parsed("property", processedModificationContext.name())));
+        player.sendMessage(MiniMessageHelper.text(messages.modifiedTagProperty, Placeholder.parsed("property", context.name())));
     }
-    return processedModificationContext;
+    return context;
   }
 }
