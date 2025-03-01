@@ -10,7 +10,7 @@ paper = "1.21.3-R0.1-SNAPSHOT"
 configurate = "4.2.0"
 
 placeholder-legacy = "2.11.6"
-placeholder-modern = "2.2.3"
+placeholder-modern = "2.3.0"
 
 annotations = "24.0.1"
 
