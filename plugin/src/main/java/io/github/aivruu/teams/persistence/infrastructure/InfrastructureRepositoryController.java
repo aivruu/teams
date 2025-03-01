@@ -29,6 +29,7 @@ import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.infrastructure.json.TagJsonInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.infrastructure.mongodb.TagMongoInfrastructureAggregateRootRepository;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 
@@ -58,12 +59,27 @@ public final class InfrastructureRepositoryController {
         return false;
       }
     }
-    this.playerInfrastructureAggregateRootRepository = (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON)
-      ? new PlayerJsonInfrastructureAggregateRootRepository(this.dataFolder.resolve(this.configuration.playerCollectionAndDirectoryName))
-      : new PlayerMongoInfrastructureAggregateRootRepository(client, this.configuration.mongoDatabase, this.configuration.playerCollectionAndDirectoryName);
-    this.tagInfrastructureAggregateRootRepository = (this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON)
-      ? new TagJsonInfrastructureAggregateRootRepository(this.dataFolder.resolve(this.configuration.tagCollectionAndDirectoryName))
-      : new TagMongoInfrastructureAggregateRootRepository(client, this.configuration.mongoDatabase, this.configuration.tagCollectionAndDirectoryName);
+    return this.determineAndInitializeInfrastructureTypes(client);
+  }
+
+  private boolean determineAndInitializeInfrastructureTypes(final @Nullable MongoClient client) {
+    // Note: The client-instance could be null, but it won't throw a NullPointerException as this method is called
+    // only when MongoDB infrastructure is required, at that point, the client, or it was initialized already, or
+    // parameters were invalid and repository won't be initialized.
+    if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
+      this.playerInfrastructureAggregateRootRepository = new PlayerMongoInfrastructureAggregateRootRepository(
+        client, this.configuration.mongoDatabase, this.configuration.playerCollectionAndDirectoryName);
+    } else {
+      this.playerInfrastructureAggregateRootRepository = new PlayerJsonInfrastructureAggregateRootRepository(
+        this.dataFolder.resolve(this.configuration.playerCollectionAndDirectoryName));
+    }
+    if (this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
+      this.tagInfrastructureAggregateRootRepository = new TagMongoInfrastructureAggregateRootRepository(
+        client, this.configuration.mongoDatabase, this.configuration.tagCollectionAndDirectoryName);
+    } else {
+      this.tagInfrastructureAggregateRootRepository = new TagJsonInfrastructureAggregateRootRepository(
+        this.dataFolder.resolve(this.configuration.tagCollectionAndDirectoryName));
+    }
     return this.playerInfrastructureAggregateRootRepository.start() && this.tagInfrastructureAggregateRootRepository.start();
   }
 
