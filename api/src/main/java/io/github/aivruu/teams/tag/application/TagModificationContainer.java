@@ -76,9 +76,9 @@ public final class TagModificationContainer {
   public void updateModificationContext(final @NotNull String playerId, final @NotNull ModificationContext modificationContext) {
     // As before update the context we check if there's a modification for this player, we safely know that the
     // modification is still cached and we can proceed.
-    this.modificationsInProgress.asMap().compute(playerId, (key, context) ->
+    this.modificationsInProgress.asMap().compute(playerId, (key, modification) ->
       // Value will not be null.
-      new ModificationInProgressValueObject(context.tag(), modificationContext));
+      new ModificationInProgressValueObject(modification.tag(), modificationContext));
   }
 
   /**
