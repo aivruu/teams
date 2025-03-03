@@ -14,18 +14,15 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.persistence.infrastructure.utils;
+package io.github.aivruu.teams.shared.infrastructure.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
-import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
-import io.github.aivruu.teams.player.infrastructure.json.codec.JsonPlayerAggregateRootCodec;
-import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
+import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
-import io.github.aivruu.teams.tag.infrastructure.json.codec.JsonTagAggregateRootCodec;
-import io.github.aivruu.teams.tag.infrastructure.json.codec.JsonTagPropertiesValueObjectCodec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,28 +33,43 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class JsonCodecHelper {
-  private static final Gson GSON = new GsonBuilder()
-    .registerTypeAdapter(PlayerAggregateRoot.class, JsonPlayerAggregateRootCodec.INSTANCE)
-    .registerTypeAdapter(TagPropertiesValueObject.class, JsonTagPropertiesValueObjectCodec.INSTANCE)
-    .registerTypeAdapter(TagAggregateRoot.class, JsonTagAggregateRootCodec.INSTANCE)
-    .setPrettyPrinting()
-    .create();
+  private static Gson gson;
 
   private JsonCodecHelper() {
     throw new UnsupportedOperationException("This class is for utility.");
   }
 
+  public static void buildWithAdapters(final @NotNull JsonCodecAdapterContract<?>... adapters) {
+    final GsonBuilder builder = new GsonBuilder();
+    for (final JsonCodecAdapterContract<?> adapter : adapters) {
+      builder.registerTypeAdapter(adapter.forClass(), adapter);
+    }
+    gson = builder.setPrettyPrinting().create();
+  }
+
   public static <A extends AggregateRoot> @Nullable A read(final @NotNull Path file, final @NotNull Class<A> aggregateRootClass) {
     try (final Reader reader = Files.newBufferedReader(file)) {
-      return GSON.fromJson(reader, aggregateRootClass);
+      return gson.fromJson(reader, aggregateRootClass);
     } catch (final IOException exception) {
       return null;
     }
   }
 
+  public static @Nullable TagPropertiesValueObject readProperties(final @NotNull String json) {
+    try {
+      return gson.fromJson(json, TagPropertiesValueObject.class);
+    } catch (final JsonSyntaxException exception) {
+      return null;
+    }
+  }
+
+  public static @NotNull String writeProperties(final @NotNull TagPropertiesValueObject properties) {
+    return gson.toJson(properties);
+  }
+
   public static <A extends AggregateRoot> boolean write(final @NotNull Path file, final @NotNull A aggregateRoot) {
     try (final Writer writer = Files.newBufferedWriter(file)) {
-      GSON.toJson(aggregateRoot, writer);
+      gson.toJson(aggregateRoot, writer);
       return true;
     } catch (final IOException | JsonIOException exception) {
       return false;
