@@ -56,6 +56,9 @@ public final class MongoClientHelper {
     final @NotNull String database,
     final @NotNull String password
   ) {
+    if (client != null) {
+      return;
+    }
     final MongoClientSettings clientSettings = MongoClientSettings.builder()
       .applyConnectionString(new ConnectionString("mongodb://" + host))
       .credential(MongoCredential.createCredential(username, database, password.toCharArray()))
