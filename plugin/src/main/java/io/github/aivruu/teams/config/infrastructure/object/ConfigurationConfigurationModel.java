@@ -60,15 +60,18 @@ public final class ConfigurationConfigurationModel implements ConfigurationInter
     will be stored by the plugin.""")
   public String tagCollectionAndDirectoryName = "tags";
 
-  @Comment("The mongo-db's host to connect to.")
-  public String mongoHost = "localhost";
+  @Comment("The database's host/server to connect to.")
+  public String host = "localhost";
 
-  @Comment("The mongo-db's port to connect to.")
-  public String mongoDatabase = "database";
+  @Comment("The mariadb's database's port.")
+  public int mariaDbPort = 3306;
 
-  @Comment("The mongo-db's username to connect to.")
-  public String mongoUsername = "username";
+  @Comment("The database's name.")
+  public String database = "database";
 
-  @Comment("The mongo-db's password to connect to.")
-  public String mongoPassword = "password";
+  @Comment("The database's username for authentication.")
+  public String username = "username";
+
+  @Comment("The database's password for authentication.")
+  public String password = "password";
 }
