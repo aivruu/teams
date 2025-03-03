@@ -17,12 +17,11 @@
 package io.github.aivruu.teams.tag.infrastructure.json.codec;
 
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.TagModelEntity;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
@@ -30,8 +29,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 
-public enum JsonTagAggregateRootCodec implements JsonSerializer<TagAggregateRoot>, JsonDeserializer<TagAggregateRoot> {
+public enum JsonTagAggregateRootCodec implements JsonCodecAdapterContract<TagAggregateRoot> {
   INSTANCE;
+
+  @Override
+  public @NotNull Class<TagAggregateRoot> forClass() {
+    return TagAggregateRoot.class;
+  }
 
   @Override
   public @NotNull TagAggregateRoot deserialize(final JsonElement json, final Type type, final JsonDeserializationContext ctx) throws JsonParseException {
