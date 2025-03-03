@@ -15,6 +15,10 @@ dependencies:
       join-classpath: true
       required: false
       load: BEFORE
+    TAB:
+      join-classpath: true
+      required: false
+      load: BEFORE
 
 permissions:
   teams.command:
