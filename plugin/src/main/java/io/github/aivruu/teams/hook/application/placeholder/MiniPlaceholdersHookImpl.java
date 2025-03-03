@@ -14,9 +14,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.placeholder.application.impl;
+package io.github.aivruu.teams.hook.application.placeholder;
 
-import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
+import io.github.aivruu.teams.hook.application.HookContract;
 import io.github.aivruu.teams.player.application.PlayerManager;
 import io.github.aivruu.teams.tag.application.TagManager;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
@@ -30,7 +30,7 @@ import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
+public final class MiniPlaceholdersHookImpl implements HookContract {
   private final PlayerManager playerManager;
   private final TagManager tagManager;
 
@@ -45,7 +45,7 @@ public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
   }
 
   @Override
-  public boolean hook() {
+  public boolean register() {
     final PluginManager pluginManager = Bukkit.getPluginManager();
     if (pluginManager.getPlugin("MiniPlaceholders") == null || !pluginManager.isPluginEnabled("MiniPlaceholders")) {
       return false;

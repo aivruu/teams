@@ -14,11 +14,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.placeholder.application.impl;
+package io.github.aivruu.teams.hook.application.placeholder;
 
 import io.github.aivruu.teams.Constants;
 import io.github.aivruu.teams.component.application.LegacyComponentHelper;
-import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
+import io.github.aivruu.teams.hook.application.HookContract;
 import io.github.aivruu.teams.player.application.PlayerManager;
 import io.github.aivruu.teams.tag.application.TagManager;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
@@ -31,7 +31,7 @@ import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implements PlaceholderHookContract {
+public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implements HookContract {
   private final PlayerManager playerManager;
   private final TagManager tagManager;
 
@@ -46,12 +46,12 @@ public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implement
   }
 
   @Override
-  public boolean hook() {
+  public boolean register() {
     final PluginManager pluginManager = Bukkit.getPluginManager();
     if (pluginManager.getPlugin("PlaceholderAPI") == null || !pluginManager.isPluginEnabled("PlaceholderAPI")) {
       return false;
     }
-    return this.register();
+    return super.register();
   }
 
   @Override
