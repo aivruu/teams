@@ -32,6 +32,10 @@ import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigur
 import io.github.aivruu.teams.config.infrastructure.object.TagEditorMenuConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.TagsMenuConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
+import io.github.aivruu.teams.hook.application.HookContract;
+import io.github.aivruu.teams.hook.application.placeholder.MiniPlaceholdersHookImpl;
+import io.github.aivruu.teams.hook.application.placeholder.PlaceholderAPIHookImpl;
+import io.github.aivruu.teams.hook.application.tab.TabHookImpl;
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import io.github.aivruu.teams.menu.application.MenuManagerService;
 import io.github.aivruu.teams.menu.application.listener.MenuInteractionListener;
@@ -41,9 +45,6 @@ import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.packet.application.PacketAdaptationModule;
 import io.github.aivruu.teams.persistence.infrastructure.InfrastructureRepositoryController;
-import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
-import io.github.aivruu.teams.placeholder.application.impl.MiniPlaceholdersHookImpl;
-import io.github.aivruu.teams.placeholder.application.impl.PlaceholderAPIHookImpl;
 import io.github.aivruu.teams.player.application.PlayerManager;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.application.listener.PlayerRegistryListener;
@@ -269,7 +270,8 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     );
     this.registerHooks(
       new PlaceholderAPIHookImpl(this.playerManager, this.tagManager),
-      new MiniPlaceholdersHookImpl(this.playerManager, this.tagManager));
+      new MiniPlaceholdersHookImpl(this.playerManager, this.tagManager),
+      new TabHookImpl(this.tagManager, this.playerManager));
     TeamsProvider.set(this);
     this.logger.info("The plugin has been enabled successfully!");
   }
@@ -323,10 +325,11 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     });
   }
 
-  private void registerHooks(final @NotNull PlaceholderHookContract... placeholderHooks) {
-    for (final PlaceholderHookContract placeholderHook : placeholderHooks) {
-      if (!placeholderHook.hook()) continue;
-      this.logger.info("Hooked {} successfully", placeholderHook.hookName());
+  private void registerHooks(final @NotNull HookContract... hooks) {
+    for (final HookContract hook : hooks) {
+      if (hook.register()) {
+        this.logger.info("Hooked {} successfully", hook.hookName());
+      }
     }
   }
 
