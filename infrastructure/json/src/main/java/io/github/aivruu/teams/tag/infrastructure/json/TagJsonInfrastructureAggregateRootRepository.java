@@ -16,8 +16,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.infrastructure.json;
 
-import io.github.aivruu.teams.persistence.infrastructure.utils.JsonCodecHelper;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.util.JsonCodecHelper;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
