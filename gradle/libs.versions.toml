@@ -11,6 +11,7 @@ configurate = "4.2.0"
 
 placeholder-legacy = "2.11.6"
 placeholder-modern = "2.3.0"
+tab = "5.0.7"
 
 annotations = "24.0.1"
 
@@ -31,6 +32,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
 placeholder-legacy = { group = "me.clip", name = "placeholderapi", version.ref = "placeholder-legacy" }
 placeholder-modern = { group = "io.github.miniplaceholders", name = "miniplaceholders-api", version.ref = "placeholder-modern" }
+tab = { group = "com.github.NEZNAMY", name = "TAB-API", version.ref = "tab" }
 
 [plugins]
 shadow = { id = "io.github.goooler.shadow", version.ref = "shadow" }

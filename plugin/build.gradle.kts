@@ -35,6 +35,7 @@ dependencies {
 
   compileOnlyApi(libs.placeholder.legacy)
   compileOnlyApi(libs.placeholder.modern)
+  compileOnlyApi(libs.tab)
 }
 
 fun includeInfrastructureImplementations() {
