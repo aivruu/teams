@@ -22,13 +22,58 @@ import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class HikariInstanceProvider {
-  private static HikariDataSource hikariDataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
+/**
+ * This utility-class is used as {@link HikariDataSource} instance builder and provider.
+ *
+ * @since 3.5.1
+ */
+public final class HikariInstanceProvider {
+  private static @Nullable HikariDataSource hikariDataSource;
+
+  /**
+   * Returns the {@link HikariDataSource} instance if is available.
+   *
+   * @return The {@link HikariDataSource} or {@code null} if it couldn't be initialized or is closed.
+   * @since 3.5.1
+   */
   public static @Nullable HikariDataSource get() {
-    return hikariDataSource;
+    return (hikariDataSource == null || hikariDataSource.isClosed()) ? null : hikariDataSource;
   }
 
+  /**
+   * Returns the connection-pool used by HikariCP for the database.
+   *
+   * @return The {@link Connection} pool or {@code null} if data-source couldn't be initialized or
+   * a {@link SQLException} was thrown when trying to get the connection.
+   * @since 3.5.1
+   */
+  public static @Nullable Connection connection() {
+    if (hikariDataSource == null) {
+      return null;
+    }
+    try {
+      return hikariDataSource.getConnection();
+    } catch (final SQLException exception) {
+      DebugLoggerHelper.write("Unexpected exception when trying to retrieve the database's connection.", exception);
+      return null;
+    }
+  }
+
+  /**
+   * Creates a new {@link HikariDataSource} instance with the given parameters and assigns it to the
+   * {@link #hikariDataSource} field if parameters were valid. If the data-source it's already built, the
+   * method will skip the logic.
+   *
+   * @param server the database's server.
+   * @param port the database's port.
+   * @param database the database's name.
+   * @param user the database's username.
+   * @param password the database's password.
+   * @since 3.5.1
+   */
   public static void buildDataSource(
     final @NotNull String server,
     final int port,
