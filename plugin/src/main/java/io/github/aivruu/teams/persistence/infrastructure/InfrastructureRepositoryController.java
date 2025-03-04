@@ -16,6 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.persistence.infrastructure;
 
+import com.mongodb.client.MongoClient;
 import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigurationModel;
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import io.github.aivruu.teams.persistence.infrastructure.utils.HikariInstanceProvider;
@@ -37,6 +38,7 @@ import io.github.aivruu.teams.tag.infrastructure.mongodb.TagMongoInfrastructureA
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
+import java.sql.Connection;
 
 public final class InfrastructureRepositoryController {
   private final Path dataFolder;
@@ -87,6 +89,8 @@ public final class InfrastructureRepositoryController {
   }
 
   private boolean determineAndInitializeInfrastructureTypes() {
+    final Connection connection = HikariInstanceProvider.connection();
+    final MongoClient client = MongoClientHelper.client();
     this.playerInfrastructureAggregateRootRepository = switch (this.configuration.playerInfrastructureRepositoryType) {
       case JSON -> new PlayerJsonInfrastructureAggregateRootRepository(
         this.dataFolder.resolve(this.configuration.playerCollectionAndDirectoryName));
@@ -94,18 +98,18 @@ public final class InfrastructureRepositoryController {
       // only when MongoDB infrastructure is required, at that point, the client, or it was initialized already, or
       // parameters were invalid and repository won't be initialized.
       case MONGODB -> new PlayerMongoInfrastructureAggregateRootRepository(
-        MongoClientHelper.client(), this.configuration.database, this.configuration.playerCollectionAndDirectoryName);
+        client, this.configuration.database, this.configuration.playerCollectionAndDirectoryName);
       case MARIADB -> new PlayerMariaDBInfrastructureAggregateRootRepository(
         // HikariDataSource instance shouldn't be null if repository-type is for MariaDB.
-        HikariInstanceProvider.get(), this.configuration.playerCollectionAndDirectoryName);
+        connection, this.configuration.playerCollectionAndDirectoryName);
     };
     this.tagInfrastructureAggregateRootRepository = switch (this.configuration.tagInfrastructureRepositoryType) {
       case JSON -> new TagJsonInfrastructureAggregateRootRepository(
         this.dataFolder.resolve(this.configuration.tagCollectionAndDirectoryName));
       case MONGODB -> new TagMongoInfrastructureAggregateRootRepository(
-        MongoClientHelper.client(), this.configuration.database, this.configuration.tagCollectionAndDirectoryName);
+        client, this.configuration.database, this.configuration.tagCollectionAndDirectoryName);
       case MARIADB -> new TagMariaDBInfrastructureAggregateRootRepository(
-        HikariInstanceProvider.get(), this.configuration.tagCollectionAndDirectoryName);
+        connection, this.configuration.tagCollectionAndDirectoryName);
     };
     return this.playerInfrastructureAggregateRootRepository.start() && this.tagInfrastructureAggregateRootRepository.start();
   }
