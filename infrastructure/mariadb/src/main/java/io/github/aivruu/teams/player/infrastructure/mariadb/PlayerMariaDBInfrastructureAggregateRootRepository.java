@@ -16,11 +16,11 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.player.infrastructure.mariadb;
 
-import io.github.aivruu.teams.common.CommonMariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.PlayerModelEntity;
 import io.github.aivruu.teams.shared.infrastructure.StatementConstants;
+import io.github.aivruu.teams.shared.infrastructure.common.CommonMariaDBInfrastructureAggregateRootRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -16,9 +16,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.infrastructure.mariadb;
 
-import io.github.aivruu.teams.common.CommonMariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import io.github.aivruu.teams.shared.infrastructure.StatementConstants;
+import io.github.aivruu.teams.shared.infrastructure.common.CommonMariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.util.JsonCodecHelper;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.TagModelEntity;
