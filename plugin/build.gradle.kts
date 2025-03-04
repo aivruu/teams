@@ -27,8 +27,7 @@ sourceSets {
 dependencies {
   api(project(":${rootProject.name}-api"))
   api(project(":${rootProject.name}-adapt"))
-  api(project(":${rootProject.name}-json"))
-  api(project(":${rootProject.name}-mongodb"))
+  includeInfrastructureImplementations()
 
   compileOnlyApi(libs.paper)
   compileOnlyApi(libs.configurate)
@@ -36,4 +35,13 @@ dependencies {
 
   compileOnlyApi(libs.placeholder.legacy)
   compileOnlyApi(libs.placeholder.modern)
+}
+
+fun includeInfrastructureImplementations() {
+  val implementations = setOf("json", "mongodb", "mariadb")
+  dependencies {
+    for (implementation in implementations) {
+      api(project(":${rootProject.name}-infrastructure-$implementation"))
+    }
+  }
 }

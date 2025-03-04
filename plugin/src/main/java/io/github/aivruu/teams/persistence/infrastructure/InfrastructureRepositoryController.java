@@ -19,19 +19,26 @@ package io.github.aivruu.teams.persistence.infrastructure;
 import com.mongodb.client.MongoClient;
 import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigurationModel;
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.persistence.infrastructure.utils.HikariInstanceProvider;
 import io.github.aivruu.teams.persistence.infrastructure.utils.MongoClientHelper;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.infrastructure.json.PlayerJsonInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.player.infrastructure.json.codec.JsonPlayerAggregateRootCodec;
+import io.github.aivruu.teams.player.infrastructure.mariadb.PlayerMariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.player.infrastructure.mongodb.PlayerMongoInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.CloseableInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.util.JsonCodecHelper;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.infrastructure.json.TagJsonInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.tag.infrastructure.json.codec.JsonTagAggregateRootCodec;
+import io.github.aivruu.teams.tag.infrastructure.json.codec.JsonTagPropertiesValueObjectCodec;
+import io.github.aivruu.teams.tag.infrastructure.mariadb.TagMariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.infrastructure.mongodb.TagMongoInfrastructureAggregateRootRepository;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.sql.Connection;
 
 public final class InfrastructureRepositoryController {
   private final Path dataFolder;
@@ -45,50 +52,76 @@ public final class InfrastructureRepositoryController {
   }
 
   public boolean selectAndInitialize() {
-    MongoClient client = null;
-    // MongoClient instance initialization if any repository require it.
+    if (this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON ||
+        this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON) {
+      JsonCodecHelper.buildWithAdapters(
+        JsonTagAggregateRootCodec.INSTANCE, JsonTagPropertiesValueObjectCodec.INSTANCE, JsonPlayerAggregateRootCodec.INSTANCE);
+    }
+    // Database clients initialization if repositories require it.
     if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB ||
-      this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB
+        this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB
     ) {
       DebugLoggerHelper.write("Initializing mongo-client instance with configuration's parameters.");
-      MongoClientHelper.buildClient(this.configuration.mongoHost, this.configuration.mongoUsername, this.configuration.mongoDatabase, this.configuration.mongoPassword);
-      client = MongoClientHelper.client();
+      MongoClientHelper.buildClient(
+        this.configuration.host, this.configuration.username, this.configuration.database, this.configuration.password
+      );
       // Check if parameters are valid and client was initialized correctly.
-      if (client == null) {
+      if (MongoClientHelper.client() == null) {
         DebugLoggerHelper.write("Mongo-client couldn't be initialized correctly, stopping infrastructure repositories initialization.");
         return false;
       }
     }
-    return this.determineAndInitializeInfrastructureTypes(client);
+    if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MARIADB ||
+        this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MARIADB
+    ) {
+      DebugLoggerHelper.write("Initializing mongo-client instance with configuration's parameters.");
+      HikariInstanceProvider.buildDataSource(
+        this.configuration.host, this.configuration.mariaDbPort, this.configuration.username,
+        this.configuration.database, this.configuration.password
+      );
+      // Check if parameters are valid.
+      if (HikariInstanceProvider.get() == null) {
+        DebugLoggerHelper.write("HikariDataSource couldn't be initialized correctly, stopping infrastructure repositories initialization.");
+        return false;
+      }
+    }
+    return this.determineAndInitializeInfrastructureTypes();
   }
 
-  private boolean determineAndInitializeInfrastructureTypes(final @Nullable MongoClient client) {
-    // Note: The client-instance could be null, but it won't throw a NullPointerException as this method is called
-    // only when MongoDB infrastructure is required, at that point, the client, or it was initialized already, or
-    // parameters were invalid and repository won't be initialized.
-    if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
-      this.playerInfrastructureAggregateRootRepository = new PlayerMongoInfrastructureAggregateRootRepository(
-        client, this.configuration.mongoDatabase, this.configuration.playerCollectionAndDirectoryName);
-    } else {
-      this.playerInfrastructureAggregateRootRepository = new PlayerJsonInfrastructureAggregateRootRepository(
+  private boolean determineAndInitializeInfrastructureTypes() {
+    final Connection connection = HikariInstanceProvider.connection();
+    final MongoClient client = MongoClientHelper.client();
+    this.playerInfrastructureAggregateRootRepository = switch (this.configuration.playerInfrastructureRepositoryType) {
+      case JSON -> new PlayerJsonInfrastructureAggregateRootRepository(
         this.dataFolder.resolve(this.configuration.playerCollectionAndDirectoryName));
-    }
-    if (this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
-      this.tagInfrastructureAggregateRootRepository = new TagMongoInfrastructureAggregateRootRepository(
-        client, this.configuration.mongoDatabase, this.configuration.tagCollectionAndDirectoryName);
-    } else {
-      this.tagInfrastructureAggregateRootRepository = new TagJsonInfrastructureAggregateRootRepository(
+      // Note: The client-instance could be null, but it won't throw a NullPointerException as this method is called
+      // only when MongoDB infrastructure is required, at that point, the client, or it was initialized already, or
+      // parameters were invalid and repository won't be initialized.
+      case MONGODB -> new PlayerMongoInfrastructureAggregateRootRepository(
+        client, this.configuration.database, this.configuration.playerCollectionAndDirectoryName);
+      case MARIADB -> new PlayerMariaDBInfrastructureAggregateRootRepository(
+        // HikariDataSource instance shouldn't be null if repository-type is for MariaDB.
+        connection, this.configuration.playerCollectionAndDirectoryName);
+    };
+    this.tagInfrastructureAggregateRootRepository = switch (this.configuration.tagInfrastructureRepositoryType) {
+      case JSON -> new TagJsonInfrastructureAggregateRootRepository(
         this.dataFolder.resolve(this.configuration.tagCollectionAndDirectoryName));
-    }
+      case MONGODB -> new TagMongoInfrastructureAggregateRootRepository(
+        client, this.configuration.database, this.configuration.tagCollectionAndDirectoryName);
+      case MARIADB -> new TagMariaDBInfrastructureAggregateRootRepository(
+        connection, this.configuration.tagCollectionAndDirectoryName);
+    };
     return this.playerInfrastructureAggregateRootRepository.start() && this.tagInfrastructureAggregateRootRepository.start();
   }
 
   public void close() {
-    if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
+    if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB ||
+        this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MARIADB) {
       ((CloseableInfrastructureAggregateRootRepository<PlayerAggregateRoot>) this.playerInfrastructureAggregateRootRepository)
         .close();
     }
-    if (this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB) {
+    if (this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB ||
+        this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MARIADB) {
       ((CloseableInfrastructureAggregateRootRepository<TagAggregateRoot>) this.tagInfrastructureAggregateRootRepository)
         .close();
     }

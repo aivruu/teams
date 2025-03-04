@@ -2,11 +2,14 @@
 
 rootProject.name = "teams"
 
-sequenceOf("api", "adapt", "infrastructure", "mongodb", "json", "plugin").forEach {
+sequenceOf(
+  "api", "adapt", "plugin",
+  "infrastructure", "infrastructure-mariadb", "infrastructure-mongodb", "infrastructure-json"
+).forEach {
   val kerbalProject = ":${rootProject.name}-$it"
   include(kerbalProject)
-  if (it.equals("mongodb") || it.equals("json")) {
-    project(kerbalProject).projectDir = file("infrastructure/$it")
+  if (it.startsWith("infrastructure-")) {
+    project(kerbalProject).projectDir = file("infrastructure/${it.substring(15)}")
   } else {
     project(kerbalProject).projectDir = file(it)
   }

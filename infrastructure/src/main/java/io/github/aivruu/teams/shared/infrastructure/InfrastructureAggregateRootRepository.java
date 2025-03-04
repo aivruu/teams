@@ -45,6 +45,6 @@ public interface InfrastructureAggregateRootRepository<A extends AggregateRoot> 
    * @since 0.0.1
    */
   enum Type {
-    JSON, MONGODB
+    JSON, MONGODB, MARIADB
   }
 }

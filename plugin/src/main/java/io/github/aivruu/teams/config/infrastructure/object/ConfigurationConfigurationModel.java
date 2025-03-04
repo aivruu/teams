@@ -39,13 +39,15 @@ public final class ConfigurationConfigurationModel implements ConfigurationInter
   public boolean debugMode = false;
 
   @Comment("""
-    The infrastructure-type to use for the players' information storage, there are two options:
+    The infrastructure-type to use for the players' information storage, there are three options:
+    - MARIADB: Uses a MariaDB database for information-storing.
     - MONGODB: Uses the database to store the information.
     - JSON: Uses json-files for information storing at pre-defined directories.""")
   public InfrastructureAggregateRootRepository.Type playerInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
 
   @Comment("""
     The infrastructure-type to use for the tags' information storage, there are two options:
+    - MARIADB: Uses a MariaDB database for information-storing.
     - MONGODB: Uses the database to store the information.
     - JSON: Uses json-files for information storing at pre-defined directories.""")
   public InfrastructureAggregateRootRepository.Type tagInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
@@ -60,15 +62,18 @@ public final class ConfigurationConfigurationModel implements ConfigurationInter
     will be stored by the plugin.""")
   public String tagCollectionAndDirectoryName = "tags";
 
-  @Comment("The mongo-db's host to connect to.")
-  public String mongoHost = "localhost";
+  @Comment("The database's host/server to connect to.")
+  public String host = "localhost";
 
-  @Comment("The mongo-db's port to connect to.")
-  public String mongoDatabase = "database";
+  @Comment("The mariadb's database's port.")
+  public int mariaDbPort = 3306;
 
-  @Comment("The mongo-db's username to connect to.")
-  public String mongoUsername = "username";
+  @Comment("The database's name.")
+  public String database = "database";
 
-  @Comment("The mongo-db's password to connect to.")
-  public String mongoPassword = "password";
+  @Comment("The database's username for authentication.")
+  public String username = "username";
+
+  @Comment("The database's password for authentication.")
+  public String password = "password";
 }

@@ -24,6 +24,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import io.github.aivruu.teams.plain.application.PlainComponentHelper;
+import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,8 +32,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 
-public enum JsonTagPropertiesValueObjectCodec implements JsonSerializer<TagPropertiesValueObject>, JsonDeserializer<TagPropertiesValueObject> {
+public enum JsonTagPropertiesValueObjectCodec implements JsonCodecAdapterContract<TagPropertiesValueObject> {
   INSTANCE;
+
+  @Override
+  public @NotNull Class<TagPropertiesValueObject> forClass() {
+    return TagPropertiesValueObject.class;
+  }
 
   @Override
   public @NotNull TagPropertiesValueObject deserialize(final JsonElement json, final Type type, final JsonDeserializationContext ctx) throws JsonParseException {

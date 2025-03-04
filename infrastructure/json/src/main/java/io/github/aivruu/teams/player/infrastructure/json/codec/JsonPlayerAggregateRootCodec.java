@@ -17,20 +17,24 @@
 package io.github.aivruu.teams.player.infrastructure.json.codec;
 
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.PlayerModelEntity;
+import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 
-public enum JsonPlayerAggregateRootCodec implements JsonSerializer<PlayerAggregateRoot>, JsonDeserializer<PlayerAggregateRoot> {
+public enum JsonPlayerAggregateRootCodec implements JsonCodecAdapterContract<PlayerAggregateRoot> {
   INSTANCE;
+
+  @Override
+  public @NotNull Class<PlayerAggregateRoot> forClass() {
+    return PlayerAggregateRoot.class;
+  }
 
   @Override
   public @NotNull PlayerAggregateRoot deserialize(final JsonElement json, final Type type, final JsonDeserializationContext ctx) throws JsonParseException {
