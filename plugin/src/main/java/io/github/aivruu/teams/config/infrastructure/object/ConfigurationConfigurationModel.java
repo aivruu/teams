@@ -39,13 +39,15 @@ public final class ConfigurationConfigurationModel implements ConfigurationInter
   public boolean debugMode = false;
 
   @Comment("""
-    The infrastructure-type to use for the players' information storage, there are two options:
+    The infrastructure-type to use for the players' information storage, there are three options:
+    - MARIADB: Uses a MariaDB database for information-storing.
     - MONGODB: Uses the database to store the information.
     - JSON: Uses json-files for information storing at pre-defined directories.""")
   public InfrastructureAggregateRootRepository.Type playerInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
 
   @Comment("""
     The infrastructure-type to use for the tags' information storage, there are two options:
+    - MARIADB: Uses a MariaDB database for information-storing.
     - MONGODB: Uses the database to store the information.
     - JSON: Uses json-files for information storing at pre-defined directories.""")
   public InfrastructureAggregateRootRepository.Type tagInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
