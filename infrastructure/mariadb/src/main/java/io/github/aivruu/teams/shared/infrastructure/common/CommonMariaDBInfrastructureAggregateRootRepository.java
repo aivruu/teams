@@ -14,7 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.common;
+package io.github.aivruu.teams.shared.infrastructure.common;
 
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
@@ -28,7 +28,7 @@ public abstract class CommonMariaDBInfrastructureAggregateRootRepository<A exten
   public void close() {
     // Common logic for MariaDB implementations' close() method.
     final HikariDataSource source = HikariInstanceProvider.get();
-    if (source != null) {
+    if (source == null) {
       return;
     }
     source.close();
