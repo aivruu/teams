@@ -40,6 +40,8 @@ public final class JsonCodecHelper {
   }
 
   public static void buildWithAdapters(final @NotNull JsonCodecAdapterContract<?>... adapters) {
+    if (gson != null) return;
+
     final GsonBuilder builder = new GsonBuilder();
     for (final JsonCodecAdapterContract<?> adapter : adapters) {
       builder.registerTypeAdapter(adapter.forClass(), adapter);
