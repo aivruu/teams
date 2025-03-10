@@ -14,11 +14,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.shared.infrastructure;
+package io.github.aivruu.teams.persistence.infrastructure.utils;
 
 public final class StatementConstants {
-  public static final String CREATE_PLAYERS_DATA_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS %s(UUID varchar(36), tag VARCHAR(10))";
-  public static final String CREATE_TAGS_DATA_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS %s(id varchar(36), properties VARCHAR(255))";
+  public static final String CREATE_PLAYERS_DATA_TABLE_STATEMENT = """
+    CREATE TABLE IF NOT EXISTS %s(UUID varchar(36) NOT NULL PRIMARY KEY, tag VARCHAR(10) NULL)""";
+  public static final String CREATE_TAGS_DATA_TABLE_STATEMENT = """
+    CREATE TABLE IF NOT EXISTS %s(id varchar(10) NOT NULL PRIMARY KEY, properties VARCHAR(512) NOT NULL)""";
   public static final String FIND_PLAYER_INFORMATION_STATEMENT = "SELECT tag FROM %s WHERE UUID=?";
   public static final String FIND_TAG_INFORMATION_STATEMENT = "SELECT properties FROM %s WHERE id=?";
   public static final String SAVE_TAG_INFORMATION_STATEMENT = "INSERT INTO %s(id, properties) VALUES(?, ?)";
