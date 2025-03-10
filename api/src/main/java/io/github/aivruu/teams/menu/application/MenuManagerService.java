@@ -74,11 +74,10 @@ public final class MenuManagerService {
    */
   public boolean openMenu(final @NotNull Player player, final @NotNull String menu) {
     final AbstractMenuModel menuModel = this.menus.get(menu);
-    if (menuModel == null) {
-      return false;
+    if (menuModel != null) {
+      menuModel.open(player);
     }
-    menuModel.open(player);
-    return true;
+    return menuModel != null;
   }
 
   /**
@@ -91,11 +90,10 @@ public final class MenuManagerService {
    */
   public boolean closeMenu(final @NotNull Player player, final @NotNull String menu) {
     final AbstractMenuModel menuModel = this.menus.get(menu);
-    if (menuModel == null) {
-      return false;
+    if (menuModel != null) {
+      menuModel.close(player);
     }
-    menuModel.close(player);
-    return true;
+    return menuModel != null;
   }
 
   /**
