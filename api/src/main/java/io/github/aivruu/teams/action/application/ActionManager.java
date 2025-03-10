@@ -62,15 +62,18 @@ public final class ActionManager {
    * @param action the action's input.
    * @since 0.0.1
    */
-  public void execute(final @NotNull Player player, @NotNull String action) {
+  public void execute(final @NotNull Player player, final @NotNull String action) {
     if (action.isEmpty()) {
       return;
     }
-    final ActionModelContract actionModel = this.actions.get(StringUtils.substringBetween(action, "[", "]").toUpperCase(Locale.ROOT));
+    final ActionModelContract actionModel = this.actions.get(
+      StringUtils.substringBetween(action, "[", "]").toUpperCase(Locale.ROOT));
     if (actionModel == null) {
       DebugLoggerHelper.write("Unknown action-type specified, skipping execution.");
       return;
     }
+    // We give the method the action's arguments without the identifier, and we check if it was executed
+    // successfully.
     if (!actionModel.trigger(player, action.substring(actionModel.id().length() + 3).split(";"))) {
       DebugLoggerHelper.write("The action {}'s execution has failed.", actionModel.id());
     }
