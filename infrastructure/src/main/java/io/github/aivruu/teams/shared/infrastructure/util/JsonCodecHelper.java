@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
 import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
@@ -43,15 +44,16 @@ public final class JsonCodecHelper {
     if (gson != null) return;
 
     final GsonBuilder builder = new GsonBuilder();
+    builder.serializeNulls().setPrettyPrinting();
     for (final JsonCodecAdapterContract<?> adapter : adapters) {
       builder.registerTypeAdapter(adapter.forClass(), adapter);
     }
-    gson = builder.setPrettyPrinting().create();
+    gson = builder.create();
   }
 
   public static <A extends AggregateRoot> @Nullable A read(final @NotNull Path file, final @NotNull Class<A> aggregateRootClass) {
     try (final Reader reader = Files.newBufferedReader(file)) {
-      return gson.fromJson(reader, aggregateRootClass);
+      return gson.fromJson(reader, TypeToken.get(aggregateRootClass));
     } catch (final IOException exception) {
       return null;
     }
@@ -71,7 +73,7 @@ public final class JsonCodecHelper {
 
   public static <A extends AggregateRoot> boolean write(final @NotNull Path file, final @NotNull A aggregateRoot) {
     try (final Writer writer = Files.newBufferedWriter(file)) {
-      gson.toJson(aggregateRoot, writer);
+      gson.toJson(aggregateRoot, AggregateRoot.class, writer);
       return true;
     } catch (final IOException | JsonIOException exception) {
       return false;
