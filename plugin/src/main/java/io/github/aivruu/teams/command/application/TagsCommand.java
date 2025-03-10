@@ -19,6 +19,7 @@ package io.github.aivruu.teams.command.application;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.github.aivruu.teams.command.application.suggestion.AvailableTagSuggestionProvider;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationContainer;
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
 import io.github.aivruu.teams.menu.application.MenuManagerService;
@@ -43,18 +44,20 @@ public final class TagsCommand implements RegistrableCommandContract {
   private final MenuManagerService menuManagerService;
   private final PlayerTagSelectorManager playerTagSelectorManager;
   private final TagModificationContainer tagModificationContainer;
+  private final AvailableTagSuggestionProvider tagsSuggestionProvider;
 
   public TagsCommand(
     final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer,
     final @NotNull TagManager tagManager,
     final @NotNull MenuManagerService menuManagerService,
     final @NotNull PlayerTagSelectorManager playerTagSelectorManager,
-    final @NotNull TagModificationContainer tagModificationContainer) {
+    final @NotNull TagModificationContainer tagModificationContainer, final AvailableTagSuggestionProvider tagsSuggestionProvider) {
     this.messagesModelContainer = messagesModelContainer;
     this.tagManager = tagManager;
     this.menuManagerService = menuManagerService;
     this.playerTagSelectorManager = playerTagSelectorManager;
     this.tagModificationContainer = tagModificationContainer;
+    this.tagsSuggestionProvider = tagsSuggestionProvider;
   }
 
   @Override
@@ -114,7 +117,7 @@ public final class TagsCommand implements RegistrableCommandContract {
               final String prefix = ctx.getArgument("prefix", String.class);
               final String suffix = ctx.getArgument("suffix", String.class);
               final MessagesConfigurationModel messages = this.messagesModelContainer.model();
-              final boolean wasCreated =  this.tagManager.createTag(player, id,
+              final boolean wasCreated = this.tagManager.createTag(player, id,
                 prefix.isEmpty() ? null : MiniMessageHelper.text(prefix),
                 suffix.isEmpty() ? null : MiniMessageHelper.text(suffix), NamedTextColor.WHITE);
               if (wasCreated) {
@@ -130,6 +133,7 @@ public final class TagsCommand implements RegistrableCommandContract {
       .then(Commands.literal("edit")
         .requires(src -> src.getSender().hasPermission(Permissions.MODIFY.node()))
         .then(Commands.argument("id", StringArgumentType.word())
+          .suggests(this.tagsSuggestionProvider)
           .executes(ctx -> {
             final Player player = (Player) ctx.getSource().getSender();
             final String tag = ctx.getArgument("id", String.class);
@@ -151,17 +155,19 @@ public final class TagsCommand implements RegistrableCommandContract {
       )
       .then(Commands.literal("delete")
         .requires(src -> src.getSender().hasPermission(Permissions.DELETE.node()))
-        .then(Commands.argument("id", StringArgumentType.word()).executes(ctx -> {
-          final Player player = (Player) ctx.getSource().getSender();
-          final MessagesConfigurationModel messages = this.messagesModelContainer.model();
-          final String id = ctx.getArgument("id", String.class);
-          if (this.tagManager.deleteTag(id)) {
-            player.sendMessage(MiniMessageHelper.text(messages.deleted, Placeholder.parsed("tag-id", id)));
-          } else {
-            player.sendMessage(MiniMessageHelper.text(messages.unknownTag));
-          }
-          return Command.SINGLE_SUCCESS;
-        }))
+        .then(Commands.argument("id", StringArgumentType.word())
+          .suggests(this.tagsSuggestionProvider)
+          .executes(ctx -> {
+            final Player player = (Player) ctx.getSource().getSender();
+            final MessagesConfigurationModel messages = this.messagesModelContainer.model();
+            final String id = ctx.getArgument("id", String.class);
+            if (this.tagManager.deleteTag(id)) {
+              player.sendMessage(MiniMessageHelper.text(messages.deleted, Placeholder.parsed("tag-id", id)));
+            } else {
+              player.sendMessage(MiniMessageHelper.text(messages.unknownTag));
+            }
+            return Command.SINGLE_SUCCESS;
+          }))
       )
       .build();
   }
