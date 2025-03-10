@@ -17,6 +17,8 @@
 package io.github.aivruu.teams.aggregate.domain.registry;
 
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
+import io.github.aivruu.teams.aggregate.domain.repository.AggregateRootRepository;
+import io.github.aivruu.teams.aggregate.domain.repository.AsyncAggregateRootRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +38,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    *
    * @param id the aggregate-root's identifier.
    * @return The {@link AggregateRoot} or {@code null} if not found in cache.
+   * @see io.github.aivruu.teams.aggregate.domain.repository.AggregateRootRepository#findInCacheSync(String)
    * @since 0.0.1
    */
   @Nullable A findInCache(final @NotNull String id);
@@ -46,6 +49,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    * @param id the aggregate-root's identifier.
    * @return A {@link CompletableFuture} with the {@link AggregateRoot} or {@code null} if not found in
    * infrastructure.
+   * @see AsyncAggregateRootRepository#findInPersistenceAsync(String)
    * @since 0.0.1
    */
   @NotNull CompletableFuture<@Nullable A> findInInfrastructure(final @NotNull String id);
@@ -54,6 +58,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    * Returns a {@link Collection} with the registry's currently cached {@link AggregateRoot}s.
    *
    * @return A {@link Collection} with the cached {@link AggregateRoot}s.
+   * @see AggregateRootRepository#findAllInCacheSync()
    * @since 0.0.1
    */
   @NotNull Collection<A> findAllInCache();
@@ -63,6 +68,8 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    *
    * @param id the aggregate-root's identifier.
    * @return Whether the aggregate-root is cached or at the infrastructure.
+   * @see #existsInCache(String)
+   * @see #existsInInfrastructure(String)
    * @since 0.0.1
    */
   boolean existsGlobally(final @NotNull String id);
@@ -72,6 +79,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    *
    * @param id the aggregate-root's identifier.
    * @return Whether the aggregate-root is cached.
+   * @see AggregateRootRepository#existsInCacheSync(String)
    * @since 0.0.1
    */
   boolean existsInCache(final @NotNull String id);
@@ -81,6 +89,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    *
    * @param id the aggregate-root's identifier.
    * @return Whether the aggregate-root is in the infrastructure.
+   * @see AsyncAggregateRootRepository#existsAsync(String)
    * @since 0.0.1
    */
   boolean existsInInfrastructure(final @NotNull String id);
@@ -89,6 +98,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    * Stores the given {@link AggregateRoot} into cache.
    *
    * @param aggregateRoot the {@link AggregateRoot} to store.
+   * @see AggregateRootRepository#saveSync(AggregateRoot)
    * @since 0.0.1
    */
   void register(final @NotNull A aggregateRoot);
@@ -99,6 +109,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    *
    * @param id the aggregate-root's identifier.
    * @return The {@link AggregateRoot} or {@code null} if no found.
+   * @see AggregateRootRepository#deleteSync(String)
    * @since 0.0.1
    */
   @Nullable A unregister(final @NotNull String id);
@@ -108,6 +119,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    *
    * @param id the aggregate-root's identifier.
    * @return A {@link CompletableFuture} with the operation's result.
+   * @see AsyncAggregateRootRepository#deleteAsync(String)
    * @since 0.0.1
    */
   @NotNull CompletableFuture<Boolean> delete(final @NotNull String id);
@@ -117,6 +129,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    *
    * @param aggregateRoot the {@link AggregateRoot} to save.
    * @return A {@link CompletableFuture} with the operation's result.
+   * @see AsyncAggregateRootRepository#saveAsync(AggregateRoot)
    * @since 0.0.1
    */
   @NotNull CompletableFuture<Boolean> save(final @NotNull A aggregateRoot);
