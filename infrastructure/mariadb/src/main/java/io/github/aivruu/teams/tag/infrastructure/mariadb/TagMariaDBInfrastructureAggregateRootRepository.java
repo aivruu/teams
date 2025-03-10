@@ -17,7 +17,7 @@
 package io.github.aivruu.teams.tag.infrastructure.mariadb;
 
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
-import io.github.aivruu.teams.shared.infrastructure.StatementConstants;
+import io.github.aivruu.teams.persistence.infrastructure.utils.StatementConstants;
 import io.github.aivruu.teams.shared.infrastructure.common.CommonMariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.util.JsonCodecHelper;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
@@ -66,12 +66,13 @@ public final class TagMariaDBInfrastructureAggregateRootRepository extends Commo
         StatementConstants.FIND_TAG_INFORMATION_STATEMENT.formatted(this.tableName))
       ) {
         statement.setString(1, id);
-        final ResultSet resultSet = statement.executeQuery();
-        if (!resultSet.next()) {
-          return null;
+        try (final ResultSet resultSet = statement.executeQuery()){
+          if (!resultSet.next()) {
+            return null;
+          }
+          final TagPropertiesValueObject properties = JsonCodecHelper.readProperties(resultSet.getString("properties"));
+          return (properties == null) ? null : new TagAggregateRoot(id, new TagModelEntity(id, properties));
         }
-        final TagPropertiesValueObject properties = JsonCodecHelper.readProperties(resultSet.getString("properties"));
-        return (properties == null) ? null : new TagAggregateRoot(id, new TagModelEntity(id, properties));
       } catch (final SQLException exception) {
         DebugLoggerHelper.write("Unexpected exception when trying to retrieve tag's information from database.", exception);
         return null;
@@ -86,7 +87,9 @@ public final class TagMariaDBInfrastructureAggregateRootRepository extends Commo
         StatementConstants.FIND_TAG_INFORMATION_STATEMENT.formatted(this.tableName))
       ) {
         statement.setString(1, id);
-        return statement.executeQuery().next();
+        try (final ResultSet resultSet = statement.executeQuery()) {
+          return resultSet.next();
+        }
       } catch (final SQLException exception) {
         DebugLoggerHelper.write("Unexpected exception when trying to verify if tag's data exists in database.", exception);
         return false;

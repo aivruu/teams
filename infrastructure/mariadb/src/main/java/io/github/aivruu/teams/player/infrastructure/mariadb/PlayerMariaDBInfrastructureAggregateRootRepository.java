@@ -19,7 +19,7 @@ package io.github.aivruu.teams.player.infrastructure.mariadb;
 import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.PlayerModelEntity;
-import io.github.aivruu.teams.shared.infrastructure.StatementConstants;
+import io.github.aivruu.teams.persistence.infrastructure.utils.StatementConstants;
 import io.github.aivruu.teams.shared.infrastructure.common.CommonMariaDBInfrastructureAggregateRootRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,15 +61,16 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
   public @NotNull CompletableFuture<@Nullable PlayerAggregateRoot> findInPersistenceAsync(final @NotNull String id) {
     return CompletableFuture.supplyAsync(() -> {
       try (final PreparedStatement statement = this.connectionPool.prepareStatement(
-        StatementConstants.FIND_PLAYER_INFORMATION_STATEMENT.formatted(this.tableName))
+        StatementConstants.FIND_PLAYER_INFORMATION_STATEMENT.formatted(this.tableName));
       ) {
         statement.setString(1, id);
-        final ResultSet resultSet = statement.executeQuery();
-        if (!resultSet.next()) {
-          return null;
+        try (final ResultSet resultSet = statement.executeQuery()) {
+          if (!resultSet.next()) {
+            return null;
+          }
+          final String selectedTag = resultSet.getString(1);
+          return new PlayerAggregateRoot(id, new PlayerModelEntity(id, selectedTag.isEmpty() ? null : selectedTag));
         }
-        final String selectedTag = resultSet.getString(1);
-        return new PlayerAggregateRoot(id, new PlayerModelEntity(id, selectedTag.isEmpty() ? null : selectedTag));
       } catch (final SQLException exception) {
         DebugLoggerHelper.write("Unexpected exception when trying to retrieve player's information from database.", exception);
         return null;
@@ -84,7 +85,9 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
         StatementConstants.FIND_PLAYER_INFORMATION_STATEMENT.formatted(this.tableName))
       ) {
         statement.setString(1, id);
-        return statement.executeQuery().next();
+        try (final ResultSet resultSet = statement.executeQuery()) {
+          return resultSet.next();
+        }
       } catch (final SQLException exception) {
         DebugLoggerHelper.write("Unexpected exception when trying to verify if player's data exists in database.", exception);
         return false;
