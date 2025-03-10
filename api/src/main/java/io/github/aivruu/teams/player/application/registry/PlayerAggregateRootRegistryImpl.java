@@ -25,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRootRegistry {
   private final PlayerAggregateRootRepository playerAggregateRootRepository;
@@ -55,7 +54,8 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
 
   @Override
   public boolean existsGlobally(final @NotNull String id) {
-    return this.playerAggregateRootRepository.existsInCacheSync(id) || this.existsInInfrastructure(id);
+    return this.playerAggregateRootRepository.existsInCacheSync(id)
+      || this.playerAsyncAggregateRootRepository.existsAsync(id).join();
   }
 
   @Override
@@ -65,9 +65,7 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
 
   @Override
   public boolean existsInInfrastructure(final @NotNull String id) {
-    final AtomicBoolean atomicBoolean = new AtomicBoolean();
-    this.playerAsyncAggregateRootRepository.existsAsync(id).thenAccept(atomicBoolean::set);
-    return atomicBoolean.get();
+    return this.playerAsyncAggregateRootRepository.existsAsync(id).join();
   }
 
   @Override
