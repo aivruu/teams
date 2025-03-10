@@ -27,6 +27,7 @@ import io.github.aivruu.teams.action.application.TitleActionModel;
 import io.github.aivruu.teams.command.application.RegistrableCommandContract;
 import io.github.aivruu.teams.command.application.MainCommand;
 import io.github.aivruu.teams.command.application.TagsCommand;
+import io.github.aivruu.teams.command.application.suggestion.AvailableTagSuggestionProvider;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationContainer;
 import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.TagEditorMenuConfigurationModel;
@@ -265,7 +266,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.registerCommands(
       new MainCommand(this, this.messagesModelContainer),
       new TagsCommand(this.messagesModelContainer, this.tagManager, this.menuManagerService, this.playerTagSelectorManager,
-        this.tagModificationContainer)
+        this.tagModificationContainer, new AvailableTagSuggestionProvider(this.tagManager))
     );
     this.registerHooks(
       new PlaceholderAPIHookImpl(this.playerManager, this.tagManager),
