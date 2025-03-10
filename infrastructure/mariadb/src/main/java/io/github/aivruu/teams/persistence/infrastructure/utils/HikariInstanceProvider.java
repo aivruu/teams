@@ -31,6 +31,7 @@ import java.sql.SQLException;
  * @since 3.5.1
  */
 public final class HikariInstanceProvider {
+  private static final String MARIADB_SOURCE_CLASS_NAME = "org.mariadb.jdbc.Driver";
   private static @Nullable HikariDataSource hikariDataSource;
 
   /**
@@ -81,12 +82,11 @@ public final class HikariInstanceProvider {
     final @NotNull String user,
     final @NotNull String password
   ) {
-    if (hikariDataSource != null) {
-      return;
-    }
+    if (hikariDataSource != null) return;
+
     final HikariConfig config = new HikariConfig();
     try {
-      config.setDataSourceClassName("org.mariadb.jdbc.Driver");
+      config.setDataSourceClassName(MARIADB_SOURCE_CLASS_NAME);
       config.addDataSourceProperty("serverName", server);
       config.addDataSourceProperty("port", port);
       config.addDataSourceProperty("databaseName", database);
