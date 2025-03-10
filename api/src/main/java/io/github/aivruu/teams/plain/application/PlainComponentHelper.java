@@ -19,6 +19,7 @@ package io.github.aivruu.teams.plain.application;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A utility used for {@link Component}s conversion to plain-text and vice versa.
@@ -41,6 +42,17 @@ public final class PlainComponentHelper {
    */
   public static @NotNull String plain(final @NotNull Component component) {
     return PLAIN_TEXT_COMPONENT_SERIALIZER.serialize(component);
+  }
+
+  /**
+   * Returns a plain-text representation for the given {@link Component} if it is available.
+   *
+   * @param component the component to serialize or {@code null}.
+   * @return The plain-text representation or {@code null}.
+   * @since 3.5.1
+   */
+  public static @Nullable String plainOrNull(final @Nullable Component component) {
+    return (component == null) ? null : PLAIN_TEXT_COMPONENT_SERIALIZER.serialize(component);
   }
 
   /**
