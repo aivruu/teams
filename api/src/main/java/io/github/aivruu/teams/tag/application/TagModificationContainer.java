@@ -89,7 +89,11 @@ public final class TagModificationContainer {
    * @since 2.3.1
    */
   public @Nullable ModificationInProgressValueObject unregisterModification(final @NotNull String playerId) {
-    return this.modificationsInProgress.asMap().remove(playerId);
+    final ModificationInProgressValueObject modification = this.modificationsInProgress.getIfPresent(playerId);
+    if (modification != null) {
+      this.modificationsInProgress.invalidate(playerId);
+    }
+    return modification;
   }
 
   /**
