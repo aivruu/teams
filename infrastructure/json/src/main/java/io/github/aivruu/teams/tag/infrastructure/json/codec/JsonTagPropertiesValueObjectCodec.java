@@ -17,16 +17,13 @@
 package io.github.aivruu.teams.tag.infrastructure.json.codec;
 
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import io.github.aivruu.teams.plain.application.PlainComponentHelper;
 import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,11 +40,11 @@ public enum JsonTagPropertiesValueObjectCodec implements JsonCodecAdapterContrac
   @Override
   public @NotNull TagPropertiesValueObject deserialize(final JsonElement json, final Type type, final JsonDeserializationContext ctx) throws JsonParseException {
     final JsonObject jsonObject = json.getAsJsonObject();
-    final String prefix = jsonObject.get("prefix").getAsString();
-    final String suffix = jsonObject.get("suffix").getAsString();
+    final JsonElement prefix = jsonObject.get("prefix");
+    final JsonElement suffix = jsonObject.get("suffix");
     return new TagPropertiesValueObject(
-      prefix.isEmpty() ? null : PlainComponentHelper.modern(prefix),
-      suffix.isEmpty() ? null : PlainComponentHelper.modern(suffix),
+      prefix.isJsonNull() ? null : PlainComponentHelper.modern(prefix.getAsString()),
+      suffix.isJsonNull() ? null : PlainComponentHelper.modern(suffix.getAsString()),
       // This will never be null.
       NamedTextColor.namedColor(jsonObject.get("color-value").getAsInt())
     );
@@ -56,10 +53,8 @@ public enum JsonTagPropertiesValueObjectCodec implements JsonCodecAdapterContrac
   @Override
   public @NotNull JsonElement serialize(final TagPropertiesValueObject properties, final Type type, final JsonSerializationContext ctx) {
     final JsonObject jsonObject = new JsonObject();
-    final Component prefix = properties.prefix();
-    jsonObject.addProperty("prefix", (prefix == null) ? "" : PlainComponentHelper.plain(prefix));
-    final Component suffix = properties.suffix();
-    jsonObject.addProperty("suffix", (suffix == null) ? "" : PlainComponentHelper.plain(suffix));
+    jsonObject.addProperty("prefix", PlainComponentHelper.plainOrNull(properties.prefix()));
+    jsonObject.addProperty("suffix", PlainComponentHelper.plainOrNull(properties.suffix()));
     jsonObject.addProperty("color-value", properties.color().value());
     return jsonObject;
   }

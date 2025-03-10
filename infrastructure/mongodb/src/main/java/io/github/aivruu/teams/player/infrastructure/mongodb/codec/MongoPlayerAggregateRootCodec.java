@@ -29,16 +29,19 @@ public enum MongoPlayerAggregateRootCodec implements Codec<PlayerAggregateRoot> 
 
   @Override
   public PlayerAggregateRoot decode(final BsonReader reader, final DecoderContext decoderContext) {
+    reader.readStartDocument();
     final String id = reader.readString("id");
-    final String tag = reader.readString("selected-tag");
-    return new PlayerAggregateRoot(id, new PlayerModelEntity(id, tag.isEmpty() ? null : tag));
+    final String tag = (reader.getCurrentBsonType() == null) ? null : reader.readString("selected-tag");
+    reader.readEndDocument();
+    return new PlayerAggregateRoot(id, new PlayerModelEntity(id, tag));
   }
 
   @Override
   public void encode(final BsonWriter writer, final PlayerAggregateRoot playerAggregateRoot, final EncoderContext encoderContext) {
+    writer.writeStartDocument();
     writer.writeString("id", playerAggregateRoot.id());
-    final String tag = playerAggregateRoot.playerModel().tag();
-    writer.writeString("selected-tag", (tag == null) ? "" : tag);
+    writer.writeString("selected-tag", playerAggregateRoot.playerModel().tag());
+    writer.writeEndDocument();
   }
 
   @Override

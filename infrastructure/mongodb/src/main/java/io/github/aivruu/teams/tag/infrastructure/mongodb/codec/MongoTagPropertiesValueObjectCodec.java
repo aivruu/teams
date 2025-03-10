@@ -21,6 +21,7 @@ import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bson.BsonReader;
+import org.bson.BsonType;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
@@ -32,23 +33,37 @@ public enum MongoTagPropertiesValueObjectCodec implements Codec<TagPropertiesVal
 
   @Override
   public @NotNull TagPropertiesValueObject decode(final BsonReader reader, final DecoderContext decoderContext) {
-    final String prefix = reader.readString("prefix");
-    final String suffix = reader.readString("suffix");
+    reader.readStartDocument();
+    // Verify if values are available for reading and deserialization.
+    final String prefix = (reader.getCurrentBsonType() == BsonType.NULL) ? null : reader.readString("prefix");
+    final String suffix = (reader.getCurrentBsonType() == BsonType.NULL) ? null : reader.readString("suffix");
+    final int colorValue = reader.readInt32("color-value");
+    reader.readEndDocument();
     return new TagPropertiesValueObject(
-      prefix.isEmpty() ? null : PlainComponentHelper.modern(prefix),
-      suffix.isEmpty() ? null : PlainComponentHelper.modern(suffix),
+      (prefix == null) ? null : PlainComponentHelper.modern(prefix),
+      (suffix == null) ? null : PlainComponentHelper.modern(suffix),
       // This will never be null.
-      NamedTextColor.namedColor(reader.readInt32("color-value"))
+      NamedTextColor.namedColor(colorValue)
     );
   }
 
   @Override
   public void encode(final BsonWriter writer, final TagPropertiesValueObject properties, final EncoderContext encoderContext) {
+    writer.writeStartDocument();
     final Component prefix = properties.prefix();
-    writer.writeString("prefix", (prefix == null) ? "" : PlainComponentHelper.plain(prefix));
+    if (prefix == null) {
+      writer.writeNull("prefix");
+    } else {
+      writer.writeString("prefix", PlainComponentHelper.plain(prefix));
+    }
     final Component suffix = properties.suffix();
-    writer.writeString("suffix", (suffix == null) ? "" : PlainComponentHelper.plain(suffix));
+    if (suffix == null) {
+      writer.writeNull("suffix");
+    } else {
+      writer.writeString("suffix", PlainComponentHelper.plain(suffix));
+    }
     writer.writeInt32("color-value", properties.color().value());
+    writer.writeEndDocument();
   }
 
   @Override

@@ -40,18 +40,15 @@ public enum JsonPlayerAggregateRootCodec implements JsonCodecAdapterContract<Pla
   public @NotNull PlayerAggregateRoot deserialize(final JsonElement json, final Type type, final JsonDeserializationContext ctx) throws JsonParseException {
     final JsonObject jsonObject = json.getAsJsonObject();
     final String id = jsonObject.get("id").getAsString();
-    final String tag = jsonObject.get("selected-tag").getAsString();
-    return new PlayerAggregateRoot(
-      id, new PlayerModelEntity(id, tag.isEmpty() ? null : tag)
-    );
+    final JsonElement tag = jsonObject.get("selected-tag");
+    return new PlayerAggregateRoot(id, new PlayerModelEntity(id, (tag == null) ? null : tag.getAsString()));
   }
 
   @Override
   public @NotNull JsonElement serialize(final PlayerAggregateRoot playerAggregateRoot, final Type type, final JsonSerializationContext ctx) {
     final JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("id", playerAggregateRoot.id());
-    final String tag = playerAggregateRoot.playerModel().tag();
-    jsonObject.addProperty("selected-tag", (tag == null) ? "" : tag);
+    jsonObject.addProperty("selected-tag", playerAggregateRoot.playerModel().tag());
     return jsonObject;
   }
 }
