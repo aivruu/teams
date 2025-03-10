@@ -139,14 +139,11 @@ public abstract class TagModificationProcessor {
         if (color == null) {
           color = NamedTextColor.WHITE;
         }
-        final boolean status = this.validateResult(tagAggregateRoot, this.tagModifierService.updateColor(tagAggregateRoot, color));
-        yield status ? ModificationContext.COLOR : ModificationContext.FAILED;
+        yield this.validateResult(tagAggregateRoot, this.tagModifierService.updateColor(tagAggregateRoot, color))
+          ? ModificationContext.COLOR : ModificationContext.FAILED;
       }
       // Below cases are not possible to be reached.
-      case FAILED -> ModificationContext.FAILED;
-      case CANCELLED -> ModificationContext.CANCELLED;
-      case CLEARED -> ModificationContext.CLEARED;
-      case NONE -> ModificationContext.NONE;
+      case FAILED, CANCELLED, CLEARED, NONE -> context;
     };
   }
 
