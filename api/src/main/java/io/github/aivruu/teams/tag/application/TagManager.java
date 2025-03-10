@@ -31,6 +31,10 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * This class is used as global registry and information-handler for the tag.
  *
@@ -64,6 +68,25 @@ public final class TagManager {
    */
   public @Nullable TagAggregateRoot tagAggregateRootOf(final @NotNull String id) {
     return this.tagAggregateRootRegistry.findInBoth(id);
+  }
+
+  /**
+   * Returns a {@link List} with all in-cache currently tags' ids.
+   *
+   * @return A {@link List} with ids or an empty and immutable-list if there are no loaded tags.
+   * @see TagAggregateRootRegistry#findAllInCache()
+   * @since 3.5.1
+   */
+  public @NotNull List<@NotNull String> findAllTagIds() {
+    final Collection<TagAggregateRoot> tagAggregateRoots = this.tagAggregateRootRegistry.findAllInCache();
+    if (tagAggregateRoots.isEmpty()) {
+      return List.of();
+    }
+    final List<String> ids = new ArrayList<>(tagAggregateRoots.size());
+    for (final TagAggregateRoot tagAggregateRoot : tagAggregateRoots) {
+      ids.add(tagAggregateRoot.id());
+    }
+    return ids;
   }
 
   /**
