@@ -73,7 +73,7 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
 
   @Override
   public boolean existsGlobally(final @NotNull String id) {
-    return this.tagAggregateRootRepository.existsInCacheSync(id) || this.existsInInfrastructure(id);
+    return this.tagAggregateRootRepository.existsInCacheSync(id) || this.tagAsyncAggregateRootRepository.existsAsync(id).join();
   }
 
   @Override
