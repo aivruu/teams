@@ -20,10 +20,12 @@ import io.github.aivruu.teams.TeamsPlugin;
 import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationContainer;
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
+import io.github.aivruu.teams.tag.application.TagManager;
 import io.github.aivruu.teams.tag.application.TagModifierService;
 import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
+import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -32,14 +34,17 @@ import org.jetbrains.annotations.NotNull;
 
 public final class SimpleTagModificationProcessor extends TagModificationProcessor {
   private final ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer;
+  private final TagManager tagManager;
 
   public SimpleTagModificationProcessor(
     final @NotNull TeamsPlugin plugin,
     final @NotNull TagAggregateRootRegistry tagAggregateRootRegistry,
     final @NotNull TagModifierService tagModifierService,
-    final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer) {
+    final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer,
+    final @NotNull TagManager tagManager) {
     super(plugin, tagAggregateRootRegistry, tagModifierService);
     this.messagesModelContainer = messagesModelContainer;
+    this.tagManager = tagManager;
   }
 
   @Override
@@ -50,8 +55,15 @@ public final class SimpleTagModificationProcessor extends TagModificationProcess
       case CANCELLED -> player.sendMessage(MiniMessageHelper.text(messages.cancelledEditMode));
       case FAILED -> player.sendMessage(MiniMessageHelper.text(messages.tagModifyError));
       case CLEARED -> player.sendMessage(MiniMessageHelper.text(messages.clearedTagProperty));
-      case PREFIX, SUFFIX, COLOR ->
+      case PREFIX, SUFFIX, COLOR -> {
+        // Write tag's new information to the storage.
+        final TagAggregateRoot tagAggregateRoot = this.tagManager.tagAggregateRootOf(modification.tag());
+        // That is still in cache?
+        if (tagAggregateRoot != null) {
+          this.tagManager.handleTagAggregateRootSave(tagAggregateRoot);
+        }
         player.sendMessage(MiniMessageHelper.text(messages.modifiedTagProperty, Placeholder.parsed("property", context.name())));
+      }
     }
     return context;
   }
