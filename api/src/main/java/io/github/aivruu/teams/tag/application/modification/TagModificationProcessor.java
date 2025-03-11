@@ -121,8 +121,8 @@ public abstract class TagModificationProcessor {
           tagAggregateRoot.tagComponentProperties(result);
           yield ModificationContext.CLEARED;
         }
-        final boolean status = this.validateResult(tagAggregateRoot, this.tagModifierService.updatePrefix(tagAggregateRoot, MiniMessageHelper.text(input + " ")));
-        yield status ? ModificationContext.PREFIX : ModificationContext.FAILED;
+        yield this.validateResult(tagAggregateRoot, this.tagModifierService.updatePrefix(tagAggregateRoot, MiniMessageHelper.text(input + " ")))
+          ? ModificationContext.PREFIX : ModificationContext.FAILED;
       }
       case SUFFIX -> {
         if (input.equals("clear")) {
@@ -131,8 +131,8 @@ public abstract class TagModificationProcessor {
           tagAggregateRoot.tagComponentProperties(result);
           yield ModificationContext.CLEARED;
         }
-        final boolean status = this.validateResult(tagAggregateRoot, this.tagModifierService.updateSuffix(tagAggregateRoot, MiniMessageHelper.text(" " + input)));
-        yield status ? ModificationContext.SUFFIX : ModificationContext.FAILED;
+        yield this.validateResult(tagAggregateRoot, this.tagModifierService.updateSuffix(tagAggregateRoot, MiniMessageHelper.text(" " + input)))
+          ? ModificationContext.SUFFIX : ModificationContext.FAILED;
       }
       case COLOR -> {
         NamedTextColor color = NamedTextColor.NAMES.value(input);
