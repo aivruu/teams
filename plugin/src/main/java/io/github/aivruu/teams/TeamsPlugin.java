@@ -229,7 +229,8 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.tagManager = new TagManager(this.tagAggregateRootRegistry, this.packetAdaptation);
     ((TagCacheAggregateRootRepository) this.tagAggregateRootRepository).buildCache(this.tagManager);
     this.tagModifierService = new TagModifierService(this.packetAdaptation);
-    this.tagModificationProcessor = new SimpleTagModificationProcessor(this, this.tagAggregateRootRegistry, this.tagModifierService, this.messagesModelContainer);
+    this.tagModificationProcessor = new SimpleTagModificationProcessor(
+      this, this.tagAggregateRootRegistry, this.tagModifierService, this.messagesModelContainer, this.tagManager);
 
     this.logger.info("Initializing player-management services and registries.");
     this.playerAggregateRootRegistry = new PlayerAggregateRootRegistryImpl(
