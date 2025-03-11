@@ -19,7 +19,7 @@ package io.github.aivruu.teams.tag.application.modification;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a modification on curse for a tag.
+ * Represents a modification for a tag.
  *
  * @param tag the tag to be modified.
  * @param context the modification's context.
