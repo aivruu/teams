@@ -46,7 +46,7 @@ public final class AvailableTagSuggestionProvider implements SuggestionProvider<
     if (!sender.hasPermission(Permissions.MODIFY.node()) || !sender.hasPermission(Permissions.DELETE.node())) {
       return builder.buildFuture();
     }
-    for (final String tag : this.tagManager.findAllTagIds()) {
+    for (final String tag : this.tagManager.findAllLoadedTagIds()) {
       builder.suggest(tag);
     }
     return builder.buildFuture();
