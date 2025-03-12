@@ -19,6 +19,7 @@ package io.github.aivruu.teams.packet.application;
 import io.github.aivruu.teams.packet.application.minecraft.MinecraftColorHelper;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import io.papermc.paper.adventure.AdventureComponent;
+import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.MinecraftServer;
@@ -75,8 +76,12 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
   @Override
   public void removePlayerFromTeam(final @NotNull Player player) {
     final String name = player.getName();
-    // When this method is called, the player's PlayerTeam object should never be null.
-    this.scoreboard.removePlayerFromTeam(name, this.scoreboard.getPlayersTeam(name));
+    final PlayerTeam playersCurrentTeam = this.scoreboard.getPlayersTeam(name);
+    // May the team was deleted prior to this action.
+    if (playersCurrentTeam == null) {
+      return;
+    }
+    this.scoreboard.removePlayerFromTeam(name, playersCurrentTeam);
   }
 
   @Override
@@ -104,5 +109,27 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
       return;
     }
     playerTeam.setColor(MinecraftColorHelper.minecraft(namedTextColor));
+  }
+
+  @Override
+  public @Nullable Component teamPrefix(final @NotNull String team) {
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
+    return (playerTeam == null) ? null : PaperAdventure.asAdventure(playerTeam.getPlayerPrefix());
+  }
+
+  @Override
+  public @Nullable Component teamSuffix(final @NotNull String team) {
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
+    return (playerTeam == null) ? null : PaperAdventure.asAdventure(playerTeam.getPlayerSuffix());
+  }
+
+  @Override
+  public @NotNull NamedTextColor teamColor(final @NotNull String team) {
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
+    if (playerTeam == null) {
+      return NamedTextColor.WHITE;
+    }
+    final NamedTextColor color = MinecraftColorHelper.modern(playerTeam.getColor());
+    return (color == null) ? NamedTextColor.WHITE : color;
   }
 }
