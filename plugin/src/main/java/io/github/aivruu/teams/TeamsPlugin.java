@@ -270,8 +270,8 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
         this.tagModificationContainer, new AvailableTagSuggestionProvider(this.tagManager))
     );
     this.registerHooks(
-      new PlaceholderAPIHookImpl(this.playerManager, this.tagManager),
-      new MiniPlaceholdersHookImpl(this.playerManager, this.tagManager));
+      new PlaceholderAPIHookImpl(this.playerManager, this.packetAdaptation),
+      new MiniPlaceholdersHookImpl(this.playerManager, this.packetAdaptation));
     TeamsProvider.set(this);
     this.logger.info("The plugin has been enabled successfully!");
   }
