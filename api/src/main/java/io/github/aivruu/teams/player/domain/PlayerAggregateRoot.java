@@ -17,6 +17,7 @@
 package io.github.aivruu.teams.player.domain;
 
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,7 +85,8 @@ public final class PlayerAggregateRoot extends AggregateRoot {
    * @deprecated in favour of {@link #tagWithStatus(String)}
    * @since 0.0.1
    */
-  @Deprecated
+  @Deprecated()
+  @ApiStatus.ScheduledForRemoval(inVersion = "4.0.0")
   public void tag(final @Nullable String tag) {
     this.playerModel.tag(tag);
   }
