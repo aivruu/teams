@@ -18,11 +18,9 @@ package io.github.aivruu.teams.placeholder.application.impl;
 
 import io.github.aivruu.teams.Constants;
 import io.github.aivruu.teams.component.application.LegacyComponentHelper;
+import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
 import io.github.aivruu.teams.player.application.PlayerManager;
-import io.github.aivruu.teams.tag.application.TagManager;
-import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
-import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -33,11 +31,11 @@ import org.jetbrains.annotations.Nullable;
 
 public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implements PlaceholderHookContract {
   private final PlayerManager playerManager;
-  private final TagManager tagManager;
+  private final PacketAdaptationContract packetAdaptation;
 
-  public PlaceholderAPIHookImpl(final @NotNull PlayerManager playerManager, final @NotNull TagManager tagManager) {
+  public PlaceholderAPIHookImpl(final @NotNull PlayerManager playerManager, final @NotNull PacketAdaptationContract packetAdaptation) {
     this.playerManager = playerManager;
-    this.tagManager = tagManager;
+    this.packetAdaptation = packetAdaptation;
   }
 
   @Override
@@ -78,11 +76,7 @@ public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implement
   public @Nullable String onPlaceholderRequest(final Player player, @NotNull final String params) {
     if (params.contains("_")) {
       final String[] args = params.split("_", 2);
-      final TagAggregateRoot tagAggregateRoot = this.tagManager.tagAggregateRootOf(args[0]);
-      // Shouldn't be null if the player has it selected, but the tag could have been deleted prior
-      // to placeholder-request.
-      return (tagAggregateRoot == null)
-        ? null : this.validateTagPlaceholder(tagAggregateRoot.tagModel().tagComponentProperties(), args[1]);
+      return this.validateTagPlaceholder(args[0], args[1]);
     }
     if (player == null) {
       return null;
@@ -94,22 +88,17 @@ public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implement
     if (params.equals("tag")) {
       return (tagId == null) ? "" : tagId;
     }
-    if (tagId == null) {
-      return null;
-    }
-    final TagAggregateRoot tagAggregateRoot = this.tagManager.tagAggregateRootOf(tagId);
-    // Shouldn't be null if the player has it selected, but the tag could have been deleted prior
-    // to placeholder-request.
-    return (tagAggregateRoot == null)
-      ? null : this.validateTagPlaceholder(tagAggregateRoot.tagModel().tagComponentProperties(), params);
+    return (tagId == null) ? "" : this.validateTagPlaceholder(tagId, params);
   }
 
-  private @Nullable String validateTagPlaceholder(final @NotNull TagPropertiesValueObject properties, final @NotNull String params) {
+  private @Nullable String validateTagPlaceholder(final @NotNull String tagId, final @NotNull String params) {
+    final String prefix = LegacyComponentHelper.legacy(this.packetAdaptation.teamPrefix(tagId));
+    final String suffix = LegacyComponentHelper.legacy(this.packetAdaptation.teamSuffix(tagId));
     return switch (params) {
-      case "prefix" -> LegacyComponentHelper.legacy(properties.prefix());
-      case "suffix" -> LegacyComponentHelper.legacy(properties.suffix());
+      case "prefix" -> (prefix == null) ? "" : prefix;
+      case "suffix" -> (suffix == null) ? "" : suffix;
       case "color" -> LegacyComponentHelper.legacy(Component.text()
-        .style(builder -> builder.color(properties.color()))
+        .style(builder -> builder.color(this.packetAdaptation.teamColor(tagId)))
         .build());
       default -> null;
     };
