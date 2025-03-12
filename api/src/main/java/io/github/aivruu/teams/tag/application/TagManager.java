@@ -77,7 +77,7 @@ public final class TagManager {
    * @see TagAggregateRootRegistry#findAllInCache()
    * @since 3.5.1
    */
-  public @NotNull List<@NotNull String> findAllTagIds() {
+  public @NotNull List<@NotNull String> findAllLoadedTagIds() {
     final Collection<TagAggregateRoot> tagAggregateRoots = this.tagAggregateRootRegistry.findAllInCache();
     if (tagAggregateRoots.isEmpty()) {
       return List.of();
@@ -173,7 +173,7 @@ public final class TagManager {
         return false;
       })
       .thenAccept(deleted -> {
-        if (deleted) DebugLoggerHelper.write("Tag '{}' information has been deleted.");
+        if (deleted) DebugLoggerHelper.write("Tag '{}' information has been deleted.", id);
         else DebugLoggerHelper.write("The tag's information couldn't be deleted.");
       });
     return true;
