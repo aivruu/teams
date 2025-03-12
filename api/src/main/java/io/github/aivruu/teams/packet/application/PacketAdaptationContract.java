@@ -101,4 +101,32 @@ public interface PacketAdaptationContract {
    * @since 1.4.1
    */
   void updateTeamColor(final @NotNull String team, final @NotNull NamedTextColor namedTextColor);
+
+  /**
+   * Returns the team's prefix {@link Component}.
+   *
+   * @param team the team specified.
+   * @return A {@link Component} or {@code null} if there's none.
+   * @since 3.5.1
+   */
+  @Nullable Component teamPrefix(final @NotNull String team);
+
+  /**
+   * Returns the team's suffix {@link Component}.
+   *
+   * @param team the team specified.
+   * @return A {@link Component} or {@code null} if there's none.
+   * @since 3.5.1
+   */
+  @Nullable Component teamSuffix(final @NotNull String team);
+
+  /**
+   * Returns the team's color.
+   *
+   * @param team the team specified.
+   * @return A {@link NamedTextColor} or {@link NamedTextColor#WHITE} if team not exist, or color-value
+   * of the team is not valid.
+   * @since 3.5.1
+   */
+  @NotNull NamedTextColor teamColor(final @NotNull String team);
 }
