@@ -131,11 +131,9 @@ public abstract class AbstractMenuModel implements InventoryHolder {
   }
 
   /**
-   * Implementation method for {@link InventoryHolder} interface-contract, it will build the inventory
-   * if necessary before provide it.
+   * {@inheritDoc}
    *
-   * @return This {@link AbstractMenuModel}'s {@link Inventory}.
-   * @since 3.4.1
+   * It will build the inventory if necessary before provide it.
    */
   @Override
   public @NotNull Inventory getInventory() {
