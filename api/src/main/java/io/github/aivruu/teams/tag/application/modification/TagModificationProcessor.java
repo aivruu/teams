@@ -113,26 +113,27 @@ public abstract class TagModificationProcessor {
   private @NotNull ModificationContext processContext(
     final @NotNull ModificationContext context, final @NotNull TagAggregateRoot tagAggregateRoot, final @NotNull String input
   ) {
+    final boolean mustBeCleared = input.equals("clear");
     return switch (context) {
       case PREFIX -> {
-        if (input.equals("clear")) {
-          final TagPropertiesValueObject result = this.tagModifierService.updatePrefix(tagAggregateRoot, null).result();
-          // When second-parameters is null, the result will never be null.
-          tagAggregateRoot.tagComponentProperties(result);
+        final ValueObjectMutationResult<TagPropertiesValueObject> mutationResult = this.tagModifierService.updatePrefix(tagAggregateRoot,
+          mustBeCleared ? null : MiniMessageHelper.text(input + " "));
+        if (mustBeCleared) {
+          // Result won't be null if content has been cleared.
+          tagAggregateRoot.tagComponentProperties(mutationResult.result());
           yield ModificationContext.CLEARED;
         }
-        yield this.validateResult(tagAggregateRoot, this.tagModifierService.updatePrefix(tagAggregateRoot, MiniMessageHelper.text(input + " ")))
-          ? ModificationContext.PREFIX : ModificationContext.FAILED;
+        yield this.validateResult(tagAggregateRoot, mutationResult) ? ModificationContext.PREFIX : ModificationContext.FAILED;
       }
       case SUFFIX -> {
-        if (input.equals("clear")) {
-          final TagPropertiesValueObject result = this.tagModifierService.updateSuffix(tagAggregateRoot, null).result();
-          // When second-parameters is null, the result will never be null.
-          tagAggregateRoot.tagComponentProperties(result);
+        final ValueObjectMutationResult<TagPropertiesValueObject> mutationResult = this.tagModifierService.updateSuffix(tagAggregateRoot,
+          mustBeCleared ? null : MiniMessageHelper.text(" " + input));
+        if (mustBeCleared) {
+          // Result won't be null if content has been cleared.
+          tagAggregateRoot.tagComponentProperties(mutationResult.result());
           yield ModificationContext.CLEARED;
         }
-        yield this.validateResult(tagAggregateRoot, this.tagModifierService.updateSuffix(tagAggregateRoot, MiniMessageHelper.text(" " + input)))
-          ? ModificationContext.SUFFIX : ModificationContext.FAILED;
+        yield this.validateResult(tagAggregateRoot, mutationResult) ? ModificationContext.SUFFIX : ModificationContext.FAILED;
       }
       case COLOR -> {
         NamedTextColor color = NamedTextColor.NAMES.value(input);
