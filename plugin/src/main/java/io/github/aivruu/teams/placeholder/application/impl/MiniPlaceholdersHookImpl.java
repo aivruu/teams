@@ -16,12 +16,11 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.placeholder.application.impl;
 
+import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
 import io.github.aivruu.teams.player.application.PlayerManager;
-import io.github.aivruu.teams.tag.application.TagManager;
-import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
-import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import io.github.miniplaceholders.api.Expansion;
+import io.github.miniplaceholders.api.utils.TagsUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.Bukkit;
@@ -32,11 +31,11 @@ import org.jetbrains.annotations.Nullable;
 
 public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
   private final PlayerManager playerManager;
-  private final TagManager tagManager;
+  private final PacketAdaptationContract packetAdaptation;
 
-  public MiniPlaceholdersHookImpl(final @NotNull PlayerManager playerManager, final @NotNull TagManager tagManager) {
+  public MiniPlaceholdersHookImpl(final @NotNull PlayerManager playerManager, final @NotNull PacketAdaptationContract packetAdaptation) {
     this.playerManager = playerManager;
-    this.tagManager = tagManager;
+    this.packetAdaptation = packetAdaptation;
   }
 
   @Override
@@ -57,28 +56,28 @@ public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
           .playerModel()
           .tag();
-        return (tagId == null) ? null : Tag.selfClosingInserting(Component.text(tagId));
+        return (tagId == null) ? TagsUtils.EMPTY_TAG : Tag.selfClosingInserting(Component.text(tagId));
       })
       .audiencePlaceholder("prefix", (audience, queue, ctx) -> {
         // At this point the player's information should be loaded into the cache, so the model won't be null.
         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
           .playerModel()
           .tag();
-        return (tagId == null) ? null : this.validateTagPlaceholder(tagId, "prefix");
+        return (tagId == null) ? TagsUtils.EMPTY_TAG : this.validateTagPlaceholder(tagId, "prefix");
       })
       .audiencePlaceholder("suffix", (audience, queue, ctx) -> {
         // At this point the player's information should be loaded into the cache, so the model won't be null.
         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
           .playerModel()
           .tag();
-        return (tagId == null) ? null : this.validateTagPlaceholder(tagId, "suffix");
+        return (tagId == null) ? TagsUtils.EMPTY_TAG : this.validateTagPlaceholder(tagId, "suffix");
       })
       .audiencePlaceholder("color", (audience, queue, ctx) -> {
         // At this point the player's information should be loaded into the cache, so the model won't be null.
         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
           .playerModel()
           .tag();
-        return (tagId == null) ? null : this.validateTagPlaceholder(tagId, "color");
+        return (tagId == null) ? TagsUtils.EMPTY_TAG : this.validateTagPlaceholder(tagId, "color");
       })
       .build();
     // Register the expansion to MiniPlaceholders.
@@ -87,17 +86,12 @@ public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
   }
 
   private @Nullable Tag validateTagPlaceholder(final @NotNull String tagId, final @NotNull String type) {
-    final TagAggregateRoot tagAggregateRoot = this.tagManager.tagAggregateRootOf(tagId);
-    // Shouldn't be null if the player has it selected, but the tag could have been deleted prior
-    // to placeholder-request.
-    if (tagAggregateRoot == null) {
-      return null;
-    }
-    final TagPropertiesValueObject properties = tagAggregateRoot.tagModel().tagComponentProperties();
+    final Component prefix = this.packetAdaptation.teamPrefix(tagId);
+    final Component suffix = this.packetAdaptation.teamSuffix(tagId);
     return switch (type) {
-      case "prefix" -> (properties.prefix() == null) ? null : Tag.selfClosingInserting(properties.prefix());
-      case "suffix" -> (properties.suffix() == null) ? null : Tag.selfClosingInserting(properties.suffix());
-      case "color" -> Tag.styling(builder -> builder.color(properties.color()));
+      case "prefix" -> (prefix == null) ? null : Tag.selfClosingInserting(prefix);
+      case "suffix" -> (suffix == null) ? null : Tag.selfClosingInserting(suffix);
+      case "color" -> Tag.styling(builder -> builder.color(this.packetAdaptation.teamColor(tagId)));
       default -> null;
     };
   }
