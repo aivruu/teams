@@ -73,7 +73,7 @@ public final class JsonCodecHelper {
 
   public static <A extends AggregateRoot> boolean write(final @NotNull Path file, final @NotNull A aggregateRoot) {
     try (final Writer writer = Files.newBufferedWriter(file)) {
-      gson.toJson(aggregateRoot, AggregateRoot.class, writer);
+      gson.toJson(aggregateRoot, writer);
       return true;
     } catch (final IOException | JsonIOException exception) {
       return false;
