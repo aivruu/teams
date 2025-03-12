@@ -40,13 +40,10 @@ public final class TagAggregateRootCacheInvalidationListener implements RemovalL
     if (key == null || tagAggregateRoot == null) {
       return;
     }
-    if (cause == RemovalCause.EXPLICIT) {
-      DebugLoggerHelper.write("Invalidating tag-aggregate-root with id '{}' from cache.", key);
-    } else if (cause == RemovalCause.EXPIRED) {
-      DebugLoggerHelper.write("Invalidating expired tag-aggregate-root with id '{}' from cache after 5 minutes.", key);
-    } else {
-      DebugLoggerHelper.write("Invalidating tag-aggregate-root with id '{}' from cache with unknown cause.", key);
+    if (cause != RemovalCause.EXPIRED) {
+      return;
     }
+    DebugLoggerHelper.write("Invalidating expired tag-aggregate-root with id '{}' from cache after 5 minutes.", key);
     this.tagManager.handleTagAggregateRootSave(tagAggregateRoot);
   }
 }
