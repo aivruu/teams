@@ -32,7 +32,6 @@ public final class PlaceholderHelper {
   private static final TagResolver MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS;
   private static final boolean legacyPlaceholdersHooked;
   private static final boolean modernPlaceholdersHooked;
-  private static final TagResolver.Builder MODERN_PLACEHOLDERS_BUILDER;
 
   static {
     final PluginManager pluginManager = Bukkit.getPluginManager();
@@ -44,7 +43,6 @@ public final class PlaceholderHelper {
     } else {
       MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS = TagResolver.empty();
     }
-    MODERN_PLACEHOLDERS_BUILDER = TagResolver.builder().resolver(MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS);
   }
 
   public static @NotNull Component parseBoth(final @Nullable Player player, final @NotNull String text) {
@@ -67,11 +65,12 @@ public final class PlaceholderHelper {
     if (!modernPlaceholdersHooked) {
       return TagResolver.empty();
     }
+    final TagResolver.Builder builder = TagResolver.builder().resolver(MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS);
     // Should for audience specific-placeholders be included?
     if (player != null) {
-      MODERN_PLACEHOLDERS_BUILDER.resolver(MiniPlaceholders.getAudiencePlaceholders(player));
+      builder.resolver(MiniPlaceholders.getAudiencePlaceholders(player));
     }
-    return MODERN_PLACEHOLDERS_BUILDER.build(); // Experimental
+    return builder.build();
   }
 
   public static @NotNull String parseLegacy(final @Nullable Player player, final @NotNull String text) {
