@@ -26,7 +26,7 @@ public final class ConfigurationConfigurationModel implements ConfigurationInter
   @Comment("""
     Represents the amount of threads that plugin's Executor will be able to use, this threads
     are used for heavy-operations for the plugin's functions, such as in the infrastructure for
-    load and save information into persistent-storage, as well for menus' items-building operations.
+    load and save information into persistent-storage, configuration-reloading, and more.
 
     Be carefully with the amount of threads you assign to it.""")
   public int threadPoolSize = 4;
@@ -53,12 +53,12 @@ public final class ConfigurationConfigurationModel implements ConfigurationInter
   public InfrastructureAggregateRootRepository.Type tagInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
 
   @Comment("""
-    The name of the MongoDB's database's collection or the directory's name where the players' information
+    The name of the database/collection (remote) or the directory's (local) name where the players' information
     will be stored by the plugin.""")
   public String playerCollectionAndDirectoryName = "players";
 
   @Comment("""
-    The name of the MongoDB's database's collection or the directory's name where the tags' information
+    The name of the database/collection (remote) or the directory's (local) name where the tags' information
     will be stored by the plugin.""")
   public String tagCollectionAndDirectoryName = "tags";
 
