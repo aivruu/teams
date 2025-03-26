@@ -31,4 +31,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public record TagPropertiesValueObject(
   @Nullable Component prefix, @Nullable Component suffix, @NotNull NamedTextColor color
-) {}
+) {
+  /** Represents an "empty" (or non-configured) properties-container for a tag. */
+  public static final TagPropertiesValueObject EMPTY = new TagPropertiesValueObject(null, null, NamedTextColor.WHITE);
+}
