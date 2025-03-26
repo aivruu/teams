@@ -71,7 +71,7 @@ public final class TagMariaDBInfrastructureAggregateRootRepository extends Commo
             return null;
           }
           final TagPropertiesValueObject properties = JsonCodecHelper.readProperties(resultSet.getString("properties"));
-          return (properties == null) ? null : new TagAggregateRoot(id, new TagModelEntity(id, properties));
+          return new TagAggregateRoot(id, new TagModelEntity(id, (properties == null) ? TagPropertiesValueObject.EMPTY : properties));
         }
       } catch (final SQLException exception) {
         DebugLoggerHelper.write("Unexpected exception when trying to retrieve tag's information from database.", exception);
