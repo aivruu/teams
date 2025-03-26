@@ -18,15 +18,27 @@ package io.github.aivruu.teams.persistence.infrastructure.utils;
 
 public final class StatementConstants {
   public static final String CREATE_PLAYERS_DATA_TABLE_STATEMENT = """
-    CREATE TABLE IF NOT EXISTS %s(UUID varchar(36) NOT NULL PRIMARY KEY, tag VARCHAR(10) NULL)""";
+    CREATE TABLE IF NOT EXISTS %s(
+      uuid VARCHAR(40) NOT NULL,
+      tag TEXT NULL,
+      PRIMARY KEY(uuid)
+    )""";
   public static final String CREATE_TAGS_DATA_TABLE_STATEMENT = """
-    CREATE TABLE IF NOT EXISTS %s(id varchar(10) NOT NULL PRIMARY KEY, properties VARCHAR(512) NOT NULL)""";
-  public static final String FIND_PLAYER_INFORMATION_STATEMENT = "SELECT tag FROM %s WHERE UUID=?";
-  public static final String FIND_TAG_INFORMATION_STATEMENT = "SELECT properties FROM %s WHERE id=?";
-  public static final String SAVE_TAG_INFORMATION_STATEMENT = "INSERT INTO %s(id, properties) VALUES(?, ?)";
-  public static final String SAVE_PLAYER_INFORMATION_STATEMENT = "INSERT INTO %s(UUID, tag) VALUES(?, ?)";
-  public static final String DELETE_TAG_INFORMATION_STATEMENT = "DELETE FROM %s WHERE id=?";
-  public static final String DELETE_PLAYER_INFORMATION_STATEMENT = "DELETE FROM %s WHERE UUID=?";
+    CREATE TABLE IF NOT EXISTS %s(
+      id VARCHAR(20) NOT NULL,
+      properties TEXT NOT NULL,
+      PRIMARY KEY(id)
+    )""";
+  public static final String FIND_PLAYER_INFORMATION_STATEMENT = "SELECT tag FROM %s WHERE uuid = ?";
+  public static final String FIND_TAG_INFORMATION_STATEMENT = "SELECT properties FROM %s WHERE id = ?";
+  public static final String SAVE_TAG_INFORMATION_STATEMENT = """
+    INSERT INTO %s(id, properties) VALUES(?, ?)
+    ON DUPLICATE KEY UPDATE properties = VALUES(properties)""";
+  public static final String SAVE_PLAYER_INFORMATION_STATEMENT = """
+    INSERT INTO %s(uuid, tag) VALUES(?, ?)
+    ON DUPLICATE KEY UPDATE tag = VALUES(tag)""";
+  public static final String DELETE_TAG_INFORMATION_STATEMENT = "DELETE FROM %s WHERE id = ?";
+  public static final String DELETE_PLAYER_INFORMATION_STATEMENT = "DELETE FROM %s WHERE uuid = ?";
 
   private StatementConstants() {
     throw new UnsupportedOperationException("This class cannot be instantiated.");
