@@ -65,11 +65,8 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
       ) {
         statement.setString(1, id);
         try (final ResultSet resultSet = statement.executeQuery()) {
-          if (!resultSet.next()) {
-            return null;
-          }
-          final String selectedTag = resultSet.getString(1);
-          return new PlayerAggregateRoot(id, new PlayerModelEntity(id, selectedTag.isEmpty() ? null : selectedTag));
+          return !resultSet.next()
+            ? null : new PlayerAggregateRoot(id, new PlayerModelEntity(id, /* Get the tag-id */ resultSet.getString(1)));
         }
       } catch (final SQLException exception) {
         DebugLoggerHelper.write("Unexpected exception when trying to retrieve player's information from database.", exception);
@@ -101,9 +98,8 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
       try (final PreparedStatement statement = this.connectionPool.prepareStatement(
         StatementConstants.SAVE_PLAYER_INFORMATION_STATEMENT.formatted(this.tableName))
       ) {
-        final String tag = aggregateRoot.playerModel().tag();
         statement.setString(1, aggregateRoot.id());
-        statement.setString(2, (tag == null) ? "" : tag);
+        statement.setString(2, aggregateRoot.playerModel().tag());
         return statement.executeUpdate() > 0;
       } catch (final SQLException exception) {
         DebugLoggerHelper.write("Unexpected exception when trying to save player's data to the database.", exception);
