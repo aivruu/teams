@@ -19,6 +19,7 @@ package io.github.aivruu.teams.player.infrastructure.mongodb;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.UpdateResult;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.shared.infrastructure.CloseableInfrastructureAggregateRootRepository;
 import org.bson.Document;
@@ -73,8 +74,14 @@ public final class PlayerMongoInfrastructureAggregateRootRepository implements C
 
   @Override
   public @NotNull CompletableFuture<Boolean> saveAsync(final @NotNull PlayerAggregateRoot aggregateRoot) {
-    return CompletableFuture.supplyAsync(() ->
-      this.playerAggregateRootMongoCollection.insertOne(aggregateRoot).wasAcknowledged(), THREAD_POOL);
+    return CompletableFuture.supplyAsync(() -> {
+      final UpdateResult result = this.playerAggregateRootMongoCollection.updateOne(
+        new Document("id", aggregateRoot.id()), new Document("$set", aggregateRoot));
+      // Check if the row exists (was matched).
+      return (result.getMatchedCount() == 0)
+        ? this.playerAggregateRootMongoCollection.insertOne(aggregateRoot).wasAcknowledged()
+        : result.wasAcknowledged();
+    }, THREAD_POOL);
   }
 
   @Override

@@ -19,6 +19,7 @@ package io.github.aivruu.teams.tag.infrastructure.mongodb;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.UpdateResult;
 import io.github.aivruu.teams.shared.infrastructure.CloseableInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import org.bson.Document;
@@ -73,8 +74,14 @@ public final class TagMongoInfrastructureAggregateRootRepository implements Clos
 
   @Override
   public @NotNull CompletableFuture<Boolean> saveAsync(final @NotNull TagAggregateRoot aggregateRoot) {
-    return CompletableFuture.supplyAsync(() ->
-      this.tagAggregateRootMongoCollection.insertOne(aggregateRoot).wasAcknowledged(), THREAD_POOL);
+    return CompletableFuture.supplyAsync(() -> {
+      final UpdateResult result = this.tagAggregateRootMongoCollection.updateOne(
+        new Document("id", aggregateRoot.id()), new Document("$set", aggregateRoot));
+      // Check if the row exists (was matched).
+      return (result.getMatchedCount() == 0)
+        ? this.tagAggregateRootMongoCollection.insertOne(aggregateRoot).wasAcknowledged()
+        : result.wasAcknowledged();
+    }, THREAD_POOL);
   }
 
   @Override
