@@ -85,12 +85,10 @@ public abstract class TagModificationProcessor {
       return ModificationContext.FAILED;
     }
     final String input = PlainComponentHelper.plain(message);
-    if (input.equals("cancel")) {
-      return ModificationContext.CANCELLED;
-    }
-    return this.processContext(context,
+    return input.equals("cancel")
+      ? ModificationContext.CANCELLED
       // Tag-existing validation is made previously during editor's command-execution, so the tag should exist.
-      this.tagAggregateRootRegistry.findInBoth(tag), input);
+      : this.processContext(context, this.tagAggregateRootRegistry.findInBoth(tag), input);
   }
 
   /**
