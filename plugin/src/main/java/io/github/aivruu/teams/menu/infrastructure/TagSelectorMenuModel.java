@@ -22,6 +22,7 @@ import io.github.aivruu.teams.config.infrastructure.object.MessagesConfiguration
 import io.github.aivruu.teams.config.infrastructure.object.TagsMenuConfigurationModel;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
+import io.github.aivruu.teams.player.application.PlayerManager;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.util.PlaceholderParser;
@@ -42,16 +43,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public final class TagSelectorMenuModel extends AbstractMenuModel {
+  private final PlayerManager playerManager;
   private final PlayerTagSelectorManager playerTagSelectorManager;
   private ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer;
   private ConfigurationContainer<TagsMenuConfigurationModel> tagsMenuModelConfiguration;
 
   public TagSelectorMenuModel(
-    final @NotNull ActionManager actionManager,
-    final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer,
-    final @NotNull ConfigurationContainer<TagsMenuConfigurationModel> tagsMenuModelConfiguration,
-    final @NotNull PlayerTagSelectorManager playerTagSelectorManager) {
+     final @NotNull ActionManager actionManager,
+     final @NotNull PlayerManager playerManager,
+     final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer,
+     final @NotNull ConfigurationContainer<TagsMenuConfigurationModel> tagsMenuModelConfiguration,
+     final @NotNull PlayerTagSelectorManager playerTagSelectorManager) {
     super(MenuConstants.TAGS_MENU_ID, actionManager);
+    this.playerManager = playerManager;
     this.messagesModelContainer = messagesModelContainer;
     this.tagsMenuModelConfiguration = tagsMenuModelConfiguration;
     this.playerTagSelectorManager = playerTagSelectorManager;
@@ -135,8 +139,12 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
         player.sendMessage(MiniMessageParser.text(messages.alreadySelected));
       case PlayerTagSelectorManager.TAG_SPECIFIED_NOT_EXIST ->
         player.sendMessage(MiniMessageParser.text(messages.unknownTag));
-      case PlayerAggregateRoot.TAG_HAS_BEEN_CHANGED ->
+      case PlayerAggregateRoot.TAG_HAS_BEEN_CHANGED -> {
+        // Aggregate-root won't be null.
+        this.playerManager.handlePlayerAggregateRootSave(this.playerManager.playerAggregateRootOf(
+           player.getUniqueId().toString()));
         player.sendMessage(MiniMessageParser.text(messages.selected, Placeholder.parsed("tag-id", itemSection.tag)));
+      }
       default -> throw new UnsupportedOperationException("Unexpected status-code result.");
     }
   }
