@@ -17,14 +17,13 @@
 package io.github.aivruu.teams;
 
 import io.github.aivruu.teams.action.application.ActionManager;
-import io.github.aivruu.teams.menu.application.MenuManagerService;
+import io.github.aivruu.teams.menu.application.MenuManager;
 import io.github.aivruu.teams.player.application.PlayerManager;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.domain.registry.PlayerAggregateRootRegistry;
 import io.github.aivruu.teams.player.domain.repository.PlayerAggregateRootRepository;
 import io.github.aivruu.teams.tag.application.TagManager;
-import io.github.aivruu.teams.tag.application.TagModificationContainer;
-import io.github.aivruu.teams.tag.application.TagModifierService;
+import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import io.github.aivruu.teams.tag.domain.repository.TagAggregateRootRepository;
@@ -65,22 +64,13 @@ public interface Teams {
   @NotNull TagManager tagManager();
 
   /**
-   * Returns the {@link TagModifierService} instance, will throw an {@link IllegalStateException}
-   * if the instance is not initialized.
+   * Returns the {@link TagModificationRepository} instance, will throw an
+   * {@link IllegalStateException} if the instance is not initialized.
    *
-   * @return The {@link TagModifierService}.
-   * @since 0.0.1
-   */
-  @NotNull TagModifierService tagModifierService();
-
-  /**
-   * Returns the {@link TagModificationContainer} instance, will throw an {@link IllegalStateException}
-   * if the instance is not initialized.
-   *
-   * @return The {@link TagModificationContainer}.
+   * @return The {@link TagModificationRepository}.
    * @since 2.3.1
    */
-  @NotNull TagModificationContainer tagModificationContainer();
+  @NotNull TagModificationRepository tagModificationRepository();
 
   /**
    * Returns the {@link TagModificationProcessor} instance, will throw an {@link IllegalStateException}
@@ -128,13 +118,13 @@ public interface Teams {
   @NotNull PlayerTagSelectorManager playerTagSelectorManager();
 
   /**
-   * Returns the {@link MenuManagerService} instance, will throw an {@link IllegalStateException}
+   * Returns the {@link MenuManager} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
-   * @return The {@link MenuManagerService}.
+   * @return The {@link MenuManager}.
    * @since 0.0.1
    */
-  @NotNull MenuManagerService menuManagerService();
+  @NotNull MenuManager menuManagerService();
 
   /**
    * Returns the {@link ActionManager} instance, will throw an {@link IllegalStateException}
