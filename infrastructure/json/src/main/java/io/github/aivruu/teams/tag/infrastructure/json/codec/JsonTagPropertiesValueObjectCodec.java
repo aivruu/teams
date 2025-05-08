@@ -21,9 +21,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.aivruu.teams.plain.application.PlainComponentHelper;
 import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
+import io.github.aivruu.teams.util.application.component.PlainComponentParser;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,8 +43,8 @@ public enum JsonTagPropertiesValueObjectCodec implements JsonCodecAdapterContrac
     final JsonElement prefix = jsonObject.get("prefix");
     final JsonElement suffix = jsonObject.get("suffix");
     return new TagPropertiesValueObject(
-      prefix.isJsonNull() ? null : PlainComponentHelper.modern(prefix.getAsString()),
-      suffix.isJsonNull() ? null : PlainComponentHelper.modern(suffix.getAsString()),
+      prefix.isJsonNull() ? null : PlainComponentParser.modern(prefix.getAsString()),
+      suffix.isJsonNull() ? null : PlainComponentParser.modern(suffix.getAsString()),
       // This will never be null.
       NamedTextColor.namedColor(jsonObject.get("color-value").getAsInt())
     );
@@ -53,8 +53,8 @@ public enum JsonTagPropertiesValueObjectCodec implements JsonCodecAdapterContrac
   @Override
   public @NotNull JsonElement serialize(final TagPropertiesValueObject properties, final Type type, final JsonSerializationContext ctx) {
     final JsonObject jsonObject = new JsonObject();
-    jsonObject.addProperty("prefix", PlainComponentHelper.plainOrNull(properties.prefix()));
-    jsonObject.addProperty("suffix", PlainComponentHelper.plainOrNull(properties.suffix()));
+    jsonObject.addProperty("prefix", PlainComponentParser.plainOrNull(properties.prefix()));
+    jsonObject.addProperty("suffix", PlainComponentParser.plainOrNull(properties.suffix()));
     jsonObject.addProperty("color-value", properties.color().value());
     return jsonObject;
   }
