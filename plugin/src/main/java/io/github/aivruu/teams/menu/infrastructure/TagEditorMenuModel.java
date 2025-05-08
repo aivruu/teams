@@ -22,10 +22,10 @@ import io.github.aivruu.teams.config.infrastructure.object.MessagesConfiguration
 import io.github.aivruu.teams.config.infrastructure.object.TagEditorMenuConfigurationModel;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
-import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
-import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
-import io.github.aivruu.teams.tag.application.TagModificationContainer;
+import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
+import io.github.aivruu.teams.util.PlaceholderParser;
+import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -43,17 +43,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public final class TagEditorMenuModel extends AbstractMenuModel {
-  private final TagModificationContainer tagModificationContainer;
+  private final TagModificationRepository tagModificationRepository;
   private ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer;
   private ConfigurationContainer<TagEditorMenuConfigurationModel> tagsMenuModelConfiguration;
 
   public TagEditorMenuModel(
     final @NotNull ActionManager actionManager,
-    final @NotNull TagModificationContainer tagModificationContainer,
+    final @NotNull TagModificationRepository tagModificationRepository,
     final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer,
     final @NotNull ConfigurationContainer<TagEditorMenuConfigurationModel> tagEditorMenuModelConfiguration) {
     super(MenuConstants.TAGS_EDITOR_ID, actionManager);
-    this.tagModificationContainer = tagModificationContainer;
+    this.tagModificationRepository = tagModificationRepository;
     this.messagesModelContainer = messagesModelContainer;
     this.tagsMenuModelConfiguration = tagEditorMenuModelConfiguration;
   }
@@ -69,7 +69,8 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
   @Override
   public void build() {
     final TagEditorMenuConfigurationModel menu = this.tagsMenuModelConfiguration.model();
-    super.inventory = Bukkit.createInventory(this, menu.rows * 9, PlaceholderHelper.parseBoth(null, menu.title));
+    super.inventory = Bukkit.createInventory(this, menu.rows * 9,
+       PlaceholderParser.parseBoth(null, menu.title));
     for (final TagEditorMenuConfigurationModel.ItemSection itemSection : menu.items) {
       for (final byte slot : itemSection.slots) {
         super.inventory.setItem(slot, this.prepareItem(itemSection));
@@ -118,13 +119,13 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
     }
     final String playerId = player.getUniqueId().toString();
     // May modification have expired before player have selected an editor?
-    if (!this.tagModificationContainer.isModifying(playerId)) {
+    if (!this.tagModificationRepository.existsSync(playerId)) {
       return;
     }
-    for (final Component message : MiniMessageHelper.array(this.messagesModelContainer.model().enteredEditMode, Placeholder.parsed("type", itemSection.inputTypeRequired.name()))) {
+    for (final Component message : MiniMessageParser.array(this.messagesModelContainer.model().enteredEditMode, Placeholder.parsed("type", itemSection.inputTypeRequired.name()))) {
       player.sendMessage(message);
     }
-    this.tagModificationContainer.updateModificationContext(playerId, itemSection.inputTypeRequired);
+    this.tagModificationRepository.updateSync(playerId, itemSection.inputTypeRequired);
   }
 
   @Override
@@ -144,8 +145,8 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
     if (itemSection.material != Material.AIR){
       item.editMeta(meta -> {
         // Provide support for support only for legacy and modern global-placeholders.
-        meta.itemName(PlaceholderHelper.parseBoth(null, itemSection.displayName));
-        meta.lore(Arrays.asList(PlaceholderHelper.parseBoth(null, itemSection.lore)));
+        meta.itemName(PlaceholderParser.parseBoth(null, itemSection.displayName));
+        meta.lore(Arrays.asList(PlaceholderParser.parseBoth(null, itemSection.lore)));
         if (itemSection.data > 0) {
           meta.setCustomModelData(itemSection.data);
         }
