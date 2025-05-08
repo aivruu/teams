@@ -14,7 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.plain.application;
+package io.github.aivruu.teams.util.application.component;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -24,12 +24,12 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A utility used for {@link Component}s conversion to plain-text and vice versa.
  *
- * @since 0.0.1
+ * @since 4.0.0
  */
-public final class PlainComponentHelper {
+public final class PlainComponentParser {
   private static final PlainTextComponentSerializer PLAIN_TEXT_COMPONENT_SERIALIZER = PlainTextComponentSerializer.plainText();
 
-  private PlainComponentHelper() {
+  private PlainComponentParser() {
     throw new UnsupportedOperationException("This class is for utility.");
   }
 
