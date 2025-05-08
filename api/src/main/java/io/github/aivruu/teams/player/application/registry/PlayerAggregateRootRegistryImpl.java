@@ -39,7 +39,7 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
 
   @Override
   public @Nullable PlayerAggregateRoot findInCache(final @NotNull String id) {
-    return this.playerAggregateRootRepository.findInCacheSync(id);
+    return this.playerAggregateRootRepository.findSync(id);
   }
 
   @Override
@@ -49,18 +49,18 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
 
   @Override
   public @NotNull Collection<PlayerAggregateRoot> findAllInCache() {
-    return this.playerAggregateRootRepository.findAllInCacheSync();
+    return this.playerAggregateRootRepository.findAllSync();
   }
 
   @Override
   public boolean existsGlobally(final @NotNull String id) {
-    return this.playerAggregateRootRepository.existsInCacheSync(id)
+    return this.playerAggregateRootRepository.existsSync(id)
       || this.playerAsyncAggregateRootRepository.existsAsync(id).join();
   }
 
   @Override
   public boolean existsInCache(final @NotNull String id) {
-    return this.playerAggregateRootRepository.existsInCacheSync(id);
+    return this.playerAggregateRootRepository.existsSync(id);
   }
 
   @Override
@@ -70,7 +70,7 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
 
   @Override
   public void register(final @NotNull PlayerAggregateRoot aggregateRoot) {
-    this.playerAggregateRootRepository.saveSync(aggregateRoot);
+    this.playerAggregateRootRepository.saveSync(aggregateRoot.id(), aggregateRoot);
   }
 
   @Override
