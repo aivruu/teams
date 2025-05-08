@@ -17,7 +17,7 @@
 package io.github.aivruu.teams.tag.application.registry;
 
 import io.github.aivruu.teams.aggregate.domain.repository.AsyncAggregateRootRepository;
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import io.github.aivruu.teams.tag.domain.repository.TagAggregateRootRepository;
@@ -40,23 +40,23 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
 
   @Override
   public @Nullable TagAggregateRoot findInCache(final @NotNull String id) {
-    return this.tagAggregateRootRepository.findInCacheSync(id);
+    return this.tagAggregateRootRepository.findSync(id);
   }
 
   @Override
   public @Nullable TagAggregateRoot findInBoth(final @NotNull String id) {
-    TagAggregateRoot tagAggregateRoot = this.tagAggregateRootRepository.findInCacheSync(id);
+    TagAggregateRoot tagAggregateRoot = this.tagAggregateRootRepository.findSync(id);
     if (tagAggregateRoot != null) {
       return tagAggregateRoot;
     }
     tagAggregateRoot = this.tagAsyncAggregateRootRepository.findInPersistenceAsync(id)
       .exceptionally(exception -> {
-        DebugLoggerHelper.write("Unexpected exception during in-infrastructure tag fetching with id '{}'.", id, exception);
+        Debugger.write("Unexpected exception during in-infrastructure tag fetching with id '{}'.", id, exception);
         return null;
       })
       .join();
     if (tagAggregateRoot != null) {
-      this.tagAggregateRootRepository.saveSync(tagAggregateRoot);
+      this.tagAggregateRootRepository.saveSync(tagAggregateRoot.id(), tagAggregateRoot);
     }
     return tagAggregateRoot;
   }
@@ -68,17 +68,17 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
 
   @Override
   public @NotNull Collection<TagAggregateRoot> findAllInCache() {
-    return this.tagAggregateRootRepository.findAllInCacheSync();
+    return this.tagAggregateRootRepository.findAllSync();
   }
 
   @Override
   public boolean existsGlobally(final @NotNull String id) {
-    return this.tagAggregateRootRepository.existsInCacheSync(id) || this.tagAsyncAggregateRootRepository.existsAsync(id).join();
+    return this.tagAggregateRootRepository.existsSync(id) || this.tagAsyncAggregateRootRepository.existsAsync(id).join();
   }
 
   @Override
   public boolean existsInCache(final @NotNull String id) {
-    return this.tagAggregateRootRepository.existsInCacheSync(id);
+    return this.tagAggregateRootRepository.existsSync(id);
   }
 
   @Override
@@ -89,7 +89,7 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
 
   @Override
   public void register(final @NotNull TagAggregateRoot aggregateRoot) {
-    this.tagAggregateRootRepository.saveSync(aggregateRoot);
+    this.tagAggregateRootRepository.saveSync(aggregateRoot.id(), aggregateRoot);
   }
 
   @Override
