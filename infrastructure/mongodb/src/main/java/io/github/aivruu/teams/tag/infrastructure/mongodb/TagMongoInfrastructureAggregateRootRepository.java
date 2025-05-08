@@ -20,7 +20,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.UpdateResult;
-import io.github.aivruu.teams.shared.infrastructure.CloseableInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-public final class TagMongoInfrastructureAggregateRootRepository implements CloseableInfrastructureAggregateRootRepository<TagAggregateRoot> {
+public final class TagMongoInfrastructureAggregateRootRepository extends InfrastructureAggregateRootRepository<TagAggregateRoot> {
   private final MongoClient client;
   private final String databaseName;
   private final String collectionName;
