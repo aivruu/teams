@@ -18,7 +18,7 @@ package io.github.aivruu.teams.player.infrastructure.json;
 
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
-import io.github.aivruu.teams.shared.infrastructure.util.JsonCodecHelper;
+import io.github.aivruu.teams.shared.infrastructure.util.JsonCoder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
-public final class PlayerJsonInfrastructureAggregateRootRepository implements InfrastructureAggregateRootRepository<PlayerAggregateRoot> {
+public final class PlayerJsonInfrastructureAggregateRootRepository extends InfrastructureAggregateRootRepository<PlayerAggregateRoot> {
   private final Path directory;
 
   public PlayerJsonInfrastructureAggregateRootRepository(final @NotNull Path directory) {
@@ -51,7 +51,7 @@ public final class PlayerJsonInfrastructureAggregateRootRepository implements In
   public @NotNull CompletableFuture<@Nullable PlayerAggregateRoot> findInPersistenceAsync(final @NotNull String id) {
     return CompletableFuture.supplyAsync(() -> {
       final Path file = this.directory.resolve(id + ".json");
-      return Files.notExists(file) ? null : JsonCodecHelper.read(file, PlayerAggregateRoot.class);
+      return Files.notExists(file) ? null : JsonCoder.read(file, PlayerAggregateRoot.class);
     }, THREAD_POOL);
   }
 
@@ -71,7 +71,7 @@ public final class PlayerJsonInfrastructureAggregateRootRepository implements In
           return false;
         }
       }
-      return JsonCodecHelper.write(file, aggregateRoot);
+      return JsonCoder.write(file, aggregateRoot);
     }, THREAD_POOL);
   }
 
