@@ -17,7 +17,6 @@
 package io.github.aivruu.teams.player.domain;
 
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,18 +75,5 @@ public final class PlayerAggregateRoot extends AggregateRoot {
     }
     this.playerModel.tag(tag);
     return (tag == null) ? TAG_HAS_BEEN_CLEARED : TAG_HAS_BEEN_CHANGED;
-  }
-
-  /**
-   * Sets a new tag-selection for the player.
-   *
-   * @param tag the tag's id or {@code null} for unselect.
-   * @deprecated in favour of {@link #tagWithStatus(String)}
-   * @since 0.0.1
-   */
-  @Deprecated()
-  @ApiStatus.ScheduledForRemoval(inVersion = "4.0.0")
-  public void tag(final @Nullable String tag) {
-    this.playerModel.tag(tag);
   }
 }
