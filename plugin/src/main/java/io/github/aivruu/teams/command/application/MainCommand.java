@@ -21,8 +21,8 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.aivruu.teams.TeamsPlugin;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationContainer;
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
-import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
 import io.github.aivruu.teams.permission.application.Permissions;
+import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.command.CommandSender;
@@ -52,7 +52,8 @@ public final class MainCommand implements RegistrableCommandContract {
       .then(Commands.literal("help")
         .requires(src -> src.getSender().hasPermission(Permissions.HELP.node()))
         .executes(ctx -> {
-          ctx.getSource().getSender().sendMessage(MiniMessageHelper.list(this.messagesModelContainer.model().help));
+          ctx.getSource().getSender().sendMessage(MiniMessageParser.list(
+             this.messagesModelContainer.model().help));
           return Command.SINGLE_SUCCESS;
         })
       )
@@ -62,9 +63,9 @@ public final class MainCommand implements RegistrableCommandContract {
           final CommandSender sender = ctx.getSource().getSender();
           final MessagesConfigurationModel messages = this.messagesModelContainer.model();
           if (this.plugin.reload()) {
-            sender.sendMessage(MiniMessageHelper.text(messages.reloadSuccess));
+            sender.sendMessage(MiniMessageParser.text(messages.reloadSuccess));
           } else {
-            sender.sendMessage(MiniMessageHelper.text(messages.reloadError));
+            sender.sendMessage(MiniMessageParser.text(messages.reloadError));
           }
           return Command.SINGLE_SUCCESS;
         })
