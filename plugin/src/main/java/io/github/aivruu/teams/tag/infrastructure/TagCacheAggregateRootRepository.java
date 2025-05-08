@@ -27,10 +27,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public final class TagCacheAggregateRootRepository implements TagAggregateRootRepository {
   private Cache<String, TagAggregateRoot> cache;
+  private @Nullable Collection<TagAggregateRoot> valuesView;
 
   public void buildCache(final @NotNull TagManager tagManager) {
     this.cache = Caffeine.newBuilder()
@@ -41,37 +43,51 @@ public final class TagCacheAggregateRootRepository implements TagAggregateRootRe
   }
 
   @Override
-  public @Nullable TagAggregateRoot findInCacheSync(final @NotNull String id) {
+  public @Nullable TagAggregateRoot findSync(final @NotNull String id) {
     return this.cache.getIfPresent(id);
   }
 
   @Override
-  public boolean existsInCacheSync(final @NotNull String id) {
+  public boolean existsSync(final @NotNull String id) {
     return this.cache.asMap().containsKey(id);
   }
 
   @Override
-  public @NotNull Collection<TagAggregateRoot> findAllInCacheSync() {
-    return this.cache.asMap().values();
+  public @NotNull Collection<TagAggregateRoot> findAllSync() {
+    if (this.valuesView == null) {
+      this.valuesView = List.copyOf(this.cache.asMap().values());
+    }
+    return this.valuesView;
   }
 
   @Override
-  public void saveSync(final @NotNull TagAggregateRoot aggregateRoot) {
+  public void saveSync(final @NotNull String id, final @NotNull TagAggregateRoot aggregateRoot) {
     this.cache.put(aggregateRoot.id(), aggregateRoot);
+    if (this.valuesView == null) {
+      this.valuesView = List.copyOf(this.cache.asMap().values());
+    }
+    this.valuesView.add(aggregateRoot);
   }
 
   @Override
   public @Nullable TagAggregateRoot deleteSync(final @NotNull String id) {
     final TagAggregateRoot tagAggregateRoot = this.cache.getIfPresent(id);
+    if (this.valuesView == null) {
+      this.valuesView = List.copyOf(this.cache.asMap().values());
+    }
     if (tagAggregateRoot != null) {
       this.cache.invalidate(id);
+      this.valuesView.remove(tagAggregateRoot);
     }
     return tagAggregateRoot;
   }
 
   @Override
-  public void clearAllSync() {
+  public void clearSync() {
     this.cache.invalidateAll();
+    if (this.valuesView != null) {
+      this.valuesView.clear();
+    }
   }
 }
 
