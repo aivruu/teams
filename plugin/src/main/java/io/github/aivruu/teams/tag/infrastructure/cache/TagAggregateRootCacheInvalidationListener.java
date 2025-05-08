@@ -18,7 +18,7 @@ package io.github.aivruu.teams.tag.infrastructure.cache;
 
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.tag.application.TagManager;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -43,7 +43,7 @@ public final class TagAggregateRootCacheInvalidationListener implements RemovalL
     if (cause != RemovalCause.EXPIRED) {
       return;
     }
-    DebugLoggerHelper.write("Invalidating expired tag-aggregate-root with id '{}' from cache after 5 minutes.", key);
+    Debugger.write("Invalidating expired tag-aggregate-root with id '{}' from cache after 5 minutes.", key);
     this.tagManager.handleTagAggregateRootSave(tagAggregateRoot);
   }
 }
