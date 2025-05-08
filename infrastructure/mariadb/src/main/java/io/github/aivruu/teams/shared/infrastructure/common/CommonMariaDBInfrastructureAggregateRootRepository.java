@@ -19,11 +19,10 @@ package io.github.aivruu.teams.shared.infrastructure.common;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
 import io.github.aivruu.teams.persistence.infrastructure.utils.HikariInstanceProvider;
-import io.github.aivruu.teams.shared.infrastructure.CloseableInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
 
 public abstract class CommonMariaDBInfrastructureAggregateRootRepository<A extends AggregateRoot>
-  implements CloseableInfrastructureAggregateRootRepository<A>
-{
+   extends InfrastructureAggregateRootRepository<A> {
   @Override
   public void close() {
     // Common logic for MariaDB implementations' close() method.
