@@ -1,0 +1,75 @@
+package io.github.aivruu.teams.repository.domain;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+
+public interface DomainRepository<T> {
+  /** Cached exception for methods that are not supported by its implementaions. */
+  UnsupportedOperationException NOT_IMPLEMENTED_EXCEPTION =
+     new UnsupportedOperationException("This method is not implemented and is not supported.");
+
+  /**
+   * Returns the object requested if found in the repository.
+   *
+   * @param id the object's id.
+   * @return The object or {@code null} if isn't in the repository.
+   * @since 4.0.0
+   */
+  @Nullable T findSync(final @NotNull String id);
+
+  /**
+   * Checks if the specified object is stored by the repository.
+   *
+   * @param id the id for the object to store.
+   * @return true if the object is stored, false otherwise.
+   * @since 2.3.1
+   */
+  boolean existsSync(final @NotNull String id);
+
+  /**
+   * Returns all objects stored by this repository until this moment.
+   * <p>
+   * This method won't consider changes made to these objects, or if more objects were added
+   * or removed.
+   *
+   * @return A {@link Collection} with the objects that this repository has
+   * @since 4.0.0
+   */
+  @NotNull Collection<T> findAllSync();
+
+  /**
+   * Saves the given object into the repository.
+   *
+   * @param id the object's id.
+   * @param object the object to save.
+   * @since 4.0.0
+   */
+  void saveSync(final @NotNull String id, final @NotNull T object);
+
+  /**
+   * Updates the mapping for the cache-entry with the specified id.
+   *
+   * @param id the entry's id.
+   * @param value the new-value for the entry.
+   * @param <V> a generic-type for the value.
+   */
+  <V> void updateSync(final @NotNull String id, final @NotNull V value);
+
+  /**
+   * Removes the object for the specified-id from the repository, and returns its reference.
+   *
+   * @param id the aggregate-root's id.
+   * @return The removed object's reference or {@code null} if was not found.
+   * @since 4.0.0
+   */
+  @Nullable T deleteSync(final @NotNull String id);
+
+  /**
+   * Deletes all the objects stored in this repository.
+   *
+   * @since 4.0.0
+   */
+  void clearSync();
+}
