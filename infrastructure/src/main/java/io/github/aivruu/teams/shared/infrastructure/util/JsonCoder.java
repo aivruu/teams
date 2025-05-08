@@ -33,10 +33,10 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public final class JsonCodecHelper {
+public final class JsonCoder {
   private static Gson gson;
 
-  private JsonCodecHelper() {
+  private JsonCoder() {
     throw new UnsupportedOperationException("This class is for utility.");
   }
 
