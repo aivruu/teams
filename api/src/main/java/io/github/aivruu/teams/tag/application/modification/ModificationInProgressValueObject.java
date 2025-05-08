@@ -21,8 +21,12 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a modification for a tag.
  *
+ * @param modifier it refers to the tag's modifier's id.
  * @param tag the tag to be modified.
  * @param context the modification's context.
  * @since 2.3.1
  */
-public record ModificationInProgressValueObject(@NotNull String tag, @NotNull ModificationContext context) {}
+public record ModificationInProgressValueObject(
+   @NotNull String modifier,
+   @NotNull String tag,
+   @NotNull ModificationContext context) {}
