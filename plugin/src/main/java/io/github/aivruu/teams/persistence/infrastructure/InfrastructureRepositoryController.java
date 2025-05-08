@@ -18,7 +18,7 @@ package io.github.aivruu.teams.persistence.infrastructure;
 
 import com.mongodb.client.MongoClient;
 import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigurationModel;
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.persistence.infrastructure.utils.HikariInstanceProvider;
 import io.github.aivruu.teams.persistence.infrastructure.utils.MongoClientHelper;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
@@ -26,9 +26,8 @@ import io.github.aivruu.teams.player.infrastructure.json.PlayerJsonInfrastructur
 import io.github.aivruu.teams.player.infrastructure.json.codec.JsonPlayerAggregateRootCodec;
 import io.github.aivruu.teams.player.infrastructure.mariadb.PlayerMariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.player.infrastructure.mongodb.PlayerMongoInfrastructureAggregateRootRepository;
-import io.github.aivruu.teams.shared.infrastructure.CloseableInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
-import io.github.aivruu.teams.shared.infrastructure.util.JsonCodecHelper;
+import io.github.aivruu.teams.shared.infrastructure.util.JsonCoder;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.infrastructure.json.TagJsonInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.infrastructure.json.codec.JsonTagAggregateRootCodec;
@@ -54,34 +53,34 @@ public final class InfrastructureRepositoryController {
   public boolean selectAndInitialize() {
     if (this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON ||
         this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON) {
-      JsonCodecHelper.buildWithAdapters(
+      JsonCoder.buildWithAdapters(
         JsonTagAggregateRootCodec.INSTANCE, JsonTagPropertiesValueObjectCodec.INSTANCE, JsonPlayerAggregateRootCodec.INSTANCE);
     }
     // Database clients initialization if repositories require it.
     if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB ||
         this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB
     ) {
-      DebugLoggerHelper.write("Initializing mongo-client instance with configuration's parameters.");
+      Debugger.write("Initializing mongo-client instance with configuration's parameters.");
       MongoClientHelper.buildClient(
         this.configuration.host, this.configuration.username, this.configuration.database, this.configuration.password
       );
       // Check if parameters are valid and client was initialized correctly.
       if (MongoClientHelper.client() == null) {
-        DebugLoggerHelper.write("Mongo-client couldn't be initialized correctly, stopping infrastructure repositories initialization.");
+        Debugger.write("Mongo-client couldn't be initialized correctly, stopping infrastructure repositories initialization.");
         return false;
       }
     }
     if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MARIADB ||
         this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MARIADB
     ) {
-      DebugLoggerHelper.write("Initializing mongo-client instance with configuration's parameters.");
+      Debugger.write("Initializing mongo-client instance with configuration's parameters.");
       HikariInstanceProvider.buildDataSource(
         this.configuration.host, this.configuration.mariaDbPort, this.configuration.username,
         this.configuration.database, this.configuration.password
       );
       // Check if parameters are valid.
       if (HikariInstanceProvider.get() == null) {
-        DebugLoggerHelper.write("HikariDataSource couldn't be initialized correctly, stopping infrastructure repositories initialization.");
+        Debugger.write("HikariDataSource couldn't be initialized correctly, stopping infrastructure repositories initialization.");
         return false;
       }
     }
@@ -115,15 +114,11 @@ public final class InfrastructureRepositoryController {
   }
 
   public void close() {
-    if (this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB ||
-        this.configuration.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MARIADB) {
-      ((CloseableInfrastructureAggregateRootRepository<PlayerAggregateRoot>) this.playerInfrastructureAggregateRootRepository)
-        .close();
+    if (this.playerInfrastructureAggregateRootRepository != null) {
+      this.playerInfrastructureAggregateRootRepository.close();
     }
-    if (this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB ||
-        this.configuration.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MARIADB) {
-      ((CloseableInfrastructureAggregateRootRepository<TagAggregateRoot>) this.tagInfrastructureAggregateRootRepository)
-        .close();
+    if (this.tagInfrastructureAggregateRootRepository != null) {
+      this.tagInfrastructureAggregateRootRepository.close();
     }
   }
 
