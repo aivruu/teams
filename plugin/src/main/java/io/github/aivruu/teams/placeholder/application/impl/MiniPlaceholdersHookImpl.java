@@ -19,13 +19,12 @@ package io.github.aivruu.teams.placeholder.application.impl;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
 import io.github.aivruu.teams.player.application.PlayerManager;
+import io.github.aivruu.teams.util.PlaceholderParser;
 import io.github.miniplaceholders.api.Expansion;
 import io.github.miniplaceholders.api.utils.TagsUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,8 +44,7 @@ public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
 
   @Override
   public boolean hook() {
-    final PluginManager pluginManager = Bukkit.getPluginManager();
-    if (pluginManager.getPlugin("MiniPlaceholders") == null || !pluginManager.isPluginEnabled("MiniPlaceholders")) {
+    if (!PlaceholderParser.MODERN_PLACEHOLDERS_HOOKED) {
       return false;
     }
     final Expansion expansion = Expansion.builder("aldrteams")
