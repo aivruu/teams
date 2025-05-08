@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class AbstractMenuModel implements InventoryHolder {
   /** The {@link NamespacedKey} used for identify any menu-model implementation's items. */
   public static final NamespacedKey MENU_ITEM_NBT_KEY = NamespacedKey.minecraft("teams_menu_item");
-  private final String id;
+  protected final String id;
   protected final ActionManager actionManager;
   protected Inventory inventory;
 
