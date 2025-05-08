@@ -38,7 +38,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    *
    * @param id the aggregate-root's identifier.
    * @return The {@link AggregateRoot} or {@code null} if not found in cache.
-   * @see io.github.aivruu.teams.aggregate.domain.repository.AggregateRootRepository#findInCacheSync(String)
+   * @see io.github.aivruu.teams.aggregate.domain.repository.AggregateRootRepository#findSync(String)
    * @since 0.0.1
    */
   @Nullable A findInCache(final @NotNull String id);
@@ -58,7 +58,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    * Returns a {@link Collection} with the registry's currently cached {@link AggregateRoot}s.
    *
    * @return A {@link Collection} with the cached {@link AggregateRoot}s.
-   * @see AggregateRootRepository#findAllInCacheSync()
+   * @see AggregateRootRepository#findAllSync()
    * @since 0.0.1
    */
   @NotNull Collection<A> findAllInCache();
@@ -79,7 +79,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    *
    * @param id the aggregate-root's identifier.
    * @return Whether the aggregate-root is cached.
-   * @see AggregateRootRepository#existsInCacheSync(String)
+   * @see AggregateRootRepository#existsSync(String)
    * @since 0.0.1
    */
   boolean existsInCache(final @NotNull String id);
@@ -98,7 +98,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    * Stores the given {@link AggregateRoot} into cache.
    *
    * @param aggregateRoot the {@link AggregateRoot} to store.
-   * @see AggregateRootRepository#saveSync(AggregateRoot)
+   * @see AggregateRootRepository#saveSync(String, Object)
    * @since 0.0.1
    */
   void register(final @NotNull A aggregateRoot);
