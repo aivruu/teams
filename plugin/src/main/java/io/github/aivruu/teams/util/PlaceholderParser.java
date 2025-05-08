@@ -14,10 +14,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.placeholder.application;
+package io.github.aivruu.teams.util;
 
-import io.github.aivruu.teams.component.application.LegacyComponentHelper;
-import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
+import io.github.aivruu.teams.util.application.component.MiniMessageParser;
+import io.github.aivruu.teams.util.component.LegacyComponentParser;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
@@ -28,17 +28,17 @@ import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class PlaceholderHelper {
+public final class PlaceholderParser {
   private static final TagResolver MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS;
-  private static final boolean legacyPlaceholdersHooked;
-  private static final boolean modernPlaceholdersHooked;
+  public static final boolean LEGACY_PLACEHOLDERS_HOOKED;
+  public static final boolean MODERN_PLACEHOLDERS_HOOKED;
 
   static {
     final PluginManager pluginManager = Bukkit.getPluginManager();
-    legacyPlaceholdersHooked = (pluginManager.getPlugin("PlaceholderAPI") != null && pluginManager.isPluginEnabled("PlaceholderAPI"));
-    modernPlaceholdersHooked = (pluginManager.getPlugin("MiniPlaceholders") != null && pluginManager.isPluginEnabled("MiniPlaceholders"));
+    LEGACY_PLACEHOLDERS_HOOKED = pluginManager.isPluginEnabled("PlaceholderAPI");
+    MODERN_PLACEHOLDERS_HOOKED = pluginManager.isPluginEnabled("MiniPlaceholders");
     // Initialize until this moment MiniPlaceholders its global-placeholders.
-    if (modernPlaceholdersHooked) {
+    if (MODERN_PLACEHOLDERS_HOOKED) {
       MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS = MiniPlaceholders.getGlobalPlaceholders();
     } else {
       MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS = TagResolver.empty();
@@ -49,8 +49,8 @@ public final class PlaceholderHelper {
     // Firstly we parse it to [Component] for modern-placeholders processing, then we parse it to the
     // legacy-format for PlaceholderAPI placeholders correct-parsing, and finally we convert it into
     // a [Component].
-    final Component modern = MiniMessageHelper.text(text, parseModern(player));
-    return LegacyComponentHelper.modern(parseLegacy(player, LegacyComponentHelper.legacy(modern)));
+    final Component modern = MiniMessageParser.text(text, parseModern(player));
+    return LegacyComponentParser.modern(parseLegacy(player, LegacyComponentParser.legacy(modern)));
   }
 
   public static @NotNull Component[] parseBoth(final @Nullable Player player, final @NotNull String[] text) {
@@ -62,7 +62,7 @@ public final class PlaceholderHelper {
   }
 
   public static @NotNull TagResolver parseModern(final @Nullable Player player) {
-    if (!modernPlaceholdersHooked) {
+    if (!MODERN_PLACEHOLDERS_HOOKED) {
       return TagResolver.empty();
     }
     final TagResolver.Builder builder = TagResolver.builder().resolver(MINIPLACEHOLDERS_GLOBAL_PLACEHOLDERS);
@@ -74,9 +74,6 @@ public final class PlaceholderHelper {
   }
 
   public static @NotNull String parseLegacy(final @Nullable Player player, final @NotNull String text) {
-    if (!legacyPlaceholdersHooked) {
-      return text;
-    }
-    return PlaceholderAPI.setPlaceholders(player, text);
+    return LEGACY_PLACEHOLDERS_HOOKED ? PlaceholderAPI.setPlaceholders(player, text) : text;
   }
 }
