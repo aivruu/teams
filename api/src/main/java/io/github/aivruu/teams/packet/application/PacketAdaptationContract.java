@@ -57,17 +57,6 @@ public interface PacketAdaptationContract {
   void addPlayerToTeam(final @NotNull Player player, final @NotNull String team);
 
   /**
-   * Removes the player from the specified team's players-registry.
-   *
-   * @param player the player to remove.
-   * @param team the team's id.
-   * @deprecated in favour of {@link #removePlayerFromTeam(Player)}.
-   * @since 1.1.1
-   */
-  @Deprecated
-  void removePlayerFromTeam(final @NotNull Player player, final @NotNull String team);
-
-  /**
    * Removes the player from the team where he's currently.
    *
    * @param player the player to remove from some team.
