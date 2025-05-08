@@ -14,7 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.minimessage.application;
+package io.github.aivruu.teams.util.application.component;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -26,12 +26,12 @@ import org.jetbrains.annotations.NotNull;
 /**
  * This class is used to proportionate to {@link Component} text-parsing with {@link MiniMessage}.
  *
- * @since 0.0.1
+ * @since 4.0.0
  */
-public final class MiniMessageHelper {
+public final class MiniMessageParser {
   private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
-  private MiniMessageHelper() {
+  private MiniMessageParser() {
     throw new UnsupportedOperationException("This class is for utility and cannot be instantiated.");
   }
 
