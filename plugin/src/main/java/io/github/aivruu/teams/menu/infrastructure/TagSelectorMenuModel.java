@@ -22,10 +22,10 @@ import io.github.aivruu.teams.config.infrastructure.object.MessagesConfiguration
 import io.github.aivruu.teams.config.infrastructure.object.TagsMenuConfigurationModel;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
-import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
-import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
+import io.github.aivruu.teams.util.PlaceholderParser;
+import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -68,7 +68,8 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
   @Override
   public void build() {
     final TagsMenuConfigurationModel menu = this.tagsMenuModelConfiguration.model();
-    super.inventory = Bukkit.createInventory(this, menu.rows * 9, PlaceholderHelper.parseBoth(null, menu.title));
+    super.inventory = Bukkit.createInventory(this, menu.rows * 9,
+       PlaceholderParser.parseBoth(null, menu.title));
     for (final TagsMenuConfigurationModel.ItemSection itemSection : menu.items) {
       for (final byte slot : itemSection.slots) {
         super.inventory.setItem(slot, this.prepareItem(itemSection));
@@ -115,7 +116,7 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
       return;
     }
     if (!itemSection.permission.isEmpty() && !player.hasPermission(itemSection.permission)) {
-      player.sendMessage(MiniMessageHelper.text(itemSection.permissionMessage));
+      player.sendMessage(MiniMessageParser.text(itemSection.permissionMessage));
       return;
     }
     this.processTagSelection(player, itemSection);
@@ -129,13 +130,13 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
     // Process status-code provided by the select-operation.
     switch (this.playerTagSelectorManager.select(player, itemSection.tag)) {
       case PlayerTagSelectorManager.PLAYER_IS_NOT_ONLINE ->
-        player.sendMessage(MiniMessageHelper.text(messages.playerUnknownInfo));
+        player.sendMessage(MiniMessageParser.text(messages.playerUnknownInfo));
       case PlayerAggregateRoot.TAG_IS_ALREADY_SELECTED ->
-        player.sendMessage(MiniMessageHelper.text(messages.alreadySelected));
+        player.sendMessage(MiniMessageParser.text(messages.alreadySelected));
       case PlayerTagSelectorManager.TAG_SPECIFIED_NOT_EXIST ->
-        player.sendMessage(MiniMessageHelper.text(messages.unknownTag));
+        player.sendMessage(MiniMessageParser.text(messages.unknownTag));
       case PlayerAggregateRoot.TAG_HAS_BEEN_CHANGED ->
-        player.sendMessage(MiniMessageHelper.text(messages.selected, Placeholder.parsed("tag-id", itemSection.tag)));
+        player.sendMessage(MiniMessageParser.text(messages.selected, Placeholder.parsed("tag-id", itemSection.tag)));
       default -> throw new UnsupportedOperationException("Unexpected status-code result.");
     }
   }
@@ -157,8 +158,8 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
     if (itemSection.material != Material.AIR) {
       item.editMeta(meta -> {
         // Provide support for support only for legacy and modern global-placeholders.
-        meta.displayName(PlaceholderHelper.parseBoth(null, itemSection.displayName));
-        meta.lore(Arrays.asList(PlaceholderHelper.parseBoth(null, itemSection.lore)));
+        meta.displayName(PlaceholderParser.parseBoth(null, itemSection.displayName));
+        meta.lore(Arrays.asList(PlaceholderParser.parseBoth(null, itemSection.lore)));
         if (itemSection.data > 0) {
           meta.setCustomModelData(itemSection.data);
         }
