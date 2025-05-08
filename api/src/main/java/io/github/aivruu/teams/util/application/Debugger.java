@@ -14,7 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.logger.application;
+package io.github.aivruu.teams.util.application;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
@@ -23,13 +23,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A utility used for plugin debug-messages function.
  *
- * @since 0.0.1
+ * @since 4.0.0
  */
-public final class DebugLoggerHelper {
+public final class Debugger {
   private static final ComponentLogger LOGGER = ComponentLogger.logger("Teams-Debugger");
   private static boolean enabled;
 
-  private DebugLoggerHelper() {
+  private Debugger() {
     throw new UnsupportedOperationException("This class is for utility.");
   }
 
