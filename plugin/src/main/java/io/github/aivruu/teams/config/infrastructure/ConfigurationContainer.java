@@ -17,8 +17,8 @@
 package io.github.aivruu.teams.config.infrastructure;
 
 import io.github.aivruu.teams.TeamsPlugin;
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
-import io.github.aivruu.teams.shared.infrastructure.ExecutorHelper;
+import io.github.aivruu.teams.util.application.Debugger;
+import io.github.aivruu.teams.util.application.PluginExecutor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -94,10 +94,10 @@ public record ConfigurationContainer<C>(@NotNull C model, @NotNull HoconConfigur
         final C updatedModel = this.loader.load().get(this.modelClass);
         return (updatedModel == null) ? null : new ConfigurationContainer<>(updatedModel, this.loader, this.modelClass);
       } catch (final ConfigurateException exception) {
-        DebugLoggerHelper.write("Unexpected exception during configuration reload: {}", exception);
+        Debugger.write("Unexpected exception during configuration reload: {}", exception);
         return null;
       }
-    }, ExecutorHelper.pool());
+    }, PluginExecutor.get());
   }
 
   public static <C extends ConfigurationInterface> @Nullable ConfigurationContainer<C> of(
