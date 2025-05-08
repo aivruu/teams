@@ -17,7 +17,7 @@
 package io.github.aivruu.teams.player.application.listener;
 
 import io.github.aivruu.teams.player.application.PlayerManager;
-import io.github.aivruu.teams.tag.application.TagModificationContainer;
+import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -26,13 +26,13 @@ import org.jetbrains.annotations.NotNull;
 
 public final class PlayerRegistryListener implements Listener {
   private final PlayerManager playerManager;
-  private final TagModificationContainer tagModificationContainer;
+  private final TagModificationRepository tagModificationRepository;
 
   public PlayerRegistryListener(
     final @NotNull PlayerManager playerManager,
-    final @NotNull TagModificationContainer tagModificationContainer) {
+    final @NotNull TagModificationRepository tagModificationRepository) {
     this.playerManager = playerManager;
-    this.tagModificationContainer = tagModificationContainer;
+    this.tagModificationRepository = tagModificationRepository;
   }
 
   @EventHandler
@@ -44,6 +44,6 @@ public final class PlayerRegistryListener implements Listener {
   public void onQuit(final @NotNull PlayerQuitEvent event) {
     final String id = event.getPlayer().getUniqueId().toString();
     this.playerManager.unloadOne(id);
-    this.tagModificationContainer.unregisterModification(id);
+    this.tagModificationRepository.deleteSync(id);
   }
 }
