@@ -16,7 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.application;
 
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.TagModelEntity;
@@ -140,12 +140,12 @@ public final class TagManager {
   public void handleTagAggregateRootSave(final @NotNull TagAggregateRoot tagAggregateRoot) {
     this.tagAggregateRootRegistry.save(tagAggregateRoot)
       .exceptionally(exception -> {
-        DebugLoggerHelper.write("Unexpected exception during tag-aggregate-root saving with id '{}'.", exception);
+        Debugger.write("Unexpected exception during tag-aggregate-root saving with id '{}'.", exception);
         return false;
       })
       .thenAccept(saved -> {
         if (!saved) {
-          DebugLoggerHelper.write("The tag's aggregate-root information couldn't be saved.");
+          Debugger.write("The tag's aggregate-root information couldn't be saved.");
           // Avoid have unnecessary information in-cache.
           this.tagAggregateRootRegistry.unregister(tagAggregateRoot.id());
         }
@@ -169,12 +169,12 @@ public final class TagManager {
     // Process from-infrastructure tag deletion.
     this.tagAggregateRootRegistry.delete(id)
       .exceptionally(exception -> {
-        DebugLoggerHelper.write("Unexpected exception during tag deleting with id '{}'.", exception);
+        Debugger.write("Unexpected exception during tag deleting with id '{}'.", exception);
         return false;
       })
       .thenAccept(deleted -> {
-        if (deleted) DebugLoggerHelper.write("Tag '{}' information has been deleted.", id);
-        else DebugLoggerHelper.write("The tag's information couldn't be deleted.");
+        if (deleted) Debugger.write("Tag '{}' information has been deleted.", id);
+        else Debugger.write("The tag's information couldn't be deleted.");
       });
     return true;
   }
