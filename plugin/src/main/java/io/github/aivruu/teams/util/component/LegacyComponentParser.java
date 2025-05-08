@@ -14,14 +14,14 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.component.application;
+package io.github.aivruu.teams.util.component;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class LegacyComponentHelper {
+public final class LegacyComponentParser {
   private static final LegacyComponentSerializer LEGACY_COMPONENT_SERIALIZER = LegacyComponentSerializer.legacyAmpersand();
 
   public static @Nullable String legacy(final @Nullable Component component) {
