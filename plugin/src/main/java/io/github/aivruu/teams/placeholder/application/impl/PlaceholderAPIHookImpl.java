@@ -17,15 +17,14 @@
 package io.github.aivruu.teams.placeholder.application.impl;
 
 import io.github.aivruu.teams.Constants;
-import io.github.aivruu.teams.component.application.LegacyComponentHelper;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
 import io.github.aivruu.teams.player.application.PlayerManager;
+import io.github.aivruu.teams.util.PlaceholderParser;
+import io.github.aivruu.teams.util.component.LegacyComponentParser;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,11 +44,7 @@ public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implement
 
   @Override
   public boolean hook() {
-    final PluginManager pluginManager = Bukkit.getPluginManager();
-    if (pluginManager.getPlugin("PlaceholderAPI") == null || !pluginManager.isPluginEnabled("PlaceholderAPI")) {
-      return false;
-    }
-    return this.register();
+    return PlaceholderParser.LEGACY_PLACEHOLDERS_HOOKED && super.register();
   }
 
   @Override
@@ -92,12 +87,12 @@ public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implement
   }
 
   private @Nullable String validateTagPlaceholder(final @NotNull String tagId, final @NotNull String params) {
-    final String prefix = LegacyComponentHelper.legacy(this.packetAdaptation.teamPrefix(tagId));
-    final String suffix = LegacyComponentHelper.legacy(this.packetAdaptation.teamSuffix(tagId));
+    final String prefix = LegacyComponentParser.legacy(this.packetAdaptation.teamPrefix(tagId));
+    final String suffix = LegacyComponentParser.legacy(this.packetAdaptation.teamSuffix(tagId));
     return switch (params) {
       case "prefix" -> (prefix == null) ? "" : prefix;
       case "suffix" -> (suffix == null) ? "" : suffix;
-      case "color" -> LegacyComponentHelper.legacy(Component.text()
+      case "color" -> LegacyComponentParser.legacy(Component.text()
         .style(builder -> builder.color(this.packetAdaptation.teamColor(tagId)))
         .build());
       default -> null;
