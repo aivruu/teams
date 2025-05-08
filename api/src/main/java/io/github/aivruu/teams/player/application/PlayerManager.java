@@ -16,7 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.player.application;
 
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.PlayerModelEntity;
 import io.github.aivruu.teams.player.domain.registry.PlayerAggregateRootRegistry;
@@ -75,7 +75,7 @@ public final class PlayerManager {
       })
       .whenComplete((result, exception) -> {
         if (exception != null) {
-          DebugLoggerHelper.write("Unexpected exception during player's information search in infrastructure.", exception);
+          Debugger.write("Unexpected exception during player's information search in infrastructure.", exception);
         }
       });
   }
@@ -89,10 +89,10 @@ public final class PlayerManager {
   public void handlePlayerAggregateRootSave(final @NotNull PlayerAggregateRoot playerAggregateRoot) {
     this.playerAggregateRootRegistry.save(playerAggregateRoot)
       .thenAccept(saved -> {
-        if (!saved) DebugLoggerHelper.write("The player's information couldn't be saved.");
+        if (!saved) Debugger.write("The player's information couldn't be saved.");
       })
       .whenComplete((result, exception) -> {
-        if (exception != null) DebugLoggerHelper.write("Unexpected exception during player's data saving.", exception);
+        if (exception != null) Debugger.write("Unexpected exception during player's data saving.", exception);
       });
   }
 
