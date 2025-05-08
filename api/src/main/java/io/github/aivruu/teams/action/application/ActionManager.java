@@ -16,9 +16,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.action.application;
 
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import io.github.aivruu.teams.action.application.repository.ActionRepository;
+import io.github.aivruu.teams.util.application.Debugger;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +31,11 @@ import java.util.Locale;
  * @since 0.0.1
  */
 public final class ActionManager {
-  private final Object2ObjectMap<String, ActionModelContract> actions = new Object2ObjectOpenHashMap<>();
+  private final ActionRepository actionRepository;
+
+  public ActionManager(final @NotNull ActionRepository actionRepository) {
+    this.actionRepository = actionRepository;
+  }
 
   /**
    * Returns a {@link ActionModelContract} depart the given identifier.
@@ -42,7 +45,7 @@ public final class ActionManager {
    * @since 0.0.1
    */
   public @Nullable ActionModelContract actionModelOf(final @NotNull String id) {
-    return this.actions.get(id);
+    return this.actionRepository.findSync(id);
   }
 
   /**
@@ -52,7 +55,7 @@ public final class ActionManager {
    * @since 0.0.1
    */
   public void register(final @NotNull ActionModelContract action) {
-    this.actions.put(action.id(), action);
+    this.actionRepository.saveSync(action.id(), action);
   }
 
   /**
@@ -66,16 +69,16 @@ public final class ActionManager {
     if (action.isEmpty()) {
       return;
     }
-    final ActionModelContract actionModel = this.actions.get(
+    final ActionModelContract actionModel = this.actionRepository.findSync(
       StringUtils.substringBetween(action, "[", "]").toUpperCase(Locale.ROOT));
     if (actionModel == null) {
-      DebugLoggerHelper.write("Unknown action-type specified, skipping execution.");
+      Debugger.write("Unknown action-type specified, skipping execution.");
       return;
     }
     // We give the method the action's arguments without the identifier, and we check if it was executed
     // successfully.
     if (!actionModel.trigger(player, action.substring(actionModel.id().length() + 3).split(";"))) {
-      DebugLoggerHelper.write("The action {}'s execution has failed.", actionModel.id());
+      Debugger.write("The action {}'s execution has failed.", actionModel.id());
     }
   }
 
@@ -87,7 +90,7 @@ public final class ActionManager {
    * @since 0.0.1
    */
   public boolean unregister(final @NotNull String id) {
-    return this.actions.remove(id) != null;
+    return this.actionRepository.deleteSync(id) != null;
   }
 
   /**
@@ -96,6 +99,6 @@ public final class ActionManager {
    * @since 0.0.1
    */
   public void unregisterAll() {
-    this.actions.clear();
+    this.actionRepository.clearSync();
   }
 }
