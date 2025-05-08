@@ -18,10 +18,16 @@ package io.github.aivruu.teams.tag.domain.repository;
 
 import io.github.aivruu.teams.aggregate.domain.repository.AggregateRootRepository;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A {@link AggregateRootRepository} interface-implementation for {@link TagAggregateRoot}s.
  *
  * @since 0.0.1
  */
-public interface TagAggregateRootRepository extends AggregateRootRepository<TagAggregateRoot> {}
+public interface TagAggregateRootRepository extends AggregateRootRepository<TagAggregateRoot> {
+  @Override
+  default <V> void updateSync(final @NotNull String id, final @NotNull V value) {
+    throw NOT_IMPLEMENTED_EXCEPTION;
+  }
+}
