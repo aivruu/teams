@@ -18,8 +18,9 @@ package io.github.aivruu.teams.shared.infrastructure;
 
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
 import io.github.aivruu.teams.aggregate.domain.repository.AsyncAggregateRootRepository;
+import io.github.aivruu.teams.util.application.PluginExecutor;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * An infrastructure aggregate-root repository model.
@@ -27,9 +28,9 @@ import java.util.concurrent.Executor;
  * @param <A> an aggregate-root type.
  * @since 0.0.1
  */
-public interface InfrastructureAggregateRootRepository<A extends AggregateRoot> extends AsyncAggregateRootRepository<A> {
+public abstract class InfrastructureAggregateRootRepository<A extends AggregateRoot> implements AsyncAggregateRootRepository<A> {
   /** The plugin's thread-pool used for this async-operations. */
-  Executor THREAD_POOL = ExecutorHelper.pool();
+  public static final ExecutorService THREAD_POOL = PluginExecutor.get();
 
   /**
    * Executes this repository its start-up logic.
@@ -37,14 +38,23 @@ public interface InfrastructureAggregateRootRepository<A extends AggregateRoot> 
    * @return Whether the infrastructure-repository was successfully started.
    * @since 0.0.1
    */
-  boolean start();
+  public abstract boolean start();
+
+  /**
+   * Closes the global thread-pool.
+   *
+   * @since 4.0.0
+   */
+  public void close() {
+    THREAD_POOL.close();
+  }
 
   /**
    * An enum representing the type of infrastructure-repositories available.
    *
    * @since 0.0.1
    */
-  enum Type {
+  public enum Type {
     JSON, MONGODB, MARIADB
   }
 }
