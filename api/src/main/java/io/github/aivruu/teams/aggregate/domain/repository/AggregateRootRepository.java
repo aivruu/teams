@@ -17,66 +17,13 @@
 package io.github.aivruu.teams.aggregate.domain.repository;
 
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
+import io.github.aivruu.teams.repository.domain.DomainRepository;
 
 /**
- * This interface-contract defines the methods that implementations must follow to
- * proportionate information-handling in-cache for {@link AggregateRoot}s.
+ * This interface-contract "inherits" the method defined at the {@link DomainRepository} contract,
+ * defining a generic-type for the {@link AggregateRoot} type.
  *
  * @param <A> an aggregate-root type.
  * @since 0.0.1
  */
-public interface AggregateRootRepository<A extends AggregateRoot> {
-  /**
-   * Returns the {@link AggregateRoot} requested if found.
-   *
-   * @param id the aggregate-root's id.
-   * @return A {@link AggregateRoot} or {@code null} if isn't cached.
-   * @since 0.0.1
-   */
-  @Nullable A findInCacheSync(final @NotNull String id);
-
-  /**
-   * Checks whether the specified {@link AggregateRoot} is in cache.
-   *
-   * @param id the aggregate-root's id.
-   * @return Whether the aggregate-root is cached.
-   * @since 2.3.1
-   */
-  boolean existsInCacheSync(final @NotNull String id);
-
-  /**
-   * Returns all the current {@link AggregateRoot} cached in this repository.
-   *
-   * @return A {@link Collection} of {@link AggregateRoot}s.
-   * @since 0.0.1
-   */
-  @NotNull Collection<A> findAllInCacheSync();
-
-  /**
-   * Saves the given {@link AggregateRoot} into the repository.
-   *
-   * @param aggregateRoot the aggregate-root to save.
-   * @since 0.0.1
-   */
-  void saveSync(final @NotNull A aggregateRoot);
-
-  /**
-   * Removes the {@link AggregateRoot} specified from repository.
-   *
-   * @param id the aggregate-root's id.
-   * @return The removed {@link AggregateRoot} or {@code null} if isn't cached.
-   * @since 0.0.1
-   */
-  @Nullable A deleteSync(final @NotNull String id);
-
-  /**
-   * Clears the repository from all {@link AggregateRoot}s.
-   *
-   * @since 0.0.1
-   */
-  void clearAllSync();
-}
+public interface AggregateRootRepository<A extends AggregateRoot> extends DomainRepository<A> {}
