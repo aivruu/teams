@@ -16,8 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.menu.application;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import io.github.aivruu.teams.menu.application.repository.MenuRepository;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,8 +26,12 @@ import org.jetbrains.annotations.Nullable;
  *
  * @since 0.0.1
  */
-public final class MenuManagerService {
-  private final Object2ObjectMap<String, AbstractMenuModel> menus = new Object2ObjectOpenHashMap<>();
+public final class MenuManager {
+  private final MenuRepository menuRepository;
+
+  public MenuManager(final @NotNull MenuRepository menuRepository) {
+    this.menuRepository = menuRepository;
+  }
 
   /**
    * Returns a {@link AbstractMenuModel} based on the given identifier.
@@ -38,7 +41,7 @@ public final class MenuManagerService {
    * @since 0.0.1
    */
   public @Nullable AbstractMenuModel menuModelOf(final @NotNull String id) {
-    return this.menus.get(id);
+    return this.menuRepository.findSync(id);
   }
 
   /**
@@ -48,7 +51,7 @@ public final class MenuManagerService {
    * @since 0.0.1
    */
   public void register(final @NotNull AbstractMenuModel menu) {
-    this.menus.put(menu.id(), menu);
+    this.menuRepository.saveSync(menu.id(), menu);
     // Prepare menu's [GUI] and configure its items and actions.
     menu.build();
   }
@@ -61,7 +64,7 @@ public final class MenuManagerService {
    * @since 0.0.1
    */
   public boolean unregister(final @NotNull String id) {
-    return this.menus.remove(id) != null;
+    return this.menuRepository.deleteSync(id) != null;
   }
 
   /**
@@ -73,7 +76,7 @@ public final class MenuManagerService {
    * @since 0.0.1
    */
   public boolean openMenu(final @NotNull Player player, final @NotNull String menu) {
-    final AbstractMenuModel menuModel = this.menus.get(menu);
+    final AbstractMenuModel menuModel = this.menuRepository.findSync(menu);
     if (menuModel != null) {
       menuModel.open(player);
     }
@@ -89,7 +92,7 @@ public final class MenuManagerService {
    * @since 0.0.1
    */
   public boolean closeMenu(final @NotNull Player player, final @NotNull String menu) {
-    final AbstractMenuModel menuModel = this.menus.get(menu);
+    final AbstractMenuModel menuModel = this.menuRepository.findSync(menu);
     if (menuModel != null) {
       menuModel.close(player);
     }
@@ -102,6 +105,6 @@ public final class MenuManagerService {
    * @since 0.0.1
    */
   public void unregisterAll() {
-    this.menus.clear();
+    this.menuRepository.clearSync();
   }
 }
