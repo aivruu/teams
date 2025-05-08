@@ -14,45 +14,48 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.shared.infrastructure;
+package io.github.aivruu.teams.util.application;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * This class is used to proportionate a custom-size {@link Thread}-pool for the application.
  *
- * @since 2.0.0
+ * @since 4.0.0
  */
-public final class ExecutorHelper {
-  private static Executor pool;
+public final class PluginExecutor {
+  private static ExecutorService threadPool;
 
-  private ExecutorHelper() {
+  private PluginExecutor() {
     throw new UnsupportedOperationException("This class is for utility and cannot be instantiated.");
   }
 
   /**
-   * Returns this helper's {@link Executor}.
+   * Returns this helper's {@link ExecutorService}.
    *
-   * @return The {@link Executor}.
-   * @since 2.0.0
+   * @return The {@link ExecutorService}.
+   * @since 4.0.0
    */
-  public static @NotNull Executor pool() {
-    return pool;
+  public static @NotNull ExecutorService get() {
+    if (threadPool == null) {
+      throw new IllegalStateException("The plugin's thread-pool has not been initialized yet.");
+    }
+    return threadPool;
   }
 
   /**
-   * Creates a new thread-pool for the {@link Executor} using the given threads number.
+   * Creates a new thread-pool for the {@link ExecutorService} using the given threads number.
    *
    * @param threads the number of threads to assign.
-   * @since 2.0.0
+   * @since 4.0.0
    */
-  public static void createPool(final int threads) {
-    if (pool != null) {
+  public static void build(final int threads) {
+    if (threadPool != null) {
       return;
     }
-    pool = Executors.newFixedThreadPool(threads, r -> new Thread(r, "Teams-Thread-Pool"));
+    threadPool = Executors.newFixedThreadPool(threads, r -> new Thread(r, "Teams-Thread-Pool"));
   }
 }
