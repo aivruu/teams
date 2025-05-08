@@ -14,7 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.packet.application.minecraft;
+package io.github.aivruu.teams.packet.application.util;
 
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.ChatFormatting;
@@ -30,8 +30,8 @@ import java.awt.*;
  *
  * @since 2.3.1
  */
-public final class MinecraftColorHelper {
-  private MinecraftColorHelper() {
+public final class MinecraftColorParser {
+  private MinecraftColorParser() {
     throw new UnsupportedOperationException("This class is for utility.");
   }
 
