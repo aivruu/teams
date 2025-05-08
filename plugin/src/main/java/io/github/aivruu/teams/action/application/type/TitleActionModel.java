@@ -14,10 +14,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.action.application;
+package io.github.aivruu.teams.action.application.type;
 
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
-import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
+import io.github.aivruu.teams.action.application.ActionModelContract;
+import io.github.aivruu.teams.util.PlaceholderParser;
+import io.github.aivruu.teams.util.application.Debugger;
 import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -43,12 +44,12 @@ public final class TitleActionModel implements ActionModelContract {
       stay = Integer.parseInt(parameters[3]);
       fadeOut = Integer.parseInt(parameters[4]);
     } catch (final NumberFormatException exception) {
-      DebugLoggerHelper.write("Unexpected exception when trying to parse-to-int title's time-values.", exception);
+      Debugger.write("Unexpected exception when trying to parse-to-int title's time-values.", exception);
       return false;
     }
     player.showTitle(Title.title(
-      PlaceholderHelper.parseBoth(player, parameters[0]),
-      PlaceholderHelper.parseBoth(player, parameters[1]),
+      PlaceholderParser.parseBoth(player, parameters[0]),
+      PlaceholderParser.parseBoth(player, parameters[1]),
       Title.Times.times(
         Duration.ofSeconds(fadeIn),
         Duration.ofSeconds(stay),

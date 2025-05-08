@@ -14,35 +14,34 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.action.application;
+package io.github.aivruu.teams.action.application.type;
 
-import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
-import org.bukkit.Bukkit;
+import io.github.aivruu.teams.action.application.ActionModelContract;
+import io.github.aivruu.teams.util.application.Debugger;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public final class CommandActionModel implements ActionModelContract {
+public final class SoundActionModel implements ActionModelContract {
   @Override
   public @NotNull String id() {
-    return "COMMAND";
+    return "SOUND";
   }
 
   @Override
   public boolean trigger(final @NotNull Player player, final @NotNull String[] parameters) {
-    if (parameters.length < 2) {
+    if (parameters.length < 3) {
       return false;
     }
-    final String type = parameters[0];
-    // The message could include specific message or placeholders.
-    // Not available MiniPlaceholders support here, by now.
-    final String command = PlaceholderHelper.parseLegacy(player, parameters[1]);
-    if (type.equals("PLAYER")) {
-      player.performCommand(command);
-    } else if (type.equals("CONSOLE")) {
-      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-    } else {
+    final int volume;
+    final int pitch;
+    try {
+      volume = Integer.parseInt(parameters[1]);
+      pitch = Integer.parseInt(parameters[2]);
+    } catch (final NumberFormatException exception) {
+      Debugger.write("Unexpected exception when trying to parse-to-int volume and pitch values.", exception);
       return false;
     }
+    player.playSound(player.getLocation(), parameters[0], volume, pitch);
     return true;
   }
 }

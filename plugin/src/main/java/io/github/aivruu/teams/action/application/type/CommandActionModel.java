@@ -14,33 +14,38 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.action.application;
+package io.github.aivruu.teams.action.application.type;
 
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.action.application.ActionModelContract;
+import io.github.aivruu.teams.util.PlaceholderParser;
+import io.github.aivruu.teams.util.application.component.PlainComponentParser;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public final class SoundActionModel implements ActionModelContract {
+public final class CommandActionModel implements ActionModelContract {
   @Override
   public @NotNull String id() {
-    return "SOUND";
+    return "COMMAND";
   }
 
   @Override
   public boolean trigger(final @NotNull Player player, final @NotNull String[] parameters) {
-    if (parameters.length < 3) {
+    if (parameters.length < 2) {
       return false;
     }
-    final int volume;
-    final int pitch;
-    try {
-      volume = Integer.parseInt(parameters[1]);
-      pitch = Integer.parseInt(parameters[2]);
-    } catch (final NumberFormatException exception) {
-      DebugLoggerHelper.write("Unexpected exception when trying to parse-to-int volume and pitch values.", exception);
+    final String type = parameters[0];
+    // The message could include specific message or placeholders.
+    // Not available MiniPlaceholders support here, by now.
+    final String command = PlainComponentParser.plain(
+       PlaceholderParser.parseBoth(player, parameters[1]));
+    if (type.equals("PLAYER")) {
+      player.performCommand(command);
+    } else if (type.equals("CONSOLE")) {
+      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+    } else {
       return false;
     }
-    player.playSound(player.getLocation(), parameters[0], volume, pitch);
     return true;
   }
 }

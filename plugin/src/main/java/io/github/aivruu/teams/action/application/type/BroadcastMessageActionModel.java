@@ -14,9 +14,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.action.application;
+package io.github.aivruu.teams.action.application.type;
 
-import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
+import io.github.aivruu.teams.action.application.ActionModelContract;
+import io.github.aivruu.teams.util.PlaceholderParser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,7 @@ public final class BroadcastMessageActionModel implements ActionModelContract {
       return false;
     }
     // Properly specific-to-player placeholders shouldn't be used for this kind of message.
-    final Component message = PlaceholderHelper.parseBoth(player, parameters[1]);
+    final Component message = PlaceholderParser.parseBoth(player, parameters[1]);
     final String type = parameters[0];
     if (type.equals("GLOBAL")) {
       for (final Player serverPlayer : player.getServer().getOnlinePlayers()) {

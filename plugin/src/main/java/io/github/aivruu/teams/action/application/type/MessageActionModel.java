@@ -14,21 +14,22 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.action.application;
+package io.github.aivruu.teams.action.application.type;
 
-import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
+import io.github.aivruu.teams.action.application.ActionModelContract;
+import io.github.aivruu.teams.util.PlaceholderParser;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public final class ActionBarActionModel implements ActionModelContract {
+public final class MessageActionModel implements ActionModelContract {
   @Override
   public @NotNull String id() {
-    return "ACTION_BAR";
+    return "MESSAGE";
   }
 
   @Override
   public boolean trigger(final @NotNull Player player, final @NotNull String[] parameters) {
-    player.sendActionBar(PlaceholderHelper.parseBoth(player, parameters[0]));
+    player.sendMessage(PlaceholderParser.parseBoth(player, parameters[0]));
     return true;
   }
 }
