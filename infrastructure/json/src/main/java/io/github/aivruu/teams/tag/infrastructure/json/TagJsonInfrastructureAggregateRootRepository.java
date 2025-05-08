@@ -17,7 +17,7 @@
 package io.github.aivruu.teams.tag.infrastructure.json;
 
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
-import io.github.aivruu.teams.shared.infrastructure.util.JsonCodecHelper;
+import io.github.aivruu.teams.shared.infrastructure.util.JsonCoder;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
-public final class TagJsonInfrastructureAggregateRootRepository implements InfrastructureAggregateRootRepository<TagAggregateRoot> {
+public final class TagJsonInfrastructureAggregateRootRepository extends InfrastructureAggregateRootRepository<TagAggregateRoot> {
   private final Path directory;
 
   public TagJsonInfrastructureAggregateRootRepository(final @NotNull Path directory) {
@@ -51,7 +51,7 @@ public final class TagJsonInfrastructureAggregateRootRepository implements Infra
   public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findInPersistenceAsync(final @NotNull String id) {
     return CompletableFuture.supplyAsync(() -> {
       final Path file = this.directory.resolve(id + ".json");
-      return Files.notExists(file) ? null : JsonCodecHelper.read(file, TagAggregateRoot.class);
+      return Files.notExists(file) ? null : JsonCoder.read(file, TagAggregateRoot.class);
     }, THREAD_POOL);
   }
 
@@ -71,7 +71,7 @@ public final class TagJsonInfrastructureAggregateRootRepository implements Infra
           return false;
         }
       }
-      JsonCodecHelper.write(file, aggregateRoot);
+      JsonCoder.write(file, aggregateRoot);
       return true;
     }, THREAD_POOL);
   }
