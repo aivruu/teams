@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ public final class TeamsPlugin
   public @NotNull TagModificationRepository tagModificationRepository() {
     if (this.tagModificationRepository == null) {
       throw new IllegalStateException("The tags-modification-repository has not been initialized " +
-	       "yet.");
+         "yet.");
     }
     return this.tagModificationRepository;
   }
@@ -135,7 +135,7 @@ public final class TeamsPlugin
   public @NotNull TagModificationProcessor tagModificationProcessor() {
     if (this.tagModificationProcessor == null) {
       throw new IllegalStateException("The tags' modification-processor has not been initialized " +
-	       "yet.");
+         "yet.");
     }
     return this.tagModificationProcessor;
   }
@@ -144,7 +144,7 @@ public final class TeamsPlugin
   public @NotNull PlayerAggregateRootRepository playerCacheRepository() {
     if (this.playerAggregateRootRepository == null) {
       throw new IllegalStateException("The players' cache-repository has not been initialized yet" +
-	       ".");
+         ".");
     }
     return this.playerAggregateRootRepository;
   }
@@ -169,7 +169,7 @@ public final class TeamsPlugin
   public @NotNull PlayerTagSelectorManager playerTagSelectorManager() {
     if (this.playerTagSelectorManager == null) {
       throw new IllegalStateException("The players' tag-selector manager has not been initialized" +
-	       " yet.");
+         " yet.");
     }
     return this.playerTagSelectorManager;
   }
@@ -194,27 +194,27 @@ public final class TeamsPlugin
   public void onLoad() {
     final Path dataFolder = super.getDataPath();
     this.configurationModelContainer = ConfigurationContainer.of(dataFolder, "config",
-	     ConfigurationConfigurationModel.class);
+       ConfigurationConfigurationModel.class);
     this.messagesModelContainer = ConfigurationContainer.of(dataFolder, "messages",
-	     MessagesConfigurationModel.class);
+       MessagesConfigurationModel.class);
     this.tagsMenuModelContainer = ConfigurationContainer.of(dataFolder, "selector_menu",
-	     TagsMenuConfigurationModel.class);
+       TagsMenuConfigurationModel.class);
     this.tagEditorMenuModelContainer = ConfigurationContainer.of(dataFolder, "editor_menu",
-	     TagEditorMenuConfigurationModel.class);
+       TagEditorMenuConfigurationModel.class);
     if (this.configurationModelContainer == null || this.messagesModelContainer == null ||
        this.tagsMenuModelContainer == null || this.tagEditorMenuModelContainer == null) {
       this.logger.error("The configurations couldn't be loaded correctly, the plugin won't keep " +
-	       "the start-up process.");
+         "the start-up process.");
       return;
     }
     final ConfigurationConfigurationModel config = this.configurationModelContainer.model();
     Debugger.enable(config.debugMode);
     PluginExecutor.build(config.threadPoolSize);
     this.infrastructureRepositoryController = new InfrastructureRepositoryController(dataFolder,
-	     this.configurationModelContainer.model());
+       this.configurationModelContainer.model());
     if (!this.infrastructureRepositoryController.selectAndInitialize()) {
       this.logger.error("One, or both infrastructure-repositories couldn't be initialized " +
-	       "correctly, the plugin won't continue with start-up process!");
+         "correctly, the plugin won't continue with start-up process!");
       return;
     }
     this.playerAggregateRootRepository = new PlayerCacheAggregateRootRepository();
@@ -229,7 +229,7 @@ public final class TeamsPlugin
     this.tagAggregateRootRepository = new TagCacheAggregateRootRepository();
     this.tagAggregateRootRegistry = new TagAggregateRootRegistryImpl(
        this.tagAggregateRootRepository,
-	     this.infrastructureRepositoryController.tagInfrastructureAggregateRootRepository());
+       this.infrastructureRepositoryController.tagInfrastructureAggregateRootRepository());
     this.tagModificationRepository = new TagModificationCacheRepository();
 
     this.tagManager = new TagManager(this.tagAggregateRootRegistry, this.packetAdaptation);
@@ -240,7 +240,7 @@ public final class TeamsPlugin
     this.logger.info("Initializing player-management services and registries.");
     this.playerAggregateRootRegistry = new PlayerAggregateRootRegistryImpl(
        this.playerAggregateRootRepository,
-	     this.infrastructureRepositoryController.playerInfrastructureAggregateRootRepository());
+       this.infrastructureRepositoryController.playerInfrastructureAggregateRootRepository());
 
     this.playerManager = new PlayerManager(this.playerAggregateRootRegistry);
     this.playerTagSelectorManager = new PlayerTagSelectorManager(
@@ -261,7 +261,7 @@ public final class TeamsPlugin
     this.menuManager.register(new TagSelectorMenuModel(this.actionManager, this.playerManager,
        this.messagesModelContainer, this.tagsMenuModelContainer, this.playerTagSelectorManager));
     this.menuManager.register(new TagEditorMenuModel(this.actionManager,
-	     this.tagModificationRepository,
+       this.tagModificationRepository,
        this.messagesModelContainer, this.tagEditorMenuModelContainer));
     this.logger.info("Registered menus successfully.");
 
@@ -276,7 +276,7 @@ public final class TeamsPlugin
     this.registerCommands(
        new MainCommand(this, this.messagesModelContainer),
        new TagsCommand(this.messagesModelContainer, this.tagManager, this.menuManager,
-	        this.playerTagSelectorManager,
+          this.playerTagSelectorManager,
           this.tagModificationRepository, new AvailableTagSuggestionProvider(this.tagManager))
     );
     this.registerHooks(
@@ -288,13 +288,13 @@ public final class TeamsPlugin
 
   public boolean reload() {
     final ConfigurationContainer<ConfigurationConfigurationModel> updatedConfigurationContainer =
-	     this.configurationModelContainer.reload().join();
+       this.configurationModelContainer.reload().join();
     final ConfigurationContainer<MessagesConfigurationModel> updatedMessagesContainer =
-	     this.messagesModelContainer.reload().join();
+       this.messagesModelContainer.reload().join();
     final ConfigurationContainer<TagsMenuConfigurationModel> updatedSelectorMenuContainer =
-	     this.tagsMenuModelContainer.reload().join();
+       this.tagsMenuModelContainer.reload().join();
     final ConfigurationContainer<TagEditorMenuConfigurationModel> updatedEditorMenuContainer =
-	     this.tagEditorMenuModelContainer.reload().join();
+       this.tagEditorMenuModelContainer.reload().join();
     if (updatedConfigurationContainer == null || updatedMessagesContainer == null ||
        updatedSelectorMenuContainer == null || updatedEditorMenuContainer == null) {
       this.logger.error("Failed to reload the configuration files.");
@@ -306,7 +306,7 @@ public final class TeamsPlugin
     this.tagsMenuModelContainer = updatedSelectorMenuContainer;
     this.tagEditorMenuModelContainer = updatedEditorMenuContainer;
     final TagSelectorMenuModel tagSelectorMenu =
-	     (TagSelectorMenuModel) this.menuManager.menuModelOf(MenuConstants.TAGS_MENU_ID);
+       (TagSelectorMenuModel) this.menuManager.menuModelOf(MenuConstants.TAGS_MENU_ID);
     if (tagSelectorMenu != null) {
       // Menu's configuration and messages-container update, and re-build menu's GUI's content.
       tagSelectorMenu.messagesConfiguration(this.messagesModelContainer);
@@ -314,7 +314,7 @@ public final class TeamsPlugin
       tagSelectorMenu.build();
     }
     final TagEditorMenuModel tagEditorMenu =
-	     (TagEditorMenuModel) this.menuManager.menuModelOf(MenuConstants.TAGS_EDITOR_ID);
+       (TagEditorMenuModel) this.menuManager.menuModelOf(MenuConstants.TAGS_EDITOR_ID);
     if (tagEditorMenu != null) {
       tagEditorMenu.messagesConfiguration(this.messagesModelContainer);
       tagEditorMenu.menuConfiguration(this.tagEditorMenuModelContainer);
