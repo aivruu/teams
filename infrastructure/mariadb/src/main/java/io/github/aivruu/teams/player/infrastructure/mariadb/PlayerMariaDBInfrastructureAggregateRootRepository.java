@@ -20,7 +20,7 @@ import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.PlayerModelEntity;
 import io.github.aivruu.teams.persistence.infrastructure.utils.StatementConstants;
-import io.github.aivruu.teams.shared.infrastructure.common.CommonMariaDBInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.common.MariaDBInfrastructureAggregateRootRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
-public final class PlayerMariaDBInfrastructureAggregateRootRepository extends CommonMariaDBInfrastructureAggregateRootRepository<PlayerAggregateRoot> {
+public final class PlayerMariaDBInfrastructureAggregateRootRepository extends MariaDBInfrastructureAggregateRootRepository<PlayerAggregateRoot> {
   private final Connection connectionPool;
   private final String tableName;
 
@@ -58,7 +58,7 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
   }
 
   @Override
-  public @NotNull CompletableFuture<@Nullable PlayerAggregateRoot> findInPersistenceAsync(final @NotNull String id) {
+  public @NotNull CompletableFuture<@Nullable PlayerAggregateRoot> findAsync(final @NotNull String id) {
     return CompletableFuture.supplyAsync(() -> {
       try (final PreparedStatement statement = this.connectionPool.prepareStatement(
         StatementConstants.FIND_PLAYER_INFORMATION_STATEMENT.formatted(this.tableName));

@@ -16,76 +16,26 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.infrastructure.json;
 
-import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.json.JsonInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.util.JsonCoder;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
-public final class TagJsonInfrastructureAggregateRootRepository extends InfrastructureAggregateRootRepository<TagAggregateRoot> {
-  private final Path directory;
-
+public final class TagJsonInfrastructureAggregateRootRepository extends JsonInfrastructureAggregateRootRepository<TagAggregateRoot> {
   public TagJsonInfrastructureAggregateRootRepository(final @NotNull Path directory) {
-    this.directory = directory;
+    super(directory);
   }
 
   @Override
-  public boolean start() {
-    if (Files.exists(this.directory)) {
-      return true;
-    }
-    try {
-      Files.createDirectory(this.directory);
-      return true;
-    } catch (final IOException exception) {
-      return false;
-    }
-  }
-
-  @Override
-  public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findInPersistenceAsync(final @NotNull String id) {
+  public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findAsync(final @NotNull String id) {
     return CompletableFuture.supplyAsync(() -> {
       final Path file = this.directory.resolve(id + ".json");
       return Files.notExists(file) ? null : JsonCoder.read(file, TagAggregateRoot.class);
-    }, THREAD_POOL);
-  }
-
-  @Override
-  public @NotNull CompletableFuture<Boolean> existsAsync(final @NotNull String id) {
-    return CompletableFuture.supplyAsync(() -> Files.exists(this.directory.resolve(id + ".json")), THREAD_POOL);
-  }
-
-  @Override
-  public @NotNull CompletableFuture<Boolean> saveAsync(final @NotNull TagAggregateRoot aggregateRoot) {
-    return CompletableFuture.supplyAsync(() -> {
-      final Path file = this.directory.resolve(aggregateRoot.id() + ".json");
-      if (Files.notExists(file)) {
-        try {
-          Files.createFile(file);
-        } catch (final IOException exception) {
-          return false;
-        }
-      }
-      JsonCoder.write(file, aggregateRoot);
-      return true;
-    }, THREAD_POOL);
-  }
-
-  @Override
-  public @NotNull CompletableFuture<Boolean> deleteAsync(final @NotNull String id) {
-    return CompletableFuture.supplyAsync(() -> {
-      final Path file = this.directory.resolve(id + ".json");
-      try {
-        Files.delete(file);
-        return true;
-      } catch (final IOException exception) {
-        return false;
-      }
     }, THREAD_POOL);
   }
 }

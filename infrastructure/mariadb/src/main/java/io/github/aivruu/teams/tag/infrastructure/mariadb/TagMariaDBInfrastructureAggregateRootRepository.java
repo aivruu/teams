@@ -18,7 +18,7 @@ package io.github.aivruu.teams.tag.infrastructure.mariadb;
 
 import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.persistence.infrastructure.utils.StatementConstants;
-import io.github.aivruu.teams.shared.infrastructure.common.CommonMariaDBInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.common.MariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.util.JsonCoder;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.TagModelEntity;
@@ -32,7 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
-public final class TagMariaDBInfrastructureAggregateRootRepository extends CommonMariaDBInfrastructureAggregateRootRepository<TagAggregateRoot> {
+public final class TagMariaDBInfrastructureAggregateRootRepository extends MariaDBInfrastructureAggregateRootRepository<TagAggregateRoot> {
   private final Connection connectionPool;
   private final String tableName;
 
@@ -60,7 +60,7 @@ public final class TagMariaDBInfrastructureAggregateRootRepository extends Commo
   }
 
   @Override
-  public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findInPersistenceAsync(final @NotNull String id) {
+  public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findAsync(final @NotNull String id) {
     return CompletableFuture.supplyAsync(() -> {
       try (final PreparedStatement statement = this.connectionPool.prepareStatement(
         StatementConstants.FIND_TAG_INFORMATION_STATEMENT.formatted(this.tableName))
