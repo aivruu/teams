@@ -34,7 +34,9 @@ public final class TagModelEntity {
    * @param tagComponentProperties the tag's properties.
    * @since 0.0.1
    */
-  public TagModelEntity(final @NotNull String id, final @NotNull TagPropertiesValueObject tagComponentProperties) {
+  public TagModelEntity(
+     final @NotNull String id,
+     final @NotNull TagPropertiesValueObject tagComponentProperties) {
     this.id = id;
     this.tagComponentProperties = tagComponentProperties;
   }
