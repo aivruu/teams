@@ -35,6 +35,9 @@ public final class TagCacheAggregateRootRepository implements TagAggregateRootRe
   private @Nullable Collection<TagAggregateRoot> valuesView;
 
   public void buildCache(final @NotNull TagManager tagManager) {
+    if (this.cache != null) {
+      return;
+    }
     this.cache = Caffeine.newBuilder()
       .expireAfterWrite(5, TimeUnit.MINUTES)
       .scheduler(Scheduler.systemScheduler())
