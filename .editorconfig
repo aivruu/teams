@@ -25,5 +25,4 @@ ij_java_method_parameters_new_line_after_left_paren = false
 ij_java_method_parameters_right_paren_on_new_line = false
 ij_java_keep_builder_methods_indents = true
 ij_java_array_initializer_wrap = off
-ij_java_extends_keyword_wrap = split_into_lines
 ij_java_wrap_long_lines = true
