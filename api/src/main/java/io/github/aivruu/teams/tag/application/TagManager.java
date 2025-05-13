@@ -48,12 +48,12 @@ public final class TagManager {
    * Creates a new {@link TagManager} with the provided parameters.
    *
    * @param tagAggregateRootRegistry the {@link TagAggregateRootRegistry}.
-   * @param packetAdaptation the {@link PacketAdaptationContract}.
+   * @param packetAdaptation         the {@link PacketAdaptationContract}.
    * @since 0.0.1
    */
   public TagManager(
-    final @NotNull TagAggregateRootRegistry tagAggregateRootRegistry,
-    final @NotNull PacketAdaptationContract packetAdaptation) {
+     final @NotNull TagAggregateRootRegistry tagAggregateRootRegistry,
+     final @NotNull PacketAdaptationContract packetAdaptation) {
     this.tagAggregateRootRegistry = tagAggregateRootRegistry;
     this.packetAdaptation = packetAdaptation;
   }
@@ -78,7 +78,8 @@ public final class TagManager {
    * @since 3.5.1
    */
   public @NotNull List<@NotNull String> findAllLoadedTagIds() {
-    final Collection<TagAggregateRoot> tagAggregateRoots = this.tagAggregateRootRegistry.findAllInCache();
+    final Collection<TagAggregateRoot> tagAggregateRoots =
+       this.tagAggregateRootRegistry.findAllInCache();
     if (tagAggregateRoots.isEmpty()) {
       return List.of();
     }
@@ -90,7 +91,8 @@ public final class TagManager {
   }
 
   /**
-   * Checks whether the specified {@link TagAggregateRoot}'s information exists in the infrastructure.
+   * Checks whether the specified {@link TagAggregateRoot}'s information exists in the
+   * infrastructure.
    *
    * @param id the tag's id.
    * @return Whether the {@link TagAggregateRoot} exists.
@@ -105,7 +107,7 @@ public final class TagManager {
    * Creates a new tag (and scoreboard-team) with the specified parameters.
    *
    * @param player the player who creates the tag.
-   * @param id the tag's id.
+   * @param id     the tag's id.
    * @param prefix the tag's prefix, {@code null} for unset.
    * @param suffix the tag's suffix, {@code null} for unset.
    * @return Whether the tag was created.
@@ -113,17 +115,17 @@ public final class TagManager {
    * @since 0.0.1
    */
   public boolean createTag(
-    final @NotNull Player player,
-    final @NotNull String id,
-    final @Nullable Component prefix,
-    final @Nullable Component suffix,
-    final @NotNull NamedTextColor color
-  ) {
+     final @NotNull Player player,
+     final @NotNull String id,
+     final @Nullable Component prefix,
+     final @Nullable Component suffix,
+     final @NotNull NamedTextColor color) {
     if (this.tagAggregateRootRegistry.existsInInfrastructure(id)) {
       return false;
     }
     final TagPropertiesValueObject properties = new TagPropertiesValueObject(prefix, suffix, color);
-    final TagAggregateRoot tagAggregateRoot = new TagAggregateRoot(id, new TagModelEntity(id, properties));
+    final TagAggregateRoot tagAggregateRoot = new TagAggregateRoot(id, new TagModelEntity(id,
+       properties));
     this.tagAggregateRootRegistry.register(tagAggregateRoot);
     this.packetAdaptation.createTeam(id, properties);
     this.handleTagAggregateRootSave(tagAggregateRoot);
@@ -139,17 +141,18 @@ public final class TagManager {
    */
   public void handleTagAggregateRootSave(final @NotNull TagAggregateRoot tagAggregateRoot) {
     this.tagAggregateRootRegistry.save(tagAggregateRoot)
-      .exceptionally(exception -> {
-        Debugger.write("Unexpected exception during tag-aggregate-root saving with id '{}'.", exception);
-        return false;
-      })
-      .thenAccept(saved -> {
-        if (!saved) {
-          Debugger.write("The tag's aggregate-root information couldn't be saved.");
-          // Avoid have unnecessary information in-cache.
-          this.tagAggregateRootRegistry.unregister(tagAggregateRoot.id());
-        }
-      });
+       .exceptionally(exception -> {
+         Debugger.write("Unexpected exception during tag-aggregate-root saving with id '{}'.",
+            exception);
+         return false;
+       })
+       .thenAccept(saved -> {
+         if (!saved) {
+           Debugger.write("The tag's aggregate-root information couldn't be saved.");
+           // Avoid have unnecessary information in-cache.
+           this.tagAggregateRootRegistry.unregister(tagAggregateRoot.id());
+         }
+       });
   }
 
   /**
@@ -168,14 +171,13 @@ public final class TagManager {
     Bukkit.getPluginManager().callEvent(new TagDeleteEvent(id));
     // Process from-infrastructure tag deletion.
     this.tagAggregateRootRegistry.delete(id)
-      .exceptionally(exception -> {
-        Debugger.write("Unexpected exception during tag deleting with id '{}'.", exception);
-        return false;
-      })
-      .thenAccept(deleted -> {
-        if (deleted) Debugger.write("Tag '{}' information has been deleted.", id);
-        else Debugger.write("The tag's information couldn't be deleted.");
-      });
+       .exceptionally(exception -> {
+         Debugger.write("Unexpected exception during tag deleting with id '{}'.", exception);
+         return false;
+       })
+       .thenAccept(deleted -> Debugger.write(deleted
+          ? "Tag '{}' information has been deleted."
+          : "The tag's information couldn't be deleted.", id));
     return true;
   }
 }
