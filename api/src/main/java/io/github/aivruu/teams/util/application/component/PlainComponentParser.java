@@ -38,7 +38,7 @@ public final class PlainComponentParser {
    *
    * @param component the component to serialize.
    * @return the plain-text representation of the {@link Component}.
-   * @since 0.0.1
+   * @since 4.0.0
    */
   public static @NotNull String plain(final @NotNull Component component) {
     return PLAIN_TEXT_COMPONENT_SERIALIZER.serialize(component);
@@ -60,7 +60,7 @@ public final class PlainComponentParser {
    *
    * @param plain the plain-text representation.
    * @return The {@link Component}.
-   * @since 0.0.1
+   * @since 4.0.0
    */
   public static @NotNull Component modern(final @NotNull String plain) {
     return PLAIN_TEXT_COMPONENT_SERIALIZER.deserialize(plain);
