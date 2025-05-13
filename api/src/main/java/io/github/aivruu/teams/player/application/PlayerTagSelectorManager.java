@@ -46,28 +46,30 @@ public final class PlayerTagSelectorManager {
    * Creates a new {@link PlayerTagSelectorManager} with the provided parameters.
    *
    * @param playerAggregateRootRegistry the {@link PlayerAggregateRootRegistry}.
-   * @param packetAdaptation the {@link PacketAdaptationContract} for teams update.
+   * @param packetAdaptation            the {@link PacketAdaptationContract} for teams update.
    * @since 0.0.1
    */
   public PlayerTagSelectorManager(
-    final @NotNull PlayerAggregateRootRegistry playerAggregateRootRegistry,
-    final @NotNull TagAggregateRootRegistry tagAggregateRootRegistry,
-    final @NotNull PacketAdaptationContract packetAdaptation) {
+     final @NotNull PlayerAggregateRootRegistry playerAggregateRootRegistry,
+     final @NotNull TagAggregateRootRegistry tagAggregateRootRegistry,
+     final @NotNull PacketAdaptationContract packetAdaptation) {
     this.playerAggregateRootRegistry = playerAggregateRootRegistry;
     this.tagAggregateRootRegistry = tagAggregateRootRegistry;
     this.packetAdaptation = packetAdaptation;
   }
 
   /**
-   * Defines the given tag as the new selection for the player, and returns a status-code
-   * for the selection.
+   * Defines the given tag as the new selection for the player, and returns a status-code for the
+   * selection.
    *
    * @param player the player who selected the tag.
-   * @param tag the tag's id.
+   * @param tag    the tag's id.
    * @return A status-code which can be:
    * <ul>
-   * <li>{@link PlayerAggregateRoot#TAG_HAS_BEEN_CHANGED} if the player's tag-selection was made correctly.</li>
-   * <li>{@link PlayerAggregateRoot#TAG_IS_ALREADY_SELECTED} if the player already has the tag selected.</li>
+   * <li>{@link PlayerAggregateRoot#TAG_HAS_BEEN_CHANGED} if the player's tag-selection was made
+   * correctly.</li>
+   * <li>{@link PlayerAggregateRoot#TAG_IS_ALREADY_SELECTED} if the player already has the tag
+   * selected.</li>
    * <li>{@link #PLAYER_IS_NOT_ONLINE} if the player is not connected to the server.</li>
    * <li>{@link #TAG_SPECIFIED_NOT_EXIST} if the tag specified doesn't exist.</li>
    * </ul>
@@ -80,7 +82,8 @@ public final class PlayerTagSelectorManager {
     if (!this.tagAggregateRootRegistry.existsInInfrastructure(tag)) {
       return TAG_SPECIFIED_NOT_EXIST;
     }
-    final PlayerAggregateRoot playerAggregateRoot = this.playerAggregateRootRegistry.findInCache(player.getUniqueId().toString());
+    final PlayerAggregateRoot playerAggregateRoot = this.playerAggregateRootRegistry.findInCache(
+       player.getUniqueId().toString());
     if (playerAggregateRoot == null) {
       return PLAYER_IS_NOT_ONLINE;
     }
@@ -94,9 +97,9 @@ public final class PlayerTagSelectorManager {
   }
 
   /**
-   * Clears the player's current tag-selection if it has one, and returns a status-coded
-   * for the operation.
-   * .
+   * Clears the player's current tag-selection if it has one, and returns a status-coded for the
+   * operation.
+   *
    * @param player the player.
    * @return A status-code which can be:
    * <ul>
@@ -109,7 +112,8 @@ public final class PlayerTagSelectorManager {
    * @since 0.0.1
    */
   public byte unselect(final @NotNull Player player) {
-    final PlayerAggregateRoot playerAggregateRoot = this.playerAggregateRootRegistry.findInCache(player.getUniqueId().toString());
+    final PlayerAggregateRoot playerAggregateRoot = this.playerAggregateRootRegistry.findInCache(
+       player.getUniqueId().toString());
     if (playerAggregateRoot == null) {
       return PLAYER_IS_NOT_ONLINE;
     }
