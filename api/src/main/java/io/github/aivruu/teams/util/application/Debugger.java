@@ -37,7 +37,7 @@ public final class Debugger {
    * Enable or disable the debug-mode.
    *
    * @param enable whether debug-mode should be enabled or disabled.
-   * @since 0.0.1
+   * @since 4.0.0
    */
   public static void enable(final boolean enable) {
     enabled = enable;
@@ -49,7 +49,7 @@ public final class Debugger {
    *
    * @param message the message to print.
    * @param values the message's values to replace (marked with {@code {}}).
-   * @since 0.0.1
+   * @since 4.0.0
    */
   public static void write(final @NotNull String message, final @NotNull Object... values) {
     if (enabled) {
