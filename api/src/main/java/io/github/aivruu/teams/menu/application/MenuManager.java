@@ -75,7 +75,7 @@ public final class MenuManager {
    * @return Whether the menu exists.
    * @since 0.0.1
    */
-  public boolean openMenu(final @NotNull Player player, final @NotNull String menu) {
+  public boolean open(final @NotNull Player player, final @NotNull String menu) {
     final AbstractMenuModel menuModel = this.menuRepository.findSync(menu);
     if (menuModel != null) {
       menuModel.open(player);
@@ -91,7 +91,7 @@ public final class MenuManager {
    * @return Whether the menu exists.
    * @since 0.0.1
    */
-  public boolean closeMenu(final @NotNull Player player, final @NotNull String menu) {
+  public boolean close(final @NotNull Player player, final @NotNull String menu) {
     final AbstractMenuModel menuModel = this.menuRepository.findSync(menu);
     if (menuModel != null) {
       menuModel.close(player);
