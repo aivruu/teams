@@ -21,7 +21,7 @@ import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
 import io.github.aivruu.teams.persistence.infrastructure.utils.HikariInstanceProvider;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
 
-public abstract class CommonMariaDBInfrastructureAggregateRootRepository<A extends AggregateRoot>
+public abstract class MariaDBInfrastructureAggregateRootRepository<A extends AggregateRoot>
    extends InfrastructureAggregateRootRepository<A> {
   @Override
   public void close() {
