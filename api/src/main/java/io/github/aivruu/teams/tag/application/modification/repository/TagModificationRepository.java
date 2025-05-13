@@ -16,14 +16,31 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.application.modification.repository;
 
+import com.google.errorprone.annotations.DoNotCall;
 import io.github.aivruu.teams.repository.domain.DomainRepository;
 import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
+/**
+ * A {@link DomainRepository} implementation for {@link ModificationInProgressValueObject}s.
+ *
+ * @implNote This interface does not support {@link DomainRepository#updateSync(String, Object)}
+ * method.
+ * @since 4.0.0
+ */
 public interface TagModificationRepository extends DomainRepository<ModificationInProgressValueObject> {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * <b>NOTE: Not implemented by its interface-contract's implementation.</b>
+   *
+   * @throws UnsupportedOperationException because of not-implemented method.
+   * @since 4.0.0
+   */
   @Override
+  @DoNotCall
   default @NotNull Collection<ModificationInProgressValueObject> findAllSync() {
     throw NOT_IMPLEMENTED_EXCEPTION;
   }
