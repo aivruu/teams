@@ -45,7 +45,9 @@ public final class TagPropertyChangeEvent extends Event implements Cancellable {
    * @param context the modification's context.
    * @since 0.0.1
    */
-  public TagPropertyChangeEvent(final @NotNull String tag, final @NotNull ModificationContext context) {
+  public TagPropertyChangeEvent(
+     final @NotNull String tag,
+     final @NotNull ModificationContext context) {
     this.tag = tag;
     this.context = context;
   }
