@@ -16,6 +16,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.infrastructure.modification;
 
+import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
+import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
 import io.github.aivruu.teams.tag.application.TagManager;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
@@ -27,6 +29,7 @@ import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,13 +41,16 @@ import java.util.UUID;
 
 public final class TagModificationProcessorImpl extends TagModificationProcessor {
   private final TagManager tagManager;
+  private final ConfigurationManager configurationManager;
 
   public TagModificationProcessorImpl(
      final @NotNull JavaPlugin plugin,
      final @NotNull TagAggregateRootRegistry tagAggregateRootRegistry,
-     final @NotNull TagManager tagManager) {
+     final @NotNull TagManager tagManager,
+     final @NotNull ConfigurationManager configurationManager) {
     super(plugin, tagAggregateRootRegistry);
     this.tagManager = tagManager;
+    this.configurationManager = configurationManager;
   }
 
   @Override
@@ -56,11 +62,14 @@ public final class TagModificationProcessorImpl extends TagModificationProcessor
     if (player == null) {
       return ProcessedContextResultValueObject.asFailed();
     }
+    final MessagesConfigurationModel messages = this.configurationManager.messages();
     final ProcessedContextResultValueObject processedContextResult = super.process(modification, input);
+    if (processedContextResult.cancelled()) {
+      player.sendMessage(MiniMessageParser.text(messages.cancelledEditMode));
+      return processedContextResult;
+    }
     if (!processedContextResult.pending()) {
-      player.sendMessage(Component.text(context.name())
-         .append(Component.text(":"))
-         .append(Component.text(processedContextResult.status())));
+      player.sendMessage(MiniMessageParser.text(messages.tagModifyError));
       return processedContextResult;
     }
     final TagAggregateRoot tagAggregateRoot = processedContextResult.tagAggregateRoot();
@@ -68,12 +77,13 @@ public final class TagModificationProcessorImpl extends TagModificationProcessor
     // [PENDING_FOR_MODIFICATION_PROCESSING]
     final TagPropertiesValueObject newProperties = this.handleInputByContext(input, context, tagAggregateRoot);
     if (newProperties == null) {
-      player.sendMessage(Component.text("Properties are the same"));
+      player.sendMessage(MiniMessageParser.text(messages.valueIsSame));
     } else {
       tagAggregateRoot.tagComponentProperties(newProperties);
       // Save tag's information as it was modified.
       this.tagManager.handleTagAggregateRootSave(tagAggregateRoot);
-      player.sendMessage(Component.text("Modified property ").append(Component.text(context.name())));
+      player.sendMessage(MiniMessageParser.text(messages.modifiedTagProperty,
+         Placeholder.parsed("property", context.name().toLowerCase(Locale.ROOT))));
     }
     return processedContextResult;
   }
