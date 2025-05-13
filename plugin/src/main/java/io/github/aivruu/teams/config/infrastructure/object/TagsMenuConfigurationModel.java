@@ -16,8 +16,10 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.config.infrastructure.object;
 
-import io.github.aivruu.teams.config.infrastructure.ConfigurationInterface;
-import org.bukkit.Material;
+import io.github.aivruu.teams.config.application.ConfigurationInterface;
+import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
+import io.github.aivruu.teams.menu.application.item.MenuItemContract;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -38,18 +40,17 @@ public final class TagsMenuConfigurationModel implements ConfigurationInterface 
   public byte rows = 5;
 
   @Comment("The items that this gui will contain.")
-  public ItemSection[] items = { new ItemSection() };
+  public MenuItemContract[] items = { new MenuItemImpl() };
 
   @ConfigSerializable
-  public static class ItemSection {
-    @Comment("The id for this item.")
-    public String id = "item-1";
+  public static class MenuItemImpl implements MenuItemContract {
+    @Comment("Contains the general-information for this item.")
+    public MenuItemSection itemInformation = new MenuItemSection();
 
-    @Comment("The slot (or slots) where to place this item in the menu.")
-    public byte[] slots = { 21 };
-
-    @Comment("The material to use for this item.")
-    public Material material = Material.EMERALD;
+    @Override
+    public @NotNull MenuItemSection itemInformation() {
+      return this.itemInformation;
+    }
 
     @Comment("The tag that this item will take, empty if the item no requires this.")
     public String tag = "vip";
@@ -63,38 +64,5 @@ public final class TagsMenuConfigurationModel implements ConfigurationInterface 
       The message to send to the player if this tag-requires permissions (if 'permission' field
       is defined).""")
     public String permissionMessage = "<red>You don't have permission to use this tag.";
-
-    @Comment("The display-name for this item.")
-    public String displayName = "<gray>Tag: <green>VIP</green> | <white>Click to select it.";
-
-    @Comment("The item's lore.")
-    public String[] lore = {
-      "", "", ""
-    };
-
-    @Comment("Enables the glow-effect on this item.")
-    public boolean glow = true;
-
-    @Comment("Means that besides the item's nbt-key, the plugin will check its custom-model-data.")
-    public boolean checkCustomModelData = false;
-
-    @Comment("The custom-model-data for this item. '0' to disable it.")
-    public int data = 0;
-
-    @Comment("""
-      The actions to execute when this item is clicked with left-click or shift-left-click.
-      These actions will be executed by the plugin firstly, and then, if a tag is assigned, will
-      process it for the tag-selection.""")
-    public String[] leftClickActions = {
-      "[sound] entity.experience_orb.pickup;1;1"
-    };
-
-    @Comment("""
-      The actions to execute when this item is clicked with right-click or shift-right-click.
-      Only these actions will be executed, the plugin won't continue to check if a tag is assigned
-      for selection-process, for this, will be necessary use left-click or shift-left-click instead.""")
-    public String[] rightClickActions = {
-      "[sound] entity.experience_orb.pickup;1;1"
-    };
   }
 }

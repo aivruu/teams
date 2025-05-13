@@ -16,9 +16,11 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.config.infrastructure.object;
 
-import io.github.aivruu.teams.config.infrastructure.ConfigurationInterface;
+import io.github.aivruu.teams.config.application.ConfigurationInterface;
+import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
+import io.github.aivruu.teams.menu.application.item.MenuItemContract;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
-import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -39,18 +41,17 @@ public final class TagEditorMenuConfigurationModel implements ConfigurationInter
   public byte rows = 3;
 
   @Comment("The items that this gui will contain.")
-  public ItemSection[] items = { new ItemSection() };
+  public MenuItemContract[] items = { new MenuItemImpl() };
 
   @ConfigSerializable
-  public static class ItemSection {
-    @Comment("The id for this item.")
-    public String id = "item-1";
+  public static class MenuItemImpl implements MenuItemContract {
+    @Comment("Contains the general-information for this item.")
+    public MenuItemSection itemInformation = new MenuItemSection();
 
-    @Comment("The slot (or slots) where to place this item in the menu.")
-    public byte[] slots = { 21 };
-
-    @Comment("The material to use for this item.")
-    public Material material = Material.EMERALD;
+    @Override
+    public @NotNull MenuItemSection itemInformation() {
+      return this.itemInformation;
+    }
 
     @Comment("""
       Represents the required input-type that must be given for the defined modification-type for this tag.
@@ -59,38 +60,5 @@ public final class TagEditorMenuConfigurationModel implements ConfigurationInter
       - COLOR: A new color must be for the tag.
       - NONE: No input required, used only for decoration-items (only executes actions).""")
     public ModificationContext inputTypeRequired = ModificationContext.NONE;
-
-    @Comment("The display-name for this item.")
-    public String displayName = "<gray>Tag: <green>VIP</green> | <white>Click to select it.";
-
-    @Comment("The item's lore.")
-    public String[] lore = {
-      "", "", ""
-    };
-
-    @Comment("Enables the glow-effect on this item.")
-    public boolean glow = true;
-
-    @Comment("Means that besides the item's nbt-key, the plugin will check its custom-model-data.")
-    public boolean checkCustomModelData = false;
-
-    @Comment("The custom-model-data for this item. '0' to disable it.")
-    public int data = 0;
-
-    @Comment("""
-      The actions to execute when this item is clicked with left-click or shift-left-click.
-      These actions will be executed by the plugin firstly, and then, if a input-type is defined, it
-      process it for the tag property-mutation.""")
-    public String[] leftClickActions = {
-      "[sound] entity.experience_orb.pickup;1;1"
-    };
-
-    @Comment("""
-      The actions to execute when this item is clicked with right-click or shift-right-click.
-      Only these actions will be executed, the plugin won't continue to check by the input-type
-      specified for the modification, for this, will be necessary use left-click or shift-left-click instead.""")
-    public String[] rightClickActions = {
-      "[sound] entity.experience_orb.pickup;1;1"
-    };
   }
 }
