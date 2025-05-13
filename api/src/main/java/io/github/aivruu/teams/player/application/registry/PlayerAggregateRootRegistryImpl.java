@@ -31,8 +31,8 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
   private final AsyncAggregateRootRepository<PlayerAggregateRoot> playerAsyncAggregateRootRepository;
 
   public PlayerAggregateRootRegistryImpl(
-    final @NotNull PlayerAggregateRootRepository playerAggregateRootRepository,
-    final @NotNull AsyncAggregateRootRepository<PlayerAggregateRoot> playerAsyncAggregateRootRepository) {
+     final @NotNull PlayerAggregateRootRepository playerAggregateRootRepository,
+     final @NotNull AsyncAggregateRootRepository<PlayerAggregateRoot> playerAsyncAggregateRootRepository) {
     this.playerAggregateRootRepository = playerAggregateRootRepository;
     this.playerAsyncAggregateRootRepository = playerAsyncAggregateRootRepository;
   }
@@ -55,7 +55,7 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
   @Override
   public boolean existsGlobally(final @NotNull String id) {
     return this.playerAggregateRootRepository.existsSync(id)
-      || this.playerAsyncAggregateRootRepository.existsAsync(id).join();
+       || this.playerAsyncAggregateRootRepository.existsAsync(id).join();
   }
 
   @Override
