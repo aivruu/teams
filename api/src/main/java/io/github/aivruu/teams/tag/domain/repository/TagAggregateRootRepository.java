@@ -16,6 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.domain.repository;
 
+import com.google.errorprone.annotations.DoNotCall;
 import io.github.aivruu.teams.aggregate.domain.repository.AggregateRootRepository;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,16 @@ import org.jetbrains.annotations.NotNull;
  * @since 0.0.1
  */
 public interface TagAggregateRootRepository extends AggregateRootRepository<TagAggregateRoot> {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * <b>NOTE: Not implemented by its interface-contract's implementation.</b>
+   *
+   * @throws UnsupportedOperationException because of not-implemented method.
+   * @since 4.0.0
+   */
   @Override
+  @DoNotCall
   default <V> void updateSync(final @NotNull String id, final @NotNull V value) {
     throw NOT_IMPLEMENTED_EXCEPTION;
   }
