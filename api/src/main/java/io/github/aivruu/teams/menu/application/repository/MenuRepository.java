@@ -20,7 +20,30 @@ import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.repository.domain.DomainRepository;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+
 public interface MenuRepository extends DomainRepository<AbstractMenuModel> {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * <b>NOTE: Not implemented by its interface-contract's implementation.</b>
+   *
+   * @throws UnsupportedOperationException because of not-implemented method.
+   * @since 4.0.0
+   */
+  @Override
+  default @NotNull Collection<AbstractMenuModel> findAllSync() {
+    throw NOT_IMPLEMENTED_EXCEPTION;
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * <b>NOTE: Not implemented by its interface-contract's implementation.</b>
+   *
+   * @throws UnsupportedOperationException because of not-implemented method.
+   * @since 4.0.0
+   */
   @Override
   default <V> void updateSync(final @NotNull String id, @NotNull final V value) {
     throw NOT_IMPLEMENTED_EXCEPTION;
