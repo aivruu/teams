@@ -18,8 +18,10 @@ package io.github.aivruu.teams.tag.infrastructure.modification.cache;
 
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
+import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
 import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
+import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -29,8 +31,12 @@ import java.util.UUID;
 
 public final class TagModificationCacheInvalidationListener
    implements RemovalListener<String, ModificationInProgressValueObject> {
-  // Pending PR merging for this feature.
-//  private final ConfigurationManager configurationManager;
+  private final ConfigurationManager configurationManager;
+
+  public TagModificationCacheInvalidationListener(
+     final @NotNull ConfigurationManager configurationManager) {
+    this.configurationManager = configurationManager;
+  }
 
   @Override
   public void onRemoval(
@@ -45,6 +51,6 @@ public final class TagModificationCacheInvalidationListener
       return;
     }
     Debugger.write("Invalidating expired modification-entry for player: {}", id);
-    // ...
+    player.sendMessage(MiniMessageParser.text(this.configurationManager.messages().expiredModification));
   }
 }
