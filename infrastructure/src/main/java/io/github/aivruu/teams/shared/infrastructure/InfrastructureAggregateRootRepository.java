@@ -28,7 +28,8 @@ import java.util.concurrent.ExecutorService;
  * @param <A> an aggregate-root type.
  * @since 0.0.1
  */
-public abstract class InfrastructureAggregateRootRepository<A extends AggregateRoot> implements AsyncAggregateRootRepository<A> {
+public abstract class InfrastructureAggregateRootRepository<A extends AggregateRoot>
+   implements AsyncAggregateRootRepository<A> {
   /** The plugin's thread-pool used for this async-operations. */
   public static final ExecutorService THREAD_POOL = PluginExecutor.get();
 
