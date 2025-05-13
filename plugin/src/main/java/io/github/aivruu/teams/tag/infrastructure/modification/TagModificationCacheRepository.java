@@ -19,6 +19,7 @@ package io.github.aivruu.teams.tag.infrastructure.modification;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
+import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
@@ -33,13 +34,19 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 4.0.0
  */
-public final class TagModificationCacheRepository
-   implements TagModificationRepository {
-  private final Cache<String, ModificationInProgressValueObject> cache = Caffeine.newBuilder()
-     .expireAfterWrite(15, TimeUnit.SECONDS)
-     .scheduler(Scheduler.systemScheduler())
-     .removalListener(new TagModificationCacheInvalidationListener())
-     .build();
+public final class TagModificationCacheRepository implements TagModificationRepository {
+  private Cache<String, ModificationInProgressValueObject> cache;
+
+  public void buildCache(final @NotNull ConfigurationManager configurationManager) {
+    if (this.cache != null) {
+      return;
+    }
+    this.cache = Caffeine.newBuilder()
+       .expireAfterWrite(15, TimeUnit.SECONDS)
+       .scheduler(Scheduler.systemScheduler())
+       .removalListener(new TagModificationCacheInvalidationListener(configurationManager))
+       .build();
+  }
 
   @Override
   public @Nullable ModificationInProgressValueObject findSync(final @NotNull String id) {
