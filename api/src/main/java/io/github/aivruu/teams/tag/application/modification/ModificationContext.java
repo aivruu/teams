@@ -28,12 +28,6 @@ public enum ModificationContext {
   SUFFIX,
   /** The modification is for the color. */
   COLOR,
-  /** The modification has failed due to event-cancellation or other reasons. */
-  FAILED,
-  /** The modification was cancelled by the player. */
-  CANCELLED,
-  /** The property's content was cleared. */
-  CLEARED,
   /** There's no modification-context. */
   NONE
 }
