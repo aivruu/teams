@@ -32,18 +32,21 @@ public final class MiniMessageParser {
   private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
   private MiniMessageParser() {
-    throw new UnsupportedOperationException("This class is for utility and cannot be instantiated.");
+    throw new UnsupportedOperationException(
+       "This class is for utility and cannot be instantiated.");
   }
 
   /**
    * Parses the given string to a {@link Component} and applies the given {@link TagResolver}s.
    *
-   * @param message the text to parse.
+   * @param message   the text to parse.
    * @param resolvers the text's placeholders.
    * @return A {@link Component}.
-   * @since 0.0.1
+   * @since 4.0.0
    */
-  public static @NotNull Component text(final @NotNull String message, final @NotNull TagResolver... resolvers) {
+  public static @NotNull Component text(
+     final @NotNull String message,
+     final @NotNull TagResolver... resolvers) {
     return message.isEmpty() ? Component.empty() : MINI_MESSAGE.deserialize(message, resolvers);
   }
 
@@ -52,35 +55,39 @@ public final class MiniMessageParser {
    *
    * @param content the array to parse.
    * @return A {@link Component}.
-   * @since 0.0.1
+   * @since 4.0.0
    */
   public static @NotNull Component list(final @NotNull String[] content) {
     if (content.length == 0) {
       return Component.empty();
-    } else if (content.length == 1) { // Deserialize it single line directly instead of create a new builder.
+    }
+    if (content.length == 1) {
+      // Deserialize it single line directly instead of create a new builder.
       return MINI_MESSAGE.deserialize(content[0]);
     }
     final TextComponent.Builder componentBuilder = Component.text();
     for (final String line : content) {
-      componentBuilder.append(MINI_MESSAGE.deserialize(line))
-        .appendNewline();
+      componentBuilder.append(MINI_MESSAGE.deserialize(line)).appendNewline();
     }
     return componentBuilder.build();
   }
 
   /**
-   * Parses the given array's content to {@link Component}s and applies the given {@link TagResolver}s.
+   * Parses the given array's content to {@link Component}s and applies the given
+   * {@link TagResolver}s.
    *
-   * @param content the array to parse.
+   * @param content   the array to parse.
    * @param resolvers the text's placeholders.
    * @return A {@link Component} array.
-   * @since 0.0.1
+   * @since 4.0.0
    */
-  public static @NotNull Component[] array(final @NotNull String[] content, final @NotNull TagResolver... resolvers) {
+  public static @NotNull Component[] array(
+     final @NotNull String[] content,
+     final @NotNull TagResolver... resolvers) {
     final Component[] components = new Component[content.length];
     for (byte i = 0; i < components.length; i++) {
       components[i] = MINI_MESSAGE.deserialize(content[i], resolvers)
-        .decoration(TextDecoration.ITALIC, false);
+         .decoration(TextDecoration.ITALIC, false);
     }
     return components;
   }
@@ -90,7 +97,7 @@ public final class MiniMessageParser {
    *
    * @param component the component to parse.
    * @return A string.
-   * @since 0.0.1
+   * @since 4.0.0
    */
   public static @NotNull String string(final @NotNull Component component) {
     return MINI_MESSAGE.serialize(component);
