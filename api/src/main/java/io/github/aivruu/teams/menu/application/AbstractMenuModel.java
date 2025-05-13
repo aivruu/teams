@@ -43,11 +43,13 @@ public abstract class AbstractMenuModel implements InventoryHolder {
   /**
    * Creates a new {@link AbstractMenuModel} with the given id.
    *
-   * @param id this inventory's id.
+   * @param id            this inventory's id.
    * @param actionManager the {@link ActionManager} reference.
    * @since 3.4.1
    */
-  protected AbstractMenuModel(final @NotNull String id, final @NotNull ActionManager actionManager) {
+  protected AbstractMenuModel(
+     final @NotNull String id,
+     final @NotNull ActionManager actionManager) {
     this.id = id;
     this.actionManager = actionManager;
   }
@@ -72,43 +74,46 @@ public abstract class AbstractMenuModel implements InventoryHolder {
   /**
    * Handles the basic logic for when an inventory of this type is interacted.
    *
-   * @param player the player who clicked the item.
-   * @param clicked the item clicked, {@code null} if none.
+   * @param player    the player who clicked the item.
+   * @param clicked   the item clicked, {@code null} if none.
    * @param clickType the {@link ClickType} of the interaction.
-   * @return The {@link #MENU_ITEM_NBT_KEY} key assigned to the clicked-item, {@code null} if it doesn't
-   * have.
+   * @return The {@link #MENU_ITEM_NBT_KEY} key assigned to the clicked-item, {@code null} if it
+   * doesn't have.
    * @since 3.4.1
    */
   public @Nullable String handleClickLogic(
-    final @NotNull Player player, final @Nullable ItemStack clicked, final @NotNull ClickType clickType
-  ) {
-    return (clicked == null)
-      ? null : clicked.getItemMeta().getPersistentDataContainer().get(MENU_ITEM_NBT_KEY, PersistentDataType.STRING);
+     final @NotNull Player player,
+     final @Nullable ItemStack clicked,
+     final @NotNull ClickType clickType) {
+    return (clicked == null) ? null : clicked.getItemMeta()
+       .getPersistentDataContainer()
+       .get(MENU_ITEM_NBT_KEY, PersistentDataType.STRING);
   }
 
   /**
-   * Executes the menu's clicked-item item's actions depending on the click-type involved in the event.
+   * Executes the menu's clicked-item item's actions depending on the click-type involved in the
+   * event.
    *
-   * @param player the player who executed the actions.
-   * @param clickType the event's {@link ClickType}.
-   * @param leftClickActions the item's left-click actions.
+   * @param player            the player who executed the actions.
+   * @param clickType         the event's {@link ClickType}.
+   * @param leftClickActions  the item's left-click actions.
    * @param rightClickActions the item's right-click actions.
    * @since 3.4.1
    */
   public final void processItemActions(
-    final @NotNull Player player,
-    final @NotNull ClickType clickType,
-    final @NotNull String[] leftClickActions,
-    final @NotNull String[] rightClickActions
-  ) {
-    for (final String action : (clickType == ClickType.LEFT || clickType == ClickType.SHIFT_LEFT) ? leftClickActions : rightClickActions) {
+     final @NotNull Player player,
+     final @NotNull ClickType clickType,
+     final @NotNull String[] leftClickActions,
+     final @NotNull String[] rightClickActions) {
+    for (final String action : (clickType == ClickType.LEFT || clickType == ClickType.SHIFT_LEFT)
+       ? leftClickActions : rightClickActions) {
       this.actionManager.execute(player, action);
     }
   }
 
   /**
-   * Opens this inventory to the player, if the inventory is not built yet, it will be before open it
-   * to the player.
+   * Opens this inventory to the player, if the inventory is not built yet, it will be before open
+   * it to the player.
    *
    * @param player the player to who open the inventory.
    * @since 3.4.1
@@ -132,7 +137,7 @@ public abstract class AbstractMenuModel implements InventoryHolder {
 
   /**
    * {@inheritDoc}
-   *
+   * <p>
    * It will build the inventory if necessary before provide it.
    */
   @Override
