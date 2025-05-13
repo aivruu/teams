@@ -55,33 +55,27 @@ public final class InfrastructureRepositoryController {
 
   public boolean selectAndInitialize() {
     final ConfigurationConfigurationModel config = this.configurationManager.config();
-    if (config.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON ||
-        config.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.JSON) {
-      JsonCoder.buildWithAdapters(
-        JsonTagAggregateRootCodec.INSTANCE, JsonTagPropertiesValueObjectCodec.INSTANCE, JsonPlayerAggregateRootCodec.INSTANCE);
-    }
-    // Database clients initialization if repositories require it.
-    if (config.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB ||
-        config.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MONGODB
-    ) {
-      Debugger.write("Initializing mongo-client instance with configuration's parameters.");
-      MongoClientHelper.buildClient(config.host, config.username, config.database, config.password);
-      // Check if parameters are valid and client was initialized correctly.
-      if (MongoClientHelper.client() == null) {
-        Debugger.write("Mongo-client couldn't be initialized correctly, stopping infrastructure repositories initialization.");
-        return false;
+    switch (config.tagInfrastructureRepositoryType) {
+      case JSON -> JsonCoder.buildWithAdapters(JsonTagAggregateRootCodec.INSTANCE,
+         JsonTagPropertiesValueObjectCodec.INSTANCE, JsonPlayerAggregateRootCodec.INSTANCE);
+      case MARIADB -> {
+        Debugger.write("Initializing mongo-client instance with configuration's parameters.");
+        HikariInstanceProvider.buildDataSource(config.host, config.mariaDbPort, config.username,
+           config.database, config.password);
+        // Check if parameters are valid.
+        if (HikariInstanceProvider.get() == null) {
+          Debugger.write("HikariDataSource couldn't be initialized correctly, stopping infrastructure repositories initialization.");
+          return false;
+        }
       }
-    }
-    if (config.playerInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MARIADB ||
-        config.tagInfrastructureRepositoryType == InfrastructureAggregateRootRepository.Type.MARIADB
-    ) {
-      Debugger.write("Initializing mongo-client instance with configuration's parameters.");
-      HikariInstanceProvider.buildDataSource(config.host, config.mariaDbPort, config.username,
-         config.database, config.password);
-      // Check if parameters are valid.
-      if (HikariInstanceProvider.get() == null) {
-        Debugger.write("HikariDataSource couldn't be initialized correctly, stopping infrastructure repositories initialization.");
-        return false;
+      case MONGODB -> {
+        Debugger.write("Initializing mongo-client instance with configuration's parameters.");
+        MongoClientHelper.buildClient(config.host, config.username, config.database, config.password);
+        // Check if parameters are valid and client was initialized correctly.
+        if (MongoClientHelper.client() == null) {
+          Debugger.write("Mongo-client couldn't be initialized correctly, stopping infrastructure repositories initialization.");
+          return false;
+        }
       }
     }
     return this.determineAndInitializeInfrastructureTypes(config);
