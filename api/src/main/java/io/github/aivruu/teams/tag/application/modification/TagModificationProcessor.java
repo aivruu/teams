@@ -73,14 +73,16 @@ public abstract class TagModificationProcessor {
     if (input.equals("cancel")) {
       return ProcessedContextResultValueObject.asCancelled();
     }
-    final TagAggregateRoot tagAggregateRoot = this.tagAggregateRootRegistry.findInBoth(modification.tag());
+    final TagAggregateRoot tagAggregateRoot = this.tagAggregateRootRegistry.findInBoth(
+       modification.tag());
     if (tagAggregateRoot == null) {
       return ProcessedContextResultValueObject.asInvalid();
     }
     final TagPropertyChangeEvent tagPropertyChangeEvent = new TagPropertyChangeEvent(
        modification.tag(), modification.context());
     // Avoid IllegalStateException due to asynchronous event-firing.
-    Bukkit.getScheduler().runTask(this.plugin, () -> Bukkit.getPluginManager().callEvent(tagPropertyChangeEvent));
+    Bukkit.getScheduler().runTask(this.plugin, () ->
+       Bukkit.getPluginManager().callEvent(tagPropertyChangeEvent));
     return tagPropertyChangeEvent.isCancelled()
        ? ProcessedContextResultValueObject.asFailed()
        : ProcessedContextResultValueObject.asPending(tagAggregateRoot);
