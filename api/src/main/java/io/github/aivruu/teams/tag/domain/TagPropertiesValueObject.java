@@ -26,12 +26,14 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param prefix the prefix {@link Component} or {@code null} if no have.
  * @param suffix the suffix {@link Component} or {@code null} if no have.
- * @param color the tag's color.
+ * @param color  the tag's color.
  * @since 0.0.1
  */
 public record TagPropertiesValueObject(
-  @Nullable Component prefix, @Nullable Component suffix, @NotNull NamedTextColor color
-) {
+   @Nullable Component prefix,
+   @Nullable Component suffix,
+   @NotNull NamedTextColor color) {
   /** Represents an "empty" (or non-configured) properties-container for a tag. */
-  public static final TagPropertiesValueObject EMPTY = new TagPropertiesValueObject(null, null, NamedTextColor.WHITE);
+  public static final TagPropertiesValueObject EMPTY =
+     new TagPropertiesValueObject(null, null, NamedTextColor.WHITE);
 }
