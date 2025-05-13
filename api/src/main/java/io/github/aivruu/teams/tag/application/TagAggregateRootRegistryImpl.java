@@ -14,7 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.tag.application.registry;
+package io.github.aivruu.teams.tag.application;
 
 import io.github.aivruu.teams.aggregate.domain.repository.AsyncAggregateRootRepository;
 import io.github.aivruu.teams.util.application.Debugger;
@@ -51,7 +51,8 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
     }
     tagAggregateRoot = this.tagAsyncAggregateRootRepository.findInPersistenceAsync(id)
       .exceptionally(exception -> {
-        Debugger.write("Unexpected exception during in-infrastructure tag fetching with id '{}'.", id, exception);
+        Debugger.write("Unexpected exception during in-infrastructure tag fetching with id '{}'.",
+           id, exception);
         return null;
       })
       .join();
@@ -62,7 +63,8 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
   }
 
   @Override
-  public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findInInfrastructure(final @NotNull String id) {
+  public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findInInfrastructure(
+     final @NotNull String id) {
     return this.tagAsyncAggregateRootRepository.findInPersistenceAsync(id);
   }
 
@@ -73,7 +75,8 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
 
   @Override
   public boolean existsGlobally(final @NotNull String id) {
-    return this.tagAggregateRootRepository.existsSync(id) || this.tagAsyncAggregateRootRepository.existsAsync(id).join();
+    return this.tagAggregateRootRepository.existsSync(id)
+       || this.tagAsyncAggregateRootRepository.existsAsync(id).join();
   }
 
   @Override
