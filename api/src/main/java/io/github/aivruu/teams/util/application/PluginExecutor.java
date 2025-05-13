@@ -63,48 +63,4 @@ public final class PluginExecutor {
     }
     threadPool = Executors.newFixedThreadPool(threads, r -> new Thread(r, "Teams-Thread-Pool"));
   }
-
-  /**
-   * Executes the given command (task) after the given delay-duration.
-   * <p>
-   * Don't try to call this method if the thread-pool is not initialized yet.
-   *
-   * @param task the logic to execute.
-   * @param delay the duration-to-wait before run the task.
-   * @throws IllegalStateException if the thread-pool has not been initialized yet.
-   * @since 4.0.0
-   */
-  public static void runAfter(final @NotNull Runnable task, final @NotNull Duration delay) {
-    if (threadPool == null) {
-      Debugger.write("[WARNING] Requesting thread-pool initialization when already is initialized.");
-      return;
-    }
-    threadPool.execute(() -> {
-      try {
-        Thread.sleep(delay);
-      } catch (final InterruptedException exception) {
-        Debugger.write("Unexpected exception when trying to sleep thread before task-execution.",
-           exception);
-        Thread.currentThread().interrupt();
-      }
-      task.run();
-    });
-  }
-
-  /**
-   * Executes the given command (task) immediately.
-   * <p>
-   * Don't try to call this method if the thread-pool is not initialized yet.
-   *
-   * @param task the logic to execute.
-   * @throws IllegalStateException if the thread-pool has not been initialized yet.
-   * @since 4.0.0
-   */
-  public static void runNow(final @NotNull Runnable task) {
-    if (threadPool == null) {
-      Debugger.write("[WARNING] Requesting thread-pool initialization when already is initialized.");
-      return;
-    }
-    threadPool.execute(task);
-  }
 }
