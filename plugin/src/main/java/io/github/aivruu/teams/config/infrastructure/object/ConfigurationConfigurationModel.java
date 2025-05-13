@@ -16,7 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.config.infrastructure.object;
 
-import io.github.aivruu.teams.config.infrastructure.ConfigurationInterface;
+import io.github.aivruu.teams.config.application.ConfigurationInterface;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
