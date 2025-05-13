@@ -114,12 +114,11 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
   }
 
   @Override
+  @SuppressWarnings("ConstantConditions")
   public @NotNull NamedTextColor teamColor(final @NotNull String team) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
-    if (playerTeam == null) {
-      return NamedTextColor.WHITE;
-    }
-    final NamedTextColor color = MinecraftColorParser.modern(playerTeam.getColor());
-    return (color == null) ? NamedTextColor.WHITE : color;
+    return (playerTeam == null)
+       // modern() method's result won't be null as we give to it a own named-text-color reference.
+       ? NamedTextColor.WHITE : MinecraftColorParser.modern(playerTeam.getColor());
   }
 }
