@@ -70,14 +70,15 @@ public final class ActionManager {
       return;
     }
     final ActionModelContract actionModel = this.actionRepository.findSync(
-      StringUtils.substringBetween(action, "[", "]").toUpperCase(Locale.ROOT));
+       StringUtils.substringBetween(action, "[", "]").toUpperCase(Locale.ROOT));
     if (actionModel == null) {
       Debugger.write("Unknown action-type specified, skipping execution.");
       return;
     }
+    final String[] parameters = action.substring(actionModel.id().length() + 3).split(";");
     // We give the method the action's arguments without the identifier, and we check if it was executed
     // successfully.
-    if (!actionModel.trigger(player, action.substring(actionModel.id().length() + 3).split(";"))) {
+    if (!actionModel.trigger(player, parameters)) {
       Debugger.write("The action {}'s execution has failed.", actionModel.id());
     }
   }
