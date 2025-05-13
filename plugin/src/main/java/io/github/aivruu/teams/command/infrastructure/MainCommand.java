@@ -14,14 +14,14 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.command.application;
+package io.github.aivruu.teams.command.infrastructure;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.aivruu.teams.TeamsPlugin;
-import io.github.aivruu.teams.config.infrastructure.ConfigurationContainer;
-import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
+import io.github.aivruu.teams.command.application.RegistrableCommandContract;
 import io.github.aivruu.teams.permission.application.Permissions;
+import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
 import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -30,13 +30,13 @@ import org.jetbrains.annotations.NotNull;
 
 public final class MainCommand implements RegistrableCommandContract {
   private final TeamsPlugin plugin;
-  private final ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer;
+  private final ConfigurationManager configurationManager;
 
   public MainCommand(
-    final @NotNull TeamsPlugin plugin,
-    final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer) {
+     final @NotNull TeamsPlugin plugin,
+     final @NotNull ConfigurationManager configurationManager) {
     this.plugin = plugin;
-    this.messagesModelContainer = messagesModelContainer;
+    this.configurationManager = configurationManager;
   }
 
   @Override
@@ -53,7 +53,7 @@ public final class MainCommand implements RegistrableCommandContract {
         .requires(src -> src.getSender().hasPermission(Permissions.HELP.node()))
         .executes(ctx -> {
           ctx.getSource().getSender().sendMessage(MiniMessageParser.list(
-             this.messagesModelContainer.model().help));
+             this.configurationManager.messages().help));
           return Command.SINGLE_SUCCESS;
         })
       )
@@ -61,11 +61,10 @@ public final class MainCommand implements RegistrableCommandContract {
         .requires(src -> src.getSender().hasPermission(Permissions.RELOAD.node()))
         .executes(ctx -> {
           final CommandSender sender = ctx.getSource().getSender();
-          final MessagesConfigurationModel messages = this.messagesModelContainer.model();
           if (this.plugin.reload()) {
-            sender.sendMessage(MiniMessageParser.text(messages.reloadSuccess));
+            sender.sendMessage(MiniMessageParser.text(this.configurationManager.messages().reloadSuccess));
           } else {
-            sender.sendMessage(MiniMessageParser.text(messages.reloadError));
+            sender.sendMessage(MiniMessageParser.text(this.configurationManager.messages().reloadError));
           }
           return Command.SINGLE_SUCCESS;
         })
