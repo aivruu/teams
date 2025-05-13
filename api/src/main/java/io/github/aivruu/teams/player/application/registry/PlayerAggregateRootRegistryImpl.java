@@ -44,7 +44,7 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
 
   @Override
   public @NotNull CompletableFuture<PlayerAggregateRoot> findInInfrastructure(final @NotNull String id) {
-    return this.playerAsyncAggregateRootRepository.findInPersistenceAsync(id);
+    return this.playerAsyncAggregateRootRepository.findAsync(id);
   }
 
   @Override

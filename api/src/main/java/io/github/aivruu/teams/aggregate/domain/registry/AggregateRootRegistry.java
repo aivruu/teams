@@ -49,7 +49,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    * @param id the aggregate-root's identifier.
    * @return A {@link CompletableFuture} with the {@link AggregateRoot} or {@code null} if not found in
    * infrastructure.
-   * @see AsyncAggregateRootRepository#findInPersistenceAsync(String)
+   * @see AsyncAggregateRootRepository#findAsync(String)
    * @since 0.0.1
    */
   @NotNull CompletableFuture<@Nullable A> findInInfrastructure(final @NotNull String id);

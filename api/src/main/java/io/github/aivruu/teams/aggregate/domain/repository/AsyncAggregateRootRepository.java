@@ -37,7 +37,7 @@ public interface AsyncAggregateRootRepository<A extends AggregateRoot> {
    * @return A {@link CompletableFuture} with the {@link AggregateRoot} if found, otherwise {@code null}.
    * @since 0.0.1
    */
-  @NotNull CompletableFuture<@Nullable A> findInPersistenceAsync(final @NotNull String id);
+  @NotNull CompletableFuture<@Nullable A> findAsync(final @NotNull String id);
 
   /**
    * Checks if the {@link AggregateRoot} specified exists in repository.

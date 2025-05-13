@@ -49,7 +49,7 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
     if (tagAggregateRoot != null) {
       return tagAggregateRoot;
     }
-    tagAggregateRoot = this.tagAsyncAggregateRootRepository.findInPersistenceAsync(id)
+    tagAggregateRoot = this.tagAsyncAggregateRootRepository.findAsync(id)
       .exceptionally(exception -> {
         Debugger.write("Unexpected exception during in-infrastructure tag fetching with id '{}'.",
            id, exception);
@@ -65,7 +65,7 @@ public final class TagAggregateRootRegistryImpl implements TagAggregateRootRegis
   @Override
   public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findInInfrastructure(
      final @NotNull String id) {
-    return this.tagAsyncAggregateRootRepository.findInPersistenceAsync(id);
+    return this.tagAsyncAggregateRootRepository.findAsync(id);
   }
 
   @Override
