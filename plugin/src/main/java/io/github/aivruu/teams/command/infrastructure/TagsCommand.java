@@ -14,16 +14,17 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.command.application;
+package io.github.aivruu.teams.command.infrastructure;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.github.aivruu.teams.command.application.RegistrableCommandContract;
 import io.github.aivruu.teams.command.application.suggestion.AvailableTagSuggestionProvider;
-import io.github.aivruu.teams.config.infrastructure.ConfigurationContainer;
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
 import io.github.aivruu.teams.menu.application.MenuManager;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
+import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
 import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import io.github.aivruu.teams.permission.application.Permissions;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
@@ -41,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class TagsCommand implements RegistrableCommandContract {
-  private final ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer;
+  private final ConfigurationManager configurationManager;
   private final TagManager tagManager;
   private final MenuManager menuManager;
   private final PlayerTagSelectorManager playerTagSelectorManager;
@@ -49,13 +50,13 @@ public final class TagsCommand implements RegistrableCommandContract {
   private final AvailableTagSuggestionProvider tagsSuggestionProvider;
 
   public TagsCommand(
-     final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer,
+     final @NotNull ConfigurationManager configurationManager,
      final @NotNull TagManager tagManager,
      final @NotNull MenuManager menuManager,
      final @NotNull PlayerTagSelectorManager playerTagSelectorManager,
      final @NotNull TagModificationRepository tagModificationRepository,
      final AvailableTagSuggestionProvider tagsSuggestionProvider) {
-    this.messagesModelContainer = messagesModelContainer;
+    this.configurationManager = configurationManager;
     this.tagManager = tagManager;
     this.menuManager = menuManager;
     this.playerTagSelectorManager = playerTagSelectorManager;
@@ -77,15 +78,15 @@ public final class TagsCommand implements RegistrableCommandContract {
           .executes(ctx -> {
             final Player player = (Player) ctx.getSource().getSender();
             // We ignore the boolean-result due that this menu always exists for the menu-manager.
-            this.menuManager.openMenu(player, MenuConstants.TAGS_MENU_ID);
-            player.sendMessage(MiniMessageParser.text(this.messagesModelContainer.model().openedMenu));
+            this.menuManager.open(player, MenuConstants.TAGS_MENU_ID);
+            player.sendMessage(MiniMessageParser.text(this.configurationManager.messages().openedMenu));
             return Command.SINGLE_SUCCESS;
           })
        )
        .then(Commands.literal("unselect")
           .executes(ctx -> {
             final Player player = (Player) ctx.getSource().getSender();
-            final MessagesConfigurationModel messages = this.messagesModelContainer.model();
+            final MessagesConfigurationModel messages = this.configurationManager.messages();
             switch (this.playerTagSelectorManager.unselect(player)) {
               case PlayerTagSelectorManager.PLAYER_IS_NOT_ONLINE ->
                  player.sendMessage(MiniMessageParser.text(messages.playerUnknownInfo));
@@ -102,18 +103,20 @@ public final class TagsCommand implements RegistrableCommandContract {
        .then(Commands.literal("create")
           .requires(src -> src.getSender().hasPermission(Permissions.CREATE.node()))
           .executes(ctx -> {
-            ctx.getSource().getSender().sendMessage(MiniMessageParser.text(this.messagesModelContainer.model().modifyUsage));
+            ctx.getSource().getSender().sendMessage(MiniMessageParser.text(
+               this.configurationManager.messages().modifyUsage));
             return Command.SINGLE_SUCCESS;
           })
           .then(Commands.argument("id", StringArgumentType.word())
              .executes(ctx -> {
                ctx.getSource().getSender().sendMessage(MiniMessageParser.text(
-                  this.messagesModelContainer.model().modifyUsage));
+                  this.configurationManager.messages().modifyUsage));
                return Command.SINGLE_SUCCESS;
              })
              .then(Commands.argument("prefix", StringArgumentType.string())
                 .executes(ctx -> {
-                  ctx.getSource().getSender().sendMessage(MiniMessageParser.text(this.messagesModelContainer.model().modifyUsage));
+                  ctx.getSource().getSender().sendMessage(MiniMessageParser.text(
+                     this.configurationManager.messages().modifyUsage));
                   return Command.SINGLE_SUCCESS;
                 })
                 .then(Commands.argument("suffix", StringArgumentType.string()).executes(ctx -> {
@@ -121,12 +124,13 @@ public final class TagsCommand implements RegistrableCommandContract {
                   final String id = ctx.getArgument("id", String.class);
                   final String prefix = ctx.getArgument("prefix", String.class);
                   final String suffix = ctx.getArgument("suffix", String.class);
-                  final MessagesConfigurationModel messages = this.messagesModelContainer.model();
+                  final MessagesConfigurationModel messages = this.configurationManager.messages();
                   final boolean wasCreated = this.tagManager.createTag(player, id,
                      prefix.isEmpty() ? null : MiniMessageParser.text(prefix),
                      suffix.isEmpty() ? null : MiniMessageParser.text(suffix), NamedTextColor.WHITE);
                   if (wasCreated) {
-                    player.sendMessage(MiniMessageParser.text(messages.created, Placeholder.parsed("tag-id", id)));
+                    player.sendMessage(MiniMessageParser.text(messages.created,
+                       Placeholder.parsed("tag-id", id)));
                   } else {
                     player.sendMessage(MiniMessageParser.text(messages.alreadyExists));
                   }
@@ -140,25 +144,23 @@ public final class TagsCommand implements RegistrableCommandContract {
           .then(Commands.argument("id", StringArgumentType.word())
              .suggests(this.tagsSuggestionProvider)
              .executes(ctx -> {
+               final MessagesConfigurationModel messages = this.configurationManager.messages();
                final Player player = (Player) ctx.getSource().getSender();
                final String tag = ctx.getArgument("id", String.class);
                if (!this.tagManager.exists(tag)) {
-                 player.sendMessage(MiniMessageParser.text(this.messagesModelContainer.model()
-                    .unknownTag));
+                 player.sendMessage(MiniMessageParser.text(messages.unknownTag));
                  return Command.SINGLE_SUCCESS;
                }
                final String playerId = player.getUniqueId().toString();
                if (this.tagModificationRepository.existsSync(playerId)) {
-                 player.sendMessage(MiniMessageParser.text(this.messagesModelContainer.model()
-                    .alreadyInModification));
+                 player.sendMessage(MiniMessageParser.text(messages.alreadyInModification));
                  return Command.SINGLE_SUCCESS;
                }
                this.tagModificationRepository.saveSync(playerId,
                   new ModificationInProgressValueObject(playerId, tag, ModificationContext.NONE));
                // We ignore the boolean-result due that this menu always exists for the menu-manager.
-               this.menuManager.openMenu(player, MenuConstants.TAGS_EDITOR_ID);
-               player.sendMessage(MiniMessageParser.text(this.messagesModelContainer.model()
-                  .openedMenu));
+               this.menuManager.open(player, MenuConstants.TAGS_EDITOR_ID);
+               player.sendMessage(MiniMessageParser.text(messages.openedMenu));
                return Command.SINGLE_SUCCESS;
              })
           )
@@ -168,11 +170,12 @@ public final class TagsCommand implements RegistrableCommandContract {
           .then(Commands.argument("id", StringArgumentType.word())
              .suggests(this.tagsSuggestionProvider)
              .executes(ctx -> {
+               final MessagesConfigurationModel messages = this.configurationManager.messages();
                final Player player = (Player) ctx.getSource().getSender();
-               final MessagesConfigurationModel messages = this.messagesModelContainer.model();
                final String id = ctx.getArgument("id", String.class);
                if (this.tagManager.deleteTag(id)) {
-                 player.sendMessage(MiniMessageParser.text(messages.deleted, Placeholder.parsed("tag-id", id)));
+                 player.sendMessage(MiniMessageParser.text(messages.deleted,
+                    Placeholder.parsed("tag-id", id)));
                } else {
                  player.sendMessage(MiniMessageParser.text(messages.unknownTag));
                }
