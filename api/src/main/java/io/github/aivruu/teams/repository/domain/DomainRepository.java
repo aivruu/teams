@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 public interface DomainRepository<T> {
-  /** Cached exception for methods that are not supported by its implementaions. */
+  /** Cached-exception for implementations that does not support all interface's methods. */
   UnsupportedOperationException NOT_IMPLEMENTED_EXCEPTION =
      new UnsupportedOperationException("This method is not implemented and is not supported.");
 
