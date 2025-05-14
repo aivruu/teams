@@ -20,6 +20,7 @@ import io.github.aivruu.teams.action.application.ActionManager;
 import io.github.aivruu.teams.config.infrastructure.object.TagEditorMenuConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
+import io.github.aivruu.teams.menu.application.ProcessedMenuItemValueObject;
 import io.github.aivruu.teams.menu.application.item.MenuItemContract;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.menu.infrastructure.util.MenuItemSetter;
@@ -34,7 +35,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,37 +60,38 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
   }
 
   @Override
-  public @Nullable String handleClickLogic(
-    final @NotNull Player player,
-    final @Nullable ItemStack clicked,
-    final @NotNull ClickType clickType
-  ) {
-    final String itemNbtKey = super.handleClickLogic(player, clicked, clickType);
-    if (itemNbtKey == null) {
+  public @Nullable ProcessedMenuItemValueObject handleClickLogic(
+     final @NotNull Player player,
+     final @Nullable ItemStack clicked,
+     final @NotNull ClickType clickType) {
+    final ProcessedMenuItemValueObject processedMenuItem = super.handleClickLogic(player, clicked,
+       clickType);
+    if (processedMenuItem == null) {
       return null;
     }
     // After that we know the item is valid and has the key assigned.
-    final ItemMeta meta = clicked.getItemMeta();
-    final int customModelData = meta.hasCustomModelData() ? meta.getCustomModelData() : 0;
+    final int customModelData = processedMenuItem.meta().hasCustomModelData()
+       ? processedMenuItem.meta().getCustomModelData() : 0;
+    final String id = processedMenuItem.id();
     MenuItemSection itemInformation;
     for (final MenuItemContract itemSection : this.configurationManager.selector().items) {
       itemInformation = itemSection.itemInformation();
-      if (!itemNbtKey.equals(itemInformation.id)) {
+      if (!id.equals(itemInformation.id)) {
         continue;
       }
       if (itemInformation.checkCustomModelData && customModelData != itemInformation.data) {
         continue;
       }
-      this.processInput(player, (TagEditorMenuConfigurationModel.MenuItemImpl) itemSection, clickType);
+      this.processInput(player, (TagEditorMenuConfigurationModel.MenuItemImpl) itemSection,
+	       clickType);
     }
-    return itemNbtKey;
+    return processedMenuItem;
   }
 
   private void processInput(
-    final @NotNull Player player,
-    final @NotNull TagEditorMenuConfigurationModel.MenuItemImpl itemSection,
-    final @NotNull ClickType clickType
-  ) {
+     final @NotNull Player player,
+     final @NotNull TagEditorMenuConfigurationModel.MenuItemImpl itemSection,
+     final @NotNull ClickType clickType) {
     // Execute item's actions and check if it should stop execution-flow.
     super.processItemActions(player, clickType, itemSection.itemInformation.leftClickActions,
        itemSection.itemInformation.rightClickActions);

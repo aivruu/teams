@@ -21,6 +21,7 @@ import io.github.aivruu.teams.config.infrastructure.object.MessagesConfiguration
 import io.github.aivruu.teams.config.infrastructure.object.TagsMenuConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
+import io.github.aivruu.teams.menu.application.ProcessedMenuItemValueObject;
 import io.github.aivruu.teams.menu.application.item.MenuItemContract;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.menu.infrastructure.util.MenuItemSetter;
@@ -35,7 +36,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,22 +64,23 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
   }
 
   @Override
-  public @Nullable String handleClickLogic(
-    final @NotNull Player player,
-    final @Nullable ItemStack clicked,
-    final @NotNull ClickType clickType
-  ) {
-    final String itemNbtKey = super.handleClickLogic(player, clicked, clickType);
-    if (itemNbtKey == null) {
+  public @Nullable ProcessedMenuItemValueObject handleClickLogic(
+     final @NotNull Player player,
+     final @Nullable ItemStack clicked,
+     final @NotNull ClickType clickType) {
+    final ProcessedMenuItemValueObject processedMenuItem = super.handleClickLogic(player, clicked,
+       clickType);
+    if (processedMenuItem == null) {
       return null;
     }
     // After that we know the item is valid and has the key assigned.
-    final ItemMeta meta = clicked.getItemMeta();
-    final int customModelData = meta.hasCustomModelData() ? meta.getCustomModelData() : 0;
+    final int customModelData = processedMenuItem.meta().hasCustomModelData()
+       ? processedMenuItem.meta().getCustomModelData() : 0;
+    final String id = processedMenuItem.id();
     MenuItemSection itemInformation;
     for (final MenuItemContract menuItem : this.configurationManager.selector().items) {
       itemInformation = menuItem.itemInformation();
-      if (!itemNbtKey.equals(itemInformation.id)) {
+      if (!id.equals(itemInformation.id)) {
         continue;
       }
       if (itemInformation.checkCustomModelData && customModelData != itemInformation.data) {
@@ -87,14 +88,13 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
       }
       this.processInput(player, (TagsMenuConfigurationModel.MenuItemImpl) menuItem, clickType);
     }
-    return itemNbtKey;
+    return processedMenuItem;
   }
 
   private void processInput(
-    final @NotNull Player player,
-    final @NotNull TagsMenuConfigurationModel.MenuItemImpl itemSection,
-    final @NotNull ClickType clickType
-  ) {
+     final @NotNull Player player,
+     final @NotNull TagsMenuConfigurationModel.MenuItemImpl itemSection,
+     final @NotNull ClickType clickType) {
     // Execute item's actions and check if it should stop execution-flow.
     super.processItemActions(player, clickType, itemSection.itemInformation.leftClickActions,
        itemSection.itemInformation.rightClickActions);
@@ -113,24 +113,25 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
     this.processTagSelection(player, itemSection);
   }
 
+  @SuppressWarnings("ConstantConditions")
   private void processTagSelection(
-    final @NotNull Player player,
-    final @NotNull TagsMenuConfigurationModel.MenuItemImpl itemSection
-  ) {
+     final @NotNull Player player,
+     final @NotNull TagsMenuConfigurationModel.MenuItemImpl itemSection) {
     final MessagesConfigurationModel messages = this.configurationManager.messages();
     // Process status-code provided by the select-operation.
     switch (this.playerTagSelectorManager.select(player, itemSection.tag)) {
       case PlayerTagSelectorManager.PLAYER_IS_NOT_ONLINE ->
-        player.sendMessage(MiniMessageParser.text(messages.playerUnknownInfo));
+         player.sendMessage(MiniMessageParser.text(messages.playerUnknownInfo));
       case PlayerAggregateRoot.TAG_IS_ALREADY_SELECTED ->
-        player.sendMessage(MiniMessageParser.text(messages.alreadySelected));
+         player.sendMessage(MiniMessageParser.text(messages.alreadySelected));
       case PlayerTagSelectorManager.TAG_SPECIFIED_NOT_EXIST ->
-        player.sendMessage(MiniMessageParser.text(messages.unknownTag));
+         player.sendMessage(MiniMessageParser.text(messages.unknownTag));
       case PlayerAggregateRoot.TAG_HAS_BEEN_CHANGED -> {
         // Aggregate-root won't be null.
         this.playerManager.handlePlayerAggregateRootSave(this.playerManager.playerAggregateRootOf(
            player.getUniqueId().toString()));
-        player.sendMessage(MiniMessageParser.text(messages.selected, Placeholder.parsed("tag-id", itemSection.tag)));
+        player.sendMessage(MiniMessageParser.text(messages.selected, Placeholder.parsed("tag-id",
+           itemSection.tag)));
       }
       default -> throw new UnsupportedOperationException("Unexpected status-code result.");
     }
