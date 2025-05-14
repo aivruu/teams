@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"ConstantConditions", "rawtypes"})
 public final class ConfigurationManager {
   private final Path directory;
   private final ComponentLogger logger;
