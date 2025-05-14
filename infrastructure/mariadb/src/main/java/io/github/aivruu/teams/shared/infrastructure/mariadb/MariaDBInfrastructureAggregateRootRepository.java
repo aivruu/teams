@@ -14,7 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.shared.infrastructure.common;
+package io.github.aivruu.teams.shared.infrastructure.mariadb;
 
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
