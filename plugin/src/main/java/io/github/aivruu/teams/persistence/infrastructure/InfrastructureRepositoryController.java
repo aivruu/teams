@@ -28,7 +28,7 @@ import io.github.aivruu.teams.player.infrastructure.json.codec.JsonPlayerAggrega
 import io.github.aivruu.teams.player.infrastructure.mariadb.PlayerMariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.player.infrastructure.mongodb.PlayerMongoInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
-import io.github.aivruu.teams.shared.infrastructure.util.JsonCoder;
+import io.github.aivruu.teams.shared.infrastructure.json.JsonCoder;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.infrastructure.json.TagJsonInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.infrastructure.json.codec.JsonTagAggregateRootCodec;

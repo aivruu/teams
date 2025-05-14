@@ -18,7 +18,6 @@ package io.github.aivruu.teams.shared.infrastructure.json;
 
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
-import io.github.aivruu.teams.shared.infrastructure.util.JsonCoder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

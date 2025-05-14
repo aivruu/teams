@@ -23,7 +23,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.PlayerModelEntity;
-import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
+import io.github.aivruu.teams.shared.infrastructure.json.JsonCodecAdapterContract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;

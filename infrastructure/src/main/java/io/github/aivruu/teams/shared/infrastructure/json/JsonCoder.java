@@ -14,7 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.shared.infrastructure.util;
+package io.github.aivruu.teams.shared.infrastructure.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,7 +22,6 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
-import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

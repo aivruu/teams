@@ -18,8 +18,8 @@ package io.github.aivruu.teams.tag.infrastructure.mariadb;
 
 import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.persistence.infrastructure.utils.StatementConstants;
-import io.github.aivruu.teams.shared.infrastructure.common.MariaDBInfrastructureAggregateRootRepository;
-import io.github.aivruu.teams.shared.infrastructure.util.JsonCoder;
+import io.github.aivruu.teams.shared.infrastructure.mariadb.MariaDBInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.json.JsonCoder;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.TagModelEntity;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;

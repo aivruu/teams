@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
+import io.github.aivruu.teams.shared.infrastructure.json.JsonCodecAdapterContract;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import io.github.aivruu.teams.util.application.component.PlainComponentParser;
 import net.kyori.adventure.text.format.NamedTextColor;

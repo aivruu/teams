@@ -20,7 +20,7 @@ import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.PlayerModelEntity;
 import io.github.aivruu.teams.persistence.infrastructure.utils.StatementConstants;
-import io.github.aivruu.teams.shared.infrastructure.common.MariaDBInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.mariadb.MariaDBInfrastructureAggregateRootRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

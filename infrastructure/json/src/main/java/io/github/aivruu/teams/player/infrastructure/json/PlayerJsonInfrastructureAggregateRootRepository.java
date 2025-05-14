@@ -18,7 +18,7 @@ package io.github.aivruu.teams.player.infrastructure.json;
 
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.shared.infrastructure.json.JsonInfrastructureAggregateRootRepository;
-import io.github.aivruu.teams.shared.infrastructure.util.JsonCoder;
+import io.github.aivruu.teams.shared.infrastructure.json.JsonCoder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
