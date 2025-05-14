@@ -17,6 +17,7 @@
 package io.github.aivruu.teams.menu.application;
 
 import io.github.aivruu.teams.action.application.ActionManager;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -24,6 +25,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -77,17 +79,21 @@ public abstract class AbstractMenuModel implements InventoryHolder {
    * @param player    the player who clicked the item.
    * @param clicked   the item clicked, {@code null} if none.
    * @param clickType the {@link ClickType} of the interaction.
-   * @return The {@link #MENU_ITEM_NBT_KEY} key assigned to the clicked-item, {@code null} if it
-   * doesn't have.
-   * @since 3.4.1
+   * @return A {@link ProcessedMenuItemValueObject} with the item's id and meta-data, or
+   * {@code null} if the click was out of the inventory, or the item was air.
+   * @since 4.0.0
    */
-  public @Nullable String handleClickLogic(
+  public @Nullable ProcessedMenuItemValueObject handleClickLogic(
      final @NotNull Player player,
      final @Nullable ItemStack clicked,
      final @NotNull ClickType clickType) {
-    return (clicked == null) ? null : clicked.getItemMeta()
-       .getPersistentDataContainer()
+    if (clicked == null || clicked.getType() == Material.AIR) {
+      return null;
+    }
+    final ItemMeta meta = clicked.getItemMeta();
+    final String id = meta.getPersistentDataContainer()
        .get(MENU_ITEM_NBT_KEY, PersistentDataType.STRING);
+    return (id == null) ? null : new ProcessedMenuItemValueObject(id, clicked.getItemMeta());
   }
 
   /**
