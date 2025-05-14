@@ -40,15 +40,15 @@ public record ConfigurationContainer<C>(
   private static final String CONFIG_HEADER = """
      AldrTeams | A plugin that gives your players the ability to select customizable-tags and showcase them on
      their name-tag and tab-list.
-     
+
      This plugin supports MiniMessage format for all features, menu-configuration, tags' prefixes/suffixes
      and more, you can customize these tags as you want to implement custom gradient-prefixes or suffixes for
      special-ranks.
-     
+
      All this process is handle through a customizable-menu, which provides a highly-customization both for
      tags-selection as for another items, also, you can trigger actions when a player click on a specific item
      on the menu (left and right-click actions), all this indications more detailed in the selector_menu file.
-     
+
      Almost all plugin's executable-actions requires two or more parameters, which are separated with the ';' char.
      Single-parameter actions doesn't require that.
      Actions:
@@ -58,7 +58,7 @@ public record ConfigurationContainer<C>(
      - [MESSAGE] <message> - Sends a message to the action's player-executor.
      - [COMMAND] <PLAYER | CONSOLE>;<command> - Executes a command as the action's player-executor.
      - [BROADCAST] <GLOBAL (all server) | LOCAL (world only)>;<message> - Broadcasts a message to all players.
-     
+
      The plugin provides its own placeholders (for PlaceholderAPI and MiniPlaceholders) to check player's selected-tag
      properties, or check another tags globally:
      - PlaceholderAPI:
@@ -74,7 +74,7 @@ public record ConfigurationContainer<C>(
        <aldrteams_prefix> - Returns the prefix for the player's selected-tag.
        <aldrteams_suffix> - Returns the suffix for the player's selected-tag.
        <aldrteams_color> - Returns the color for the player's selected-tag.
-     
+
      List of available-colors for tags, these names can be used as input when modifying a tag's color in-game:
      - black
      - dark_blue
