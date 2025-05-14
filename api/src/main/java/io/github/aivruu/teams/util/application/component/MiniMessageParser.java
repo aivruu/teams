@@ -61,10 +61,6 @@ public final class MiniMessageParser {
     if (content.length == 0) {
       return Component.empty();
     }
-    if (content.length == 1) {
-      // Deserialize it single line directly instead of create a new builder.
-      return MINI_MESSAGE.deserialize(content[0]);
-    }
     final TextComponent.Builder componentBuilder = Component.text();
     for (final String line : content) {
       componentBuilder.append(MINI_MESSAGE.deserialize(line)).appendNewline();
