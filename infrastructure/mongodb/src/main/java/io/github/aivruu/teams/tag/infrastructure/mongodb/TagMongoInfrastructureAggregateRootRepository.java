@@ -40,7 +40,7 @@ public final class TagMongoInfrastructureAggregateRootRepository
       return false;
     }
     super.aggregateRootCollection = database.getCollection(this.collectionName,
-	     TagAggregateRoot.class);
+       TagAggregateRoot.class);
     return true;
   }
 }
