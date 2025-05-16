@@ -14,11 +14,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.menu.application.item;
+package io.github.aivruu.teams.menu.infrastructure;
 
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
+@ConfigSerializable
 public interface MenuItemContract {
   @NotNull MenuItemSection itemInformation();
 }
