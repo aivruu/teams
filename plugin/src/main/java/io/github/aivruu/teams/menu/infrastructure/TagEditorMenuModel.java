@@ -21,7 +21,6 @@ import io.github.aivruu.teams.config.infrastructure.object.TagEditorMenuConfigur
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.menu.application.ProcessedMenuItemValueObject;
-import io.github.aivruu.teams.menu.application.item.MenuItemContract;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.menu.infrastructure.util.MenuItemSetter;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
@@ -74,16 +73,15 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
        ? processedMenuItem.meta().getCustomModelData() : 0;
     final String id = processedMenuItem.id();
     MenuItemSection itemInformation;
-    for (final MenuItemContract itemSection : this.configurationManager.selector().items) {
-      itemInformation = itemSection.itemInformation();
+    for (final MenuItemContract menuItem : this.configurationManager.selector().items) {
+      itemInformation = menuItem.itemInformation();
       if (!id.equals(itemInformation.id)) {
         continue;
       }
       if (itemInformation.checkCustomModelData && customModelData != itemInformation.data) {
         continue;
       }
-      this.processInput(player, (TagEditorMenuConfigurationModel.MenuItemImpl) itemSection,
-	       clickType);
+      this.processInput(player, (TagEditorMenuConfigurationModel.MenuItemImpl) menuItem, clickType);
     }
     return processedMenuItem;
   }

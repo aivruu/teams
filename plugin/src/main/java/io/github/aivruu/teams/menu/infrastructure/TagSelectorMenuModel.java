@@ -22,7 +22,6 @@ import io.github.aivruu.teams.config.infrastructure.object.TagsMenuConfiguration
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.menu.application.ProcessedMenuItemValueObject;
-import io.github.aivruu.teams.menu.application.item.MenuItemContract;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.menu.infrastructure.util.MenuItemSetter;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
