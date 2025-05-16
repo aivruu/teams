@@ -23,12 +23,12 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public final class ActionCacheRepository implements ActionRepository {
   private final Object2ObjectMap<String, ActionModelContract> cache = new Object2ObjectOpenHashMap<>();
-  private @Nullable Collection<ActionModelContract> valuesView;
+  private final Collection<ActionModelContract> valuesView = new ArrayList<>();
 
   @Override
   public @Nullable ActionModelContract findSync(final @NotNull String id) {
@@ -42,18 +42,12 @@ public final class ActionCacheRepository implements ActionRepository {
 
   @Override
   public @NotNull Collection<ActionModelContract> findAllSync() {
-    if (this.valuesView == null) {
-      this.valuesView = List.copyOf(this.cache.values());
-    }
     return this.valuesView;
   }
 
   @Override
   public void saveSync(final @NotNull String id, final @NotNull ActionModelContract object) {
     this.cache.put(id, object);
-    if (this.valuesView == null) {
-      this.valuesView = List.copyOf(this.cache.values());
-    }
     this.valuesView.add(object);
   }
 
@@ -61,19 +55,15 @@ public final class ActionCacheRepository implements ActionRepository {
   public @Nullable ActionModelContract deleteSync(final @NotNull String id) {
     final ActionModelContract action = this.cache.remove(id);
     if (this.valuesView == null) {
-      this.valuesView = List.copyOf(this.cache.values());
+      return null;
     }
-    if (action != null) {
-      this.valuesView.remove(action);
-    }
+    this.valuesView.remove(action);
     return action;
   }
 
   @Override
   public void clearSync() {
     this.cache.clear();
-    if (this.valuesView != null) {
-      this.valuesView.clear();
-    }
+    this.valuesView.clear();
   }
 }

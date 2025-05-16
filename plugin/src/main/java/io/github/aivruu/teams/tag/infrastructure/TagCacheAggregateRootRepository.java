@@ -26,13 +26,13 @@ import io.github.aivruu.teams.tag.infrastructure.cache.TagAggregateRootCacheInva
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public final class TagCacheAggregateRootRepository implements TagAggregateRootRepository {
+  private final Collection<TagAggregateRoot> valuesView = new ArrayList<>();
   private Cache<String, TagAggregateRoot> cache;
-  private @Nullable Collection<TagAggregateRoot> valuesView;
 
   public void buildCache(final @NotNull TagManager tagManager) {
     if (this.cache != null) {
@@ -57,27 +57,19 @@ public final class TagCacheAggregateRootRepository implements TagAggregateRootRe
 
   @Override
   public @NotNull Collection<TagAggregateRoot> findAllSync() {
-    if (this.valuesView == null) {
-      this.valuesView = List.copyOf(this.cache.asMap().values());
-    }
     return this.valuesView;
   }
 
   @Override
   public void saveSync(final @NotNull String id, final @NotNull TagAggregateRoot aggregateRoot) {
     this.cache.put(aggregateRoot.id(), aggregateRoot);
-    if (this.valuesView == null) {
-      this.valuesView = List.copyOf(this.cache.asMap().values());
-    }
+    // Add object to values-viewer list.
     this.valuesView.add(aggregateRoot);
   }
 
   @Override
   public @Nullable TagAggregateRoot deleteSync(final @NotNull String id) {
     final TagAggregateRoot tagAggregateRoot = this.cache.getIfPresent(id);
-    if (this.valuesView == null) {
-      this.valuesView = List.copyOf(this.cache.asMap().values());
-    }
     if (tagAggregateRoot != null) {
       this.cache.invalidate(id);
       this.valuesView.remove(tagAggregateRoot);
@@ -88,9 +80,7 @@ public final class TagCacheAggregateRootRepository implements TagAggregateRootRe
   @Override
   public void clearSync() {
     this.cache.invalidateAll();
-    if (this.valuesView != null) {
-      this.valuesView.clear();
-    }
+    this.valuesView.clear();
   }
 }
 

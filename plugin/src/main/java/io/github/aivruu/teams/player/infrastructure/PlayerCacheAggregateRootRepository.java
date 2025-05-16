@@ -23,12 +23,12 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public final class PlayerCacheAggregateRootRepository implements PlayerAggregateRootRepository {
   private final Object2ObjectMap<String, PlayerAggregateRoot> cache = new Object2ObjectOpenHashMap<>();
-  private @Nullable Collection<PlayerAggregateRoot> valuesView;
+  private final Collection<PlayerAggregateRoot> valuesView = new ArrayList<>();
 
   @Override
   public @Nullable PlayerAggregateRoot findSync(final @NotNull String id) {
@@ -42,38 +42,28 @@ public final class PlayerCacheAggregateRootRepository implements PlayerAggregate
 
   @Override
   public @NotNull Collection<PlayerAggregateRoot> findAllSync() {
-    if (this.valuesView == null) {
-      this.valuesView = List.copyOf(this.cache.values());
-    }
     return this.valuesView;
   }
 
   @Override
   public void saveSync(final @NotNull String id, final @NotNull PlayerAggregateRoot aggregateRoot) {
     this.cache.put(aggregateRoot.id(), aggregateRoot);
-    if (this.valuesView == null) {
-      this.valuesView = List.copyOf(this.cache.values());
-    }
     this.valuesView.add(aggregateRoot);
   }
 
   @Override
   public @Nullable PlayerAggregateRoot deleteSync(final @NotNull String id) {
     final PlayerAggregateRoot playerAggregateRoot = this.cache.remove(id);
-    if (this.valuesView == null) {
-      this.valuesView = List.copyOf(this.cache.values());
+    if (playerAggregateRoot == null) {
+      return null;
     }
-    if (playerAggregateRoot != null) {
-      this.valuesView.remove(playerAggregateRoot);
-    }
+    this.valuesView.remove(playerAggregateRoot);
     return playerAggregateRoot;
   }
 
   @Override
   public void clearSync() {
     this.cache.clear();
-    if (this.valuesView != null) {
-      this.valuesView.clear();
-    }
+    this.valuesView.clear();
   }
 }
