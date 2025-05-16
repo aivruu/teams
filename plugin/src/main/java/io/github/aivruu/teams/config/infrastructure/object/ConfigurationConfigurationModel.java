@@ -17,9 +17,10 @@
 package io.github.aivruu.teams.config.infrastructure.object;
 
 import io.github.aivruu.teams.config.application.ConfigurationInterface;
-import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
+
+import static io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository.Type;
 
 @ConfigSerializable
 public final class ConfigurationConfigurationModel implements ConfigurationInterface {
@@ -43,14 +44,14 @@ public final class ConfigurationConfigurationModel implements ConfigurationInter
     - MARIADB: Uses a MariaDB database for information-storing.
     - MONGODB: Uses the database to store the information.
     - JSON: Uses json-files for information storing at pre-defined directories.""")
-  public InfrastructureAggregateRootRepository.Type playerInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
+  public Type playerInfrastructureRepositoryType = Type.JSON;
 
   @Comment("""
     The infrastructure-type to use for the tags' information storage, there are two options:
     - MARIADB: Uses a MariaDB database for information-storing.
     - MONGODB: Uses the database to store the information.
     - JSON: Uses json-files for information storing at pre-defined directories.""")
-  public InfrastructureAggregateRootRepository.Type tagInfrastructureRepositoryType = InfrastructureAggregateRootRepository.Type.JSON;
+  public Type tagInfrastructureRepositoryType = Type.JSON;
 
   @Comment("""
     The name of the database/collection (remote) or the directory's (local) name where the players' information
