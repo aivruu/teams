@@ -65,8 +65,6 @@ import io.github.aivruu.teams.tag.infrastructure.TagCacheAggregateRootRepository
 import io.github.aivruu.teams.tag.infrastructure.modification.TagModificationCacheRepository;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -314,7 +312,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
 
   @Override
   public void onDisable() {
-    this.logger.info("Verifying aggregate-root cache-repositories for data saving and clean.");
+    this.logger.info("Clearing cache-repositories and unregistering objects.");
     if (this.playerAggregateRootRepository != null) {
       this.playerAggregateRootRepository.clearSync();
     }
@@ -330,8 +328,8 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     if (this.menuManager != null) {
       this.menuManager.unregisterAll();
     }
+    this.logger.info("Closing infrastructure-repositories.");
     if (this.infrastructureRepositoryController != null) {
-      this.logger.info(Component.text("Closing infrastructure repository-controller.").color(NamedTextColor.YELLOW));
       this.infrastructureRepositoryController.close();
     }
   }
