@@ -34,11 +34,11 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("ConstantConditions")
 public final class PlayerTagSelectorManager {
   /** The player is not connected to server. */
-  public static final byte PLAYER_IS_NOT_ONLINE = 1;
+  public static final byte PLAYER_IS_NOT_ONLINE = 4;
   /** The specified tag does not exist. */
-  public static final byte TAG_SPECIFIED_NOT_EXIST = 2;
+  public static final byte TAG_SPECIFIED_NOT_EXIST = 5;
   /** There is no tag selected by the player. */
-  public static final byte THERE_IS_NO_TAG_SELECTED = 3;
+  public static final byte THERE_IS_NO_TAG_SELECTED = 6;
   private final PlayerAggregateRootRegistry playerAggregateRootRegistry;
   private final TagAggregateRootRegistry tagAggregateRootRegistry;
   private final PacketAdaptationContract packetAdaptation;
