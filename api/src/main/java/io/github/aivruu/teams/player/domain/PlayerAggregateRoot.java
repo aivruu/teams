@@ -27,11 +27,11 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class PlayerAggregateRoot extends AggregateRoot {
   /** The tag specified is already selected. */
-  public static final byte TAG_IS_ALREADY_SELECTED = -4;
+  public static final byte TAG_IS_ALREADY_SELECTED = 1;
   /** The current-tag has been cleared. */
-  public static final byte TAG_HAS_BEEN_CLEARED = -5;
+  public static final byte TAG_HAS_BEEN_CLEARED = 2;
   /** The current-tag has been changed by other one. */
-  public static final byte TAG_HAS_BEEN_CHANGED = -6;
+  public static final byte TAG_HAS_BEEN_CHANGED = 3;
   private final PlayerModelEntity playerModel;
 
   /**
