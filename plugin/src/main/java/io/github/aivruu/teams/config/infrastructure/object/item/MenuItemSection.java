@@ -16,7 +16,6 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.config.infrastructure.object.item;
 
-import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -31,14 +30,6 @@ public final class MenuItemSection {
 
   @Comment("The material to use for this item.")
   public Material material = Material.EMERALD;
-
-  @Comment("""
-      Represents the required input-type that must be given for the defined modification-type for this tag.
-      - PREFIX: A new prefix must be given for the tag.
-      - SUFFIX: A new suffix must be given for the tag.
-      - COLOR: A new color must be for the tag.
-      - NONE: No input required, used only for decoration-items (only executes actions).""")
-  public ModificationContext inputTypeRequired = ModificationContext.NONE;
 
   @Comment("The display-name for this item.")
   public String displayName = "<gray>Tag: <green>VIP</green> | <white>Click to select it.";
