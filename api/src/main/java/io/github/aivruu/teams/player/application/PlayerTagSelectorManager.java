@@ -31,13 +31,14 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 0.0.1
  */
+@SuppressWarnings("ConstantConditions")
 public final class PlayerTagSelectorManager {
   /** The player is not connected to server. */
-  public static final byte PLAYER_IS_NOT_ONLINE = -1;
+  public static final byte PLAYER_IS_NOT_ONLINE = 1;
   /** The specified tag does not exist. */
-  public static final byte TAG_SPECIFIED_NOT_EXIST = -2;
+  public static final byte TAG_SPECIFIED_NOT_EXIST = 2;
   /** There is no tag selected by the player. */
-  public static final byte THERE_IS_NO_TAG_SELECTED = -3;
+  public static final byte THERE_IS_NO_TAG_SELECTED = 3;
   private final PlayerAggregateRootRegistry playerAggregateRootRegistry;
   private final TagAggregateRootRegistry tagAggregateRootRegistry;
   private final PacketAdaptationContract packetAdaptation;
@@ -66,11 +67,7 @@ public final class PlayerTagSelectorManager {
    * @param tag    the tag's id.
    * @return A status-code which can be:
    * <ul>
-   * <li>{@link PlayerAggregateRoot#TAG_HAS_BEEN_CHANGED} if the player's tag-selection was made
-   * correctly.</li>
-   * <li>{@link PlayerAggregateRoot#TAG_IS_ALREADY_SELECTED} if the player already has the tag
-   * selected.</li>
-   * <li>{@link #PLAYER_IS_NOT_ONLINE} if the player is not connected to the server.</li>
+   * <li>Check {@link PlayerAggregateRoot#tagWithStatus(String)} for possible-states.</li>
    * <li>{@link #TAG_SPECIFIED_NOT_EXIST} if the tag specified doesn't exist.</li>
    * </ul>
    * @see io.github.aivruu.teams.aggregate.domain.registry.AggregateRootRegistry#existsInInfrastructure(String)
@@ -82,18 +79,16 @@ public final class PlayerTagSelectorManager {
     if (!this.tagAggregateRootRegistry.existsInInfrastructure(tag)) {
       return TAG_SPECIFIED_NOT_EXIST;
     }
-    final PlayerAggregateRoot playerAggregateRoot = this.playerAggregateRootRegistry.findInCache(
-       player.getUniqueId().toString());
-    if (playerAggregateRoot == null) {
-      return PLAYER_IS_NOT_ONLINE;
-    }
+    // We can assume that the aggregate-root won't be null, as this method is called when the
+    // command is run, which indicates player is connected.
+    final byte status = this.playerAggregateRootRegistry.findInCache(player.getUniqueId().toString())
+       .tagWithStatus(tag);
     // Tag-id provided isn't null, so we shouldn't expect a [TAG_HAS_BEEN_CLEARED] status.
-    if (playerAggregateRoot.tagWithStatus(tag) == PlayerAggregateRoot.TAG_IS_ALREADY_SELECTED) {
-      return PlayerAggregateRoot.TAG_IS_ALREADY_SELECTED;
+    if (status == PlayerAggregateRoot.TAG_HAS_BEEN_CHANGED) {
+      this.packetAdaptation.addPlayerToTeam(player, tag);
+      Bukkit.getPluginManager().callEvent(new TagSelectEvent(player, tag));
     }
-    this.packetAdaptation.addPlayerToTeam(player, tag);
-    Bukkit.getPluginManager().callEvent(new TagSelectEvent(player, tag));
-    return PlayerAggregateRoot.TAG_HAS_BEEN_CHANGED;
+    return status;
   }
 
   /**
@@ -112,11 +107,10 @@ public final class PlayerTagSelectorManager {
    * @since 0.0.1
    */
   public byte unselect(final @NotNull Player player) {
+    // We can assume that the aggregate-root won't be null, as this method is called when the
+    // command is run, which indicates player is connected.
     final PlayerAggregateRoot playerAggregateRoot = this.playerAggregateRootRegistry.findInCache(
        player.getUniqueId().toString());
-    if (playerAggregateRoot == null) {
-      return PLAYER_IS_NOT_ONLINE;
-    }
     final String tag = playerAggregateRoot.playerModel().tag();
     if (tag == null) {
       return THERE_IS_NO_TAG_SELECTED;
