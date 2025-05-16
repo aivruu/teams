@@ -35,8 +35,7 @@ public final class MenuItemCreator {
     throw new UnsupportedOperationException("This class is for utility and cannot be instantiated.");
   }
 
-  public static @NotNull ItemStack prepareFrom(
-     final @NotNull MenuItemSection itemSection) {
+  public static @NotNull ItemStack prepareFrom(final @NotNull MenuItemSection itemSection) {
     // Air material-type for an item in the menu shouldn't have any custom-information.
     if (itemSection.material == Material.AIR) {
       return AIR_ITEM_STACK;
