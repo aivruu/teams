@@ -17,7 +17,7 @@
 package io.github.aivruu.teams.menu.infrastructure.util;
 
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
-import io.github.aivruu.teams.menu.application.item.MenuItemContract;
+import io.github.aivruu.teams.menu.infrastructure.MenuItemContract;
 import io.github.aivruu.teams.util.application.Debugger;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
