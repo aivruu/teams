@@ -93,7 +93,7 @@ public abstract class AbstractMenuModel implements InventoryHolder {
     final ItemMeta meta = clicked.getItemMeta();
     final String id = meta.getPersistentDataContainer()
        .get(MENU_ITEM_NBT_KEY, PersistentDataType.STRING);
-    return (id == null) ? null : new ProcessedMenuItemValueObject(id, clicked.getItemMeta());
+    return (id == null) ? null : new ProcessedMenuItemValueObject(id, meta);
   }
 
   /**
