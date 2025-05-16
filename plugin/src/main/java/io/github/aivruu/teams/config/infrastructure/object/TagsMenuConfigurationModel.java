@@ -18,7 +18,7 @@ package io.github.aivruu.teams.config.infrastructure.object;
 
 import io.github.aivruu.teams.config.application.ConfigurationInterface;
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
-import io.github.aivruu.teams.menu.application.item.MenuItemContract;
+import io.github.aivruu.teams.menu.infrastructure.MenuItemContract;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -43,7 +43,7 @@ public final class TagsMenuConfigurationModel implements ConfigurationInterface 
   public MenuItemContract[] items = { new MenuItemImpl() };
 
   @ConfigSerializable
-  public static class MenuItemImpl implements MenuItemContract {
+  public class MenuItemImpl implements MenuItemContract {
     @Comment("Contains the general-information for this item.")
     public MenuItemSection itemInformation = new MenuItemSection();
 

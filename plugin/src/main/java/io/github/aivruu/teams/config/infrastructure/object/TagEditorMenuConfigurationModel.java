@@ -18,7 +18,7 @@ package io.github.aivruu.teams.config.infrastructure.object;
 
 import io.github.aivruu.teams.config.application.ConfigurationInterface;
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
-import io.github.aivruu.teams.menu.application.item.MenuItemContract;
+import io.github.aivruu.teams.menu.infrastructure.MenuItemContract;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
@@ -55,10 +55,10 @@ public final class TagEditorMenuConfigurationModel implements ConfigurationInter
 
     @Comment("""
       Represents the required input-type that must be given for the defined modification-type for this tag.
-      - PREFIX: A new prefix must be given for the tag.
-      - SUFFIX: A new suffix must be given for the tag.
-      - COLOR: A new color must be for the tag.
-      - NONE: No input required, used only for decoration-items (only executes actions).""")
+      - PREFIX: Will require a prefix-input for the tag.
+      - SUFFIX: Will require a suffix-input for the tag.
+      - COLOR: Will require a color-input for the tag.
+      - NONE: No input required, used for decoration-items (only executes actions).""")
     public ModificationContext inputTypeRequired = ModificationContext.NONE;
   }
 }
