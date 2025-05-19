@@ -18,9 +18,7 @@ package io.github.aivruu.teams.config.infrastructure.object;
 
 import io.github.aivruu.teams.config.application.ConfigurationInterface;
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
-import io.github.aivruu.teams.menu.infrastructure.MenuItemContract;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -41,17 +39,12 @@ public final class TagEditorMenuConfigurationModel implements ConfigurationInter
   public byte rows = 3;
 
   @Comment("The items that this gui will contain.")
-  public MenuItemContract[] items = { new MenuItemImpl() };
+  public MenuItem[] items = { new MenuItem() };
 
   @ConfigSerializable
-  public static class MenuItemImpl implements MenuItemContract {
+  public static class MenuItem {
     @Comment("Contains the general-information for this item.")
     public MenuItemSection itemInformation = new MenuItemSection();
-
-    @Override
-    public @NotNull MenuItemSection itemInformation() {
-      return this.itemInformation;
-    }
 
     @Comment("""
       Represents the required input-type that must be given for the defined modification-type for this tag.

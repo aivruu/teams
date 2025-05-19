@@ -17,7 +17,6 @@
 package io.github.aivruu.teams.menu.infrastructure.util;
 
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
-import io.github.aivruu.teams.menu.infrastructure.MenuItemContract;
 import io.github.aivruu.teams.util.application.Debugger;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -28,27 +27,26 @@ public final class MenuItemSetter {
     throw new UnsupportedOperationException("This class is for utility and cannot be instantiated.");
   }
 
-  public static void placeItems(
+  public static void placeItem(
      final @NotNull Inventory inventory,
-     final @NotNull MenuItemContract @NotNull [] items) {
-    ItemStack item;
-    MenuItemSection itemInformation;
-    for (final MenuItemContract menuItem : items) {
-      itemInformation = menuItem.itemInformation();
-      // We check if this item will be "duplicated" in the menu (such as decoration with glass-pane
-      // items), otherwise, we reuse its [ItemStack] object to avoid create multiple objects with
-      // the same information.
-      if (itemInformation.slots.length == 1) {
-        inventory.setItem(itemInformation.slots[0], MenuItemCreator.prepareFrom(itemInformation));
-        continue;
-      }
-      // Just a single object that will be used for multiple slots.
-      item = MenuItemCreator.prepareFrom(itemInformation);
-      // [!] this log is temporal.
-      Debugger.write("One item has been created.");
-      for (final byte slot : itemInformation.slots) {
-        inventory.setItem(slot, item);
-      }
+     final @NotNull MenuItemSection menuItem) {
+    if (menuItem.slots.length == 0) {
+      Debugger.write("Skipping item placing due to no-defined slots.");
+      return;
+    }
+    // We check if this item will be placed on multiple-slots in the menu (such as decoration with
+    // glass-pane items), so we can reuse its reference for the following slots' items, otherwise,
+    // just create a new one and put it there.
+    if (menuItem.slots.length == 1) {
+      inventory.setItem(menuItem.slots[0], MenuItemCreator.prepareFrom(menuItem));
+      return;
+    }
+    // Just a single object that will be used for multiple slots.
+    final ItemStack item = MenuItemCreator.prepareFrom(menuItem);
+    // [!] this log is temporal.
+    Debugger.write("One item has been created.");
+    for (final byte slot : menuItem.slots) {
+      inventory.setItem(slot, item);
     }
   }
 }

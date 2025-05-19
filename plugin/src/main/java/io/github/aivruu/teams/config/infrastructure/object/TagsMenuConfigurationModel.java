@@ -18,8 +18,6 @@ package io.github.aivruu.teams.config.infrastructure.object;
 
 import io.github.aivruu.teams.config.application.ConfigurationInterface;
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
-import io.github.aivruu.teams.menu.infrastructure.MenuItemContract;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -40,17 +38,12 @@ public final class TagsMenuConfigurationModel implements ConfigurationInterface 
   public byte rows = 5;
 
   @Comment("The items that this gui will contain.")
-  public MenuItemContract[] items = { new MenuItemImpl() };
+  public MenuItem[] items = { new MenuItem() };
 
   @ConfigSerializable
-  public class MenuItemImpl implements MenuItemContract {
+  public static class MenuItem {
     @Comment("Contains the general-information for this item.")
     public MenuItemSection itemInformation = new MenuItemSection();
-
-    @Override
-    public @NotNull MenuItemSection itemInformation() {
-      return this.itemInformation;
-    }
 
     @Comment("The tag that this item will take, empty if the item no requires this.")
     public String tag = "vip";
