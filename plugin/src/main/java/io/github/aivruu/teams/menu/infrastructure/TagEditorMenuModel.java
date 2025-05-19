@@ -18,7 +18,6 @@ package io.github.aivruu.teams.menu.infrastructure;
 
 import io.github.aivruu.teams.action.application.ActionManager;
 import io.github.aivruu.teams.config.infrastructure.object.TagEditorMenuConfigurationModel;
-import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.menu.application.ProcessedMenuItemValueObject;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
@@ -55,7 +54,9 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
     final TagEditorMenuConfigurationModel menu = this.configurationManager.editor();
     super.inventory = Bukkit.createInventory(this, menu.rows * 9,
        PlaceholderParser.parseBoth(null, menu.title));
-    MenuItemSetter.placeItems(super.inventory, menu.items);
+    for (final TagEditorMenuConfigurationModel.MenuItem menuItem : menu.items) {
+      MenuItemSetter.placeItem(super.inventory, menuItem.itemInformation);
+    }
   }
 
   @Override
@@ -72,23 +73,22 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
     final int customModelData = processedMenuItem.meta().hasCustomModelData()
        ? processedMenuItem.meta().getCustomModelData() : 0;
     final String id = processedMenuItem.id();
-    MenuItemSection itemInformation;
-    for (final MenuItemContract menuItem : this.configurationManager.selector().items) {
-      itemInformation = menuItem.itemInformation();
-      if (!id.equals(itemInformation.id)) {
+    for (final TagEditorMenuConfigurationModel.MenuItem menuItem : this.configurationManager.editor().items) {
+      if (menuItem.itemInformation.checkCustomModelData
+         && customModelData != menuItem.itemInformation.data) {
         continue;
       }
-      if (itemInformation.checkCustomModelData && customModelData != itemInformation.data) {
+      if (!id.equals(menuItem.itemInformation.id)) {
         continue;
       }
-      this.processInput(player, (TagEditorMenuConfigurationModel.MenuItemImpl) menuItem, clickType);
+      this.processInput(player, menuItem, clickType);
     }
     return processedMenuItem;
   }
 
   private void processInput(
      final @NotNull Player player,
-     final @NotNull TagEditorMenuConfigurationModel.MenuItemImpl itemSection,
+     final @NotNull TagEditorMenuConfigurationModel.MenuItem itemSection,
      final @NotNull ClickType clickType) {
     // Execute item's actions and check if it should stop execution-flow.
     super.processItemActions(player, clickType, itemSection.itemInformation.leftClickActions,

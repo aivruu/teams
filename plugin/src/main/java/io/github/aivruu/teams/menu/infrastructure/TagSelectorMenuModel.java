@@ -19,12 +19,11 @@ package io.github.aivruu.teams.menu.infrastructure;
 import io.github.aivruu.teams.action.application.ActionManager;
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.TagsMenuConfigurationModel;
-import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.menu.application.ProcessedMenuItemValueObject;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
-import io.github.aivruu.teams.menu.infrastructure.util.MenuItemSetter;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
+import io.github.aivruu.teams.menu.infrastructure.util.MenuItemSetter;
 import io.github.aivruu.teams.player.application.PlayerManager;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
@@ -59,7 +58,9 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
     final TagsMenuConfigurationModel menu = this.configurationManager.selector();
     super.inventory = Bukkit.createInventory(this, menu.rows * 9,
        PlaceholderParser.parseBoth(null, menu.title));
-    MenuItemSetter.placeItems(super.inventory, menu.items);
+    for (final TagsMenuConfigurationModel.MenuItem menuItem : menu.items) {
+      MenuItemSetter.placeItem(super.inventory, menuItem.itemInformation);
+    }
   }
 
   @Override
@@ -76,23 +77,22 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
     final int customModelData = processedMenuItem.meta().hasCustomModelData()
        ? processedMenuItem.meta().getCustomModelData() : 0;
     final String id = processedMenuItem.id();
-    MenuItemSection itemInformation;
-    for (final MenuItemContract menuItem : this.configurationManager.selector().items) {
-      itemInformation = menuItem.itemInformation();
-      if (!id.equals(itemInformation.id)) {
+    for (final TagsMenuConfigurationModel.MenuItem menuItem : this.configurationManager.selector().items) {
+      if (menuItem.itemInformation.checkCustomModelData
+         && customModelData != menuItem.itemInformation.data) {
         continue;
       }
-      if (itemInformation.checkCustomModelData && customModelData != itemInformation.data) {
+      if (!id.equals(menuItem.itemInformation.id)) {
         continue;
       }
-      this.processInput(player, (TagsMenuConfigurationModel.MenuItemImpl) menuItem, clickType);
+      this.processInput(player, menuItem, clickType);
     }
     return processedMenuItem;
   }
 
   private void processInput(
      final @NotNull Player player,
-     final @NotNull TagsMenuConfigurationModel.MenuItemImpl itemSection,
+     final @NotNull TagsMenuConfigurationModel.MenuItem itemSection,
      final @NotNull ClickType clickType) {
     // Execute item's actions and check if it should stop execution-flow.
     super.processItemActions(player, clickType, itemSection.itemInformation.leftClickActions,
@@ -115,7 +115,7 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
   @SuppressWarnings("ConstantConditions")
   private void processTagSelection(
      final @NotNull Player player,
-     final @NotNull TagsMenuConfigurationModel.MenuItemImpl itemSection) {
+     final @NotNull TagsMenuConfigurationModel.MenuItem itemSection) {
     final MessagesConfigurationModel messages = this.configurationManager.messages();
     // Process status-code provided by the select-operation.
     switch (this.playerTagSelectorManager.select(player, itemSection.tag)) {
