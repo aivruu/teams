@@ -34,6 +34,7 @@ import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.repository.MenuCacheRepository;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
 import io.github.aivruu.teams.tag.infrastructure.modification.TagModificationProcessorImpl;
+import io.github.aivruu.teams.util.PlaceholderParser;
 import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.menu.application.MenuManager;
 import io.github.aivruu.teams.menu.application.listener.MenuInteractionListener;
@@ -259,9 +260,13 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
           this.playerTagSelectorManager,
           this.tagModificationRepository, new AvailableTagSuggestionProvider(this.tagManager))
     );
-    this.registerHooks(
-       new PlaceholderAPIHookImpl(this.playerManager, this.packetAdaptation),
-       new MiniPlaceholdersHookImpl(this.playerManager, this.packetAdaptation));
+    // Avoid exception due to hook-registry try when PlaceholderAPI not being present in the server.
+    if (PlaceholderParser.LEGACY_PLACEHOLDERS_HOOKED) {
+      this.registerHook(new PlaceholderAPIHookImpl(this.playerManager, this.packetAdaptation));
+    }
+    if (PlaceholderParser.MODERN_PLACEHOLDERS_HOOKED) {
+      this.registerHook(new MiniPlaceholdersHookImpl(this.playerManager, this.packetAdaptation));
+    }
     TeamsProvider.set(this);
     this.logger.info("The plugin has been enabled successfully!");
   }
@@ -303,9 +308,8 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     });
   }
 
-  private void registerHooks(final @NotNull PlaceholderHookContract... placeholderHooks) {
-    for (final PlaceholderHookContract placeholderHook : placeholderHooks) {
-      if (!placeholderHook.hook()) continue;
+  private void registerHook(final @NotNull PlaceholderHookContract placeholderHook) {
+    if (placeholderHook.hook()) {
       this.logger.info("Hooked {} successfully", placeholderHook.hookName());
     }
   }
