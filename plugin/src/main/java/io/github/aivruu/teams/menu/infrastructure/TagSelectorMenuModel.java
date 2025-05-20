@@ -27,7 +27,7 @@ import io.github.aivruu.teams.menu.infrastructure.util.MenuItemSetter;
 import io.github.aivruu.teams.player.application.PlayerManager;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
-import io.github.aivruu.teams.util.application.PlaceholderParser;
+import io.github.aivruu.teams.util.PlaceholderParser;
 import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;

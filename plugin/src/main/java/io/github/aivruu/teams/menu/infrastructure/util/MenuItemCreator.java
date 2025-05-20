@@ -18,7 +18,7 @@ package io.github.aivruu.teams.menu.infrastructure.util;
 
 import io.github.aivruu.teams.config.infrastructure.object.item.MenuItemSection;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
-import io.github.aivruu.teams.util.application.PlaceholderParser;
+import io.github.aivruu.teams.util.PlaceholderParser;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;

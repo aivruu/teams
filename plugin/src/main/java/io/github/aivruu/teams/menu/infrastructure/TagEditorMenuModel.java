@@ -25,7 +25,7 @@ import io.github.aivruu.teams.menu.infrastructure.util.MenuItemSetter;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
 import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
-import io.github.aivruu.teams.util.application.PlaceholderParser;
+import io.github.aivruu.teams.util.PlaceholderParser;
 import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;

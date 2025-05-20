@@ -20,8 +20,8 @@ import io.github.aivruu.teams.Constants;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
 import io.github.aivruu.teams.player.application.PlayerManager;
-import io.github.aivruu.teams.util.application.PlaceholderParser;
-import io.github.aivruu.teams.util.application.component.LegacyComponentParser;
+import io.github.aivruu.teams.util.PlaceholderParser;
+import io.github.aivruu.teams.util.component.LegacyComponentParser;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -87,13 +87,13 @@ public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implement
   }
 
   private @Nullable String validateTagPlaceholder(final @NotNull String tagId, final @NotNull String params) {
-    final String prefix = LegacyComponentParser.legacy(this.packetAdaptation.prefixOf(tagId));
-    final String suffix = LegacyComponentParser.legacy(this.packetAdaptation.suffixOf(tagId));
+    final String prefix = LegacyComponentParser.legacy(this.packetAdaptation.teamPrefix(tagId));
+    final String suffix = LegacyComponentParser.legacy(this.packetAdaptation.teamSuffix(tagId));
     return switch (params) {
       case "prefix" -> (prefix == null) ? "" : prefix;
       case "suffix" -> (suffix == null) ? "" : suffix;
       case "color" -> LegacyComponentParser.legacy(Component.text()
-        .style(builder -> builder.color(this.packetAdaptation.colorOf(tagId)))
+        .style(builder -> builder.color(this.packetAdaptation.teamColor(tagId)))
         .build());
       default -> null;
     };

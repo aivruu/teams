@@ -17,7 +17,7 @@
 package io.github.aivruu.teams.action.application.type;
 
 import io.github.aivruu.teams.action.application.ActionModelContract;
-import io.github.aivruu.teams.util.application.PlaceholderParser;
+import io.github.aivruu.teams.util.PlaceholderParser;
 import io.github.aivruu.teams.util.application.component.PlainComponentParser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
