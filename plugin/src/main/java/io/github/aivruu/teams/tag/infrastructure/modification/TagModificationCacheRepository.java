@@ -68,12 +68,10 @@ public final class TagModificationCacheRepository implements TagModificationRepo
   @Override
   public <V> void updateSync(final @NotNull String id, @NotNull final V value) {
     // As before update the context we check if there's a modification for this player, we safely
-    // know that the
-    // modification is still cached and we can proceed.
+    // know that the modification is still cached and we can proceed.
     this.cache.asMap().compute(id, (key, modification) ->
        // The value always will the context, so we can cast it safely.
-       new ModificationInProgressValueObject(modification.modifier(), modification.tag(),
-          (ModificationContext) value));
+       new ModificationInProgressValueObject(modification.tag(), (ModificationContext) value));
   }
 
   @Override

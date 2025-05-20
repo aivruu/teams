@@ -21,8 +21,6 @@ import io.github.aivruu.teams.tag.application.modification.ModificationInProgres
 import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
 import io.github.aivruu.teams.util.application.component.PlainComponentParser;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -48,11 +46,11 @@ public final class TagModificationChatInputListener implements Listener {
       return;
     }
     event.setCancelled(true);
-    final String inputAsPlainText = PlainComponentParser.plain(event.message());
     // Delegate input-processing logic for validation before actual tag's property-modification.
-    if (this.tagModificationProcessor.process(modification, inputAsPlainText).modified()) {
-      return;
-    }
-    player.sendMessage(Component.text("Failed to modify tag's property.").color(NamedTextColor.RED));
+    //
+    // And ignore boolean-result as process-notifying for the player is made by the processor's
+    // implementation.
+    this.tagModificationProcessor.process(player, modification,
+       PlainComponentParser.plain(event.message()));
   }
 }
