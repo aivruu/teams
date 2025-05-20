@@ -14,10 +14,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-package io.github.aivruu.teams.util;
+package io.github.aivruu.teams.util.application;
 
+import io.github.aivruu.teams.util.application.component.LegacyComponentParser;
 import io.github.aivruu.teams.util.application.component.MiniMessageParser;
-import io.github.aivruu.teams.util.component.LegacyComponentParser;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;

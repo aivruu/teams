@@ -17,7 +17,7 @@
 package io.github.aivruu.teams.action.application.type;
 
 import io.github.aivruu.teams.action.application.ActionModelContract;
-import io.github.aivruu.teams.util.PlaceholderParser;
+import io.github.aivruu.teams.util.application.PlaceholderParser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

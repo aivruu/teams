@@ -19,7 +19,7 @@ package io.github.aivruu.teams.placeholder.application.impl;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
 import io.github.aivruu.teams.player.application.PlayerManager;
-import io.github.aivruu.teams.util.PlaceholderParser;
+import io.github.aivruu.teams.util.application.PlaceholderParser;
 import io.github.miniplaceholders.api.Expansion;
 import io.github.miniplaceholders.api.utils.TagsUtils;
 import net.kyori.adventure.text.Component;
@@ -84,12 +84,12 @@ public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
   }
 
   private @Nullable Tag validateTagPlaceholder(final @NotNull String tagId, final @NotNull String type) {
-    final Component prefix = this.packetAdaptation.teamPrefix(tagId);
-    final Component suffix = this.packetAdaptation.teamSuffix(tagId);
+    final Component prefix = this.packetAdaptation.prefixOf(tagId);
+    final Component suffix = this.packetAdaptation.suffixOf(tagId);
     return switch (type) {
       case "prefix" -> (prefix == null) ? null : Tag.selfClosingInserting(prefix);
       case "suffix" -> (suffix == null) ? null : Tag.selfClosingInserting(suffix);
-      case "color" -> Tag.styling(builder -> builder.color(this.packetAdaptation.teamColor(tagId)));
+      case "color" -> Tag.styling(builder -> builder.color(this.packetAdaptation.colorOf(tagId)));
       default -> null;
     };
   }
