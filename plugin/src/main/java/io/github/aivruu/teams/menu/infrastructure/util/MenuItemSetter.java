@@ -43,8 +43,6 @@ public final class MenuItemSetter {
     }
     // Just a single object that will be used for multiple slots.
     final ItemStack item = MenuItemCreator.prepareFrom(menuItem);
-    // [!] this log is temporal.
-    Debugger.write("One item has been created.");
     for (final byte slot : menuItem.slots) {
       inventory.setItem(slot, item);
     }
