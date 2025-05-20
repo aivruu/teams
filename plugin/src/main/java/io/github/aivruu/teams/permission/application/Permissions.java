@@ -25,7 +25,8 @@ public enum Permissions {
   MODIFY("teams.command.modify"),
   MENU("teams.command.menu"),
   RELOAD("teams.command.reload"),
-  HELP("teams.command.help");
+  HELP("teams.command.help"),
+  NOTIFY("teams.updates");
 
   private final String node;
 
