@@ -41,7 +41,8 @@ public enum JsonPlayerAggregateRootCodec implements JsonCodecAdapterContract<Pla
     final JsonObject jsonObject = json.getAsJsonObject();
     final String id = jsonObject.get("id").getAsString();
     final JsonElement tag = jsonObject.get("selected-tag");
-    return new PlayerAggregateRoot(id, new PlayerModelEntity(id, (tag == null) ? null : tag.getAsString()));
+    return new PlayerAggregateRoot(id, new PlayerModelEntity(id,
+       tag.isJsonNull() ? null : tag.getAsString()));
   }
 
   @Override
