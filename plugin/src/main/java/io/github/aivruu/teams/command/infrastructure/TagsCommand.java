@@ -157,7 +157,7 @@ public final class TagsCommand implements RegistrableCommandContract {
                  return Command.SINGLE_SUCCESS;
                }
                this.tagModificationRepository.saveSync(playerId,
-                  new ModificationInProgressValueObject(playerId, tag, ModificationContext.NONE));
+                  new ModificationInProgressValueObject(tag, ModificationContext.NONE));
                // We ignore the boolean-result due that this menu always exists for the menu-manager.
                this.menuManager.open(player, MenuConstants.TAGS_EDITOR_ID);
                player.sendMessage(MiniMessageParser.text(messages.openedMenu));
