@@ -102,20 +102,33 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
   }
 
   @Override
-  public @Nullable Component teamPrefix(final @NotNull String team) {
+  public void updateTeamAttributes(
+     final @NotNull String team,
+     final @NotNull TagPropertiesValueObject properties) {
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
+    if (playerTeam == null) {
+      return;
+    }
+    playerTeam.setColor(MinecraftColorParser.minecraft(properties.color()));
+    playerTeam.setPlayerPrefix((properties.prefix() == null) ? null : new AdventureComponent(properties.prefix()));
+    playerTeam.setPlayerSuffix((properties.suffix() == null) ? null : new AdventureComponent(properties.suffix()));
+  }
+
+  @Override
+  public @Nullable Component prefixOf(final @NotNull String team) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     return (playerTeam == null) ? null : PaperAdventure.asAdventure(playerTeam.getPlayerPrefix());
   }
 
   @Override
-  public @Nullable Component teamSuffix(final @NotNull String team) {
+  public @Nullable Component suffixOf(final @NotNull String team) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     return (playerTeam == null) ? null : PaperAdventure.asAdventure(playerTeam.getPlayerSuffix());
   }
 
   @Override
   @SuppressWarnings("ConstantConditions")
-  public @NotNull NamedTextColor teamColor(final @NotNull String team) {
+  public @NotNull NamedTextColor colorOf(final @NotNull String team) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     return (playerTeam == null)
        // modern() method's result won't be null as we give to it a own named-text-color reference.
