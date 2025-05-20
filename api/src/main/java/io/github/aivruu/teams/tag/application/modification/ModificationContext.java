@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,12 +28,6 @@ public enum ModificationContext {
   SUFFIX,
   /** The modification is for the color. */
   COLOR,
-  /** The modification has failed due to event-cancellation or other reasons. */
-  FAILED,
-  /** The modification was cancelled by the player. */
-  CANCELLED,
-  /** The property's content was cleared. */
-  CLEARED,
   /** There's no modification-context. */
   NONE
 }

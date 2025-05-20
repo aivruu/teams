@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ package io.github.aivruu.teams.persistence.infrastructure.utils;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.util.application.Debugger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +58,7 @@ public final class HikariInstanceProvider {
     try {
       return hikariDataSource.getConnection();
     } catch (final SQLException exception) {
-      DebugLoggerHelper.write("Unexpected exception when trying to retrieve the database's connection.", exception);
+      Debugger.write("Unexpected exception when trying to retrieve the database's connection.", exception);
       return null;
     }
   }
@@ -94,7 +94,7 @@ public final class HikariInstanceProvider {
       config.addDataSourceProperty("password", password);
       hikariDataSource = new HikariDataSource(config);
     } catch (final IllegalStateException exception) {
-      DebugLoggerHelper.write("Unexpected exception when trying to build a new HikariDataSource object.", exception);
+      Debugger.write("Unexpected exception when trying to build a new HikariDataSource object.", exception);
     }
   }
 }

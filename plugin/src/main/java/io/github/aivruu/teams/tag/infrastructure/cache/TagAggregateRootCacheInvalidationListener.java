@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,13 +18,14 @@ package io.github.aivruu.teams.tag.infrastructure.cache;
 
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.tag.application.TagManager;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
-public final class TagAggregateRootCacheInvalidationListener implements RemovalListener<String, TagAggregateRoot> {
+public final class TagAggregateRootCacheInvalidationListener
+   implements RemovalListener<String, TagAggregateRoot> {
   private final TagManager tagManager;
 
   public TagAggregateRootCacheInvalidationListener(final @NotNull TagManager tagManager) {
@@ -33,17 +34,14 @@ public final class TagAggregateRootCacheInvalidationListener implements RemovalL
 
   @Override
   public void onRemoval(
-    final @Nullable String key,
-    final @Nullable TagAggregateRoot tagAggregateRoot,
-    final @NotNull RemovalCause cause
-  ) {
-    if (key == null || tagAggregateRoot == null) {
+     final @Nullable String key,
+     final @Nullable TagAggregateRoot tagAggregateRoot,
+     final @NotNull RemovalCause cause) {
+    if (key == null || tagAggregateRoot == null || cause != RemovalCause.EXPIRED) {
       return;
     }
-    if (cause != RemovalCause.EXPIRED) {
-      return;
-    }
-    DebugLoggerHelper.write("Invalidating expired tag-aggregate-root with id '{}' from cache after 5 minutes.", key);
+    Debugger.write(
+       "Invalidating expired tag-aggregate-root with id '{}' from cache after 5 minutes.", key);
     this.tagManager.handleTagAggregateRootSave(tagAggregateRoot);
   }
 }

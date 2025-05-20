@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,11 +16,11 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.player.infrastructure.mariadb;
 
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.PlayerModelEntity;
 import io.github.aivruu.teams.persistence.infrastructure.utils.StatementConstants;
-import io.github.aivruu.teams.shared.infrastructure.common.CommonMariaDBInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.mariadb.MariaDBInfrastructureAggregateRootRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
-public final class PlayerMariaDBInfrastructureAggregateRootRepository extends CommonMariaDBInfrastructureAggregateRootRepository<PlayerAggregateRoot> {
+public final class PlayerMariaDBInfrastructureAggregateRootRepository extends MariaDBInfrastructureAggregateRootRepository<PlayerAggregateRoot> {
   private final Connection connectionPool;
   private final String tableName;
 
@@ -50,7 +50,7 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
         ) {
           return statement.execute();
         } catch (final SQLException exception) {
-          DebugLoggerHelper.write("Unexpected exception when trying to create the database's player-data table.", exception);
+          Debugger.write("Unexpected exception when trying to create the database's player-data table.", exception);
           return false;
         }
       }, THREAD_POOL)
@@ -58,7 +58,7 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
   }
 
   @Override
-  public @NotNull CompletableFuture<@Nullable PlayerAggregateRoot> findInPersistenceAsync(final @NotNull String id) {
+  public @NotNull CompletableFuture<@Nullable PlayerAggregateRoot> findAsync(final @NotNull String id) {
     return CompletableFuture.supplyAsync(() -> {
       try (final PreparedStatement statement = this.connectionPool.prepareStatement(
         StatementConstants.FIND_PLAYER_INFORMATION_STATEMENT.formatted(this.tableName));
@@ -69,7 +69,7 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
             ? null : new PlayerAggregateRoot(id, new PlayerModelEntity(id, /* Get the tag-id */ resultSet.getString(1)));
         }
       } catch (final SQLException exception) {
-        DebugLoggerHelper.write("Unexpected exception when trying to retrieve player's information from database.", exception);
+        Debugger.write("Unexpected exception when trying to retrieve player's information from database.", exception);
         return null;
       }
     }, THREAD_POOL);
@@ -86,7 +86,7 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
           return resultSet.next();
         }
       } catch (final SQLException exception) {
-        DebugLoggerHelper.write("Unexpected exception when trying to verify if player's data exists in database.", exception);
+        Debugger.write("Unexpected exception when trying to verify if player's data exists in database.", exception);
         return false;
       }
     }, THREAD_POOL);
@@ -102,7 +102,7 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
         statement.setString(2, aggregateRoot.playerModel().tag());
         return statement.executeUpdate() > 0;
       } catch (final SQLException exception) {
-        DebugLoggerHelper.write("Unexpected exception when trying to save player's data to the database.", exception);
+        Debugger.write("Unexpected exception when trying to save player's data to the database.", exception);
         return false;
       }
     }, THREAD_POOL);
@@ -117,7 +117,7 @@ public final class PlayerMariaDBInfrastructureAggregateRootRepository extends Co
         statement.setString(1, id);
         return statement.executeUpdate() > 0;
       } catch (final SQLException exception) {
-        DebugLoggerHelper.write("Unexpected exception when trying to delete player's data from the database.", exception);
+        Debugger.write("Unexpected exception when trying to delete player's data from the database.", exception);
         return false;
       }
     }, THREAD_POOL);

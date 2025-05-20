@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.player.application;
 
-import io.github.aivruu.teams.logger.application.DebugLoggerHelper;
+import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.PlayerModelEntity;
 import io.github.aivruu.teams.player.domain.registry.PlayerAggregateRootRegistry;
@@ -65,19 +65,21 @@ public final class PlayerManager {
       return;
     }
     this.playerAggregateRootRegistry.findInInfrastructure(id)
-      .thenAccept(playerAggregateRoot -> {
-        if (playerAggregateRoot == null) {
-          playerAggregateRoot = new PlayerAggregateRoot(id, new PlayerModelEntity(id, null));
-        }
-        // In-cache storing and in-infrastructure save handling.
-        this.playerAggregateRootRegistry.register(playerAggregateRoot);
-        this.handlePlayerAggregateRootSave(playerAggregateRoot);
-      })
-      .whenComplete((result, exception) -> {
-        if (exception != null) {
-          DebugLoggerHelper.write("Unexpected exception during player's information search in infrastructure.", exception);
-        }
-      });
+       .thenAccept(playerAggregateRoot -> {
+         if (playerAggregateRoot == null) {
+           playerAggregateRoot = new PlayerAggregateRoot(id, new PlayerModelEntity(id, null));
+         }
+         // In-cache storing and in-infrastructure save handling.
+         this.playerAggregateRootRegistry.register(playerAggregateRoot);
+         this.handlePlayerAggregateRootSave(playerAggregateRoot);
+       })
+       .whenComplete((result, exception) -> {
+         if (exception != null) {
+           Debugger.write(
+              "Unexpected exception during player's information search in infrastructure.",
+              exception);
+         }
+       });
   }
 
   /**
@@ -88,12 +90,16 @@ public final class PlayerManager {
    */
   public void handlePlayerAggregateRootSave(final @NotNull PlayerAggregateRoot playerAggregateRoot) {
     this.playerAggregateRootRegistry.save(playerAggregateRoot)
-      .thenAccept(saved -> {
-        if (!saved) DebugLoggerHelper.write("The player's information couldn't be saved.");
-      })
-      .whenComplete((result, exception) -> {
-        if (exception != null) DebugLoggerHelper.write("Unexpected exception during player's data saving.", exception);
-      });
+       .thenAccept(saved -> {
+         if (!saved) {
+           Debugger.write("The player's information couldn't be saved.");
+         }
+       })
+       .whenComplete((result, exception) -> {
+         if (exception != null) {
+           Debugger.write("Unexpected exception during player's data saving.", exception);
+         }
+       });
   }
 
   /**

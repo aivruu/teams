@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.infrastructure.mongodb.codec;
 
-import io.github.aivruu.teams.plain.application.PlainComponentHelper;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
+import io.github.aivruu.teams.util.application.component.PlainComponentParser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bson.BsonReader;
@@ -40,8 +40,8 @@ public enum MongoTagPropertiesValueObjectCodec implements Codec<TagPropertiesVal
     final int colorValue = reader.readInt32("color-value");
     reader.readEndDocument();
     return new TagPropertiesValueObject(
-      (prefix == null) ? null : PlainComponentHelper.modern(prefix),
-      (suffix == null) ? null : PlainComponentHelper.modern(suffix),
+      (prefix == null) ? null : PlainComponentParser.modern(prefix),
+      (suffix == null) ? null : PlainComponentParser.modern(suffix),
       // This will never be null.
       NamedTextColor.namedColor(colorValue)
     );
@@ -54,13 +54,13 @@ public enum MongoTagPropertiesValueObjectCodec implements Codec<TagPropertiesVal
     if (prefix == null) {
       writer.writeNull("prefix");
     } else {
-      writer.writeString("prefix", PlainComponentHelper.plain(prefix));
+      writer.writeString("prefix", PlainComponentParser.plain(prefix));
     }
     final Component suffix = properties.suffix();
     if (suffix == null) {
       writer.writeNull("suffix");
     } else {
-      writer.writeString("suffix", PlainComponentHelper.plain(suffix));
+      writer.writeString("suffix", PlainComponentParser.plain(suffix));
     }
     writer.writeInt32("color-value", properties.color().value());
     writer.writeEndDocument();

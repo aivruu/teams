@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,4 +25,6 @@ import org.jetbrains.annotations.NotNull;
  * @param context the modification's context.
  * @since 2.3.1
  */
-public record ModificationInProgressValueObject(@NotNull String tag, @NotNull ModificationContext context) {}
+public record ModificationInProgressValueObject(
+   @NotNull String tag,
+   @NotNull ModificationContext context) {}

@@ -1,6 +1,6 @@
 /**
- * Provides tag-manager and tag modification-container and service, as well, the package that contains
- * information for modifications handling.
+ * Provides access to the tag-manager and tag-registry's implementation, as well, tag-modification
+ * objects.
  *
  * @since 0.0.1
  */

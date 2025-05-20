@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,36 +31,36 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
   private final AsyncAggregateRootRepository<PlayerAggregateRoot> playerAsyncAggregateRootRepository;
 
   public PlayerAggregateRootRegistryImpl(
-    final @NotNull PlayerAggregateRootRepository playerAggregateRootRepository,
-    final @NotNull AsyncAggregateRootRepository<PlayerAggregateRoot> playerAsyncAggregateRootRepository) {
+     final @NotNull PlayerAggregateRootRepository playerAggregateRootRepository,
+     final @NotNull AsyncAggregateRootRepository<PlayerAggregateRoot> playerAsyncAggregateRootRepository) {
     this.playerAggregateRootRepository = playerAggregateRootRepository;
     this.playerAsyncAggregateRootRepository = playerAsyncAggregateRootRepository;
   }
 
   @Override
   public @Nullable PlayerAggregateRoot findInCache(final @NotNull String id) {
-    return this.playerAggregateRootRepository.findInCacheSync(id);
+    return this.playerAggregateRootRepository.findSync(id);
   }
 
   @Override
   public @NotNull CompletableFuture<PlayerAggregateRoot> findInInfrastructure(final @NotNull String id) {
-    return this.playerAsyncAggregateRootRepository.findInPersistenceAsync(id);
+    return this.playerAsyncAggregateRootRepository.findAsync(id);
   }
 
   @Override
   public @NotNull Collection<PlayerAggregateRoot> findAllInCache() {
-    return this.playerAggregateRootRepository.findAllInCacheSync();
+    return this.playerAggregateRootRepository.findAllSync();
   }
 
   @Override
   public boolean existsGlobally(final @NotNull String id) {
-    return this.playerAggregateRootRepository.existsInCacheSync(id)
-      || this.playerAsyncAggregateRootRepository.existsAsync(id).join();
+    return this.playerAggregateRootRepository.existsSync(id)
+       || this.playerAsyncAggregateRootRepository.existsAsync(id).join();
   }
 
   @Override
   public boolean existsInCache(final @NotNull String id) {
-    return this.playerAggregateRootRepository.existsInCacheSync(id);
+    return this.playerAggregateRootRepository.existsSync(id);
   }
 
   @Override
@@ -70,7 +70,7 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
 
   @Override
   public void register(final @NotNull PlayerAggregateRoot aggregateRoot) {
-    this.playerAggregateRootRepository.saveSync(aggregateRoot);
+    this.playerAggregateRootRepository.saveSync(aggregateRoot.id(), aggregateRoot);
   }
 
   @Override

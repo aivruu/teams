@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,95 +17,86 @@
 package io.github.aivruu.teams.menu.infrastructure;
 
 import io.github.aivruu.teams.action.application.ActionManager;
-import io.github.aivruu.teams.config.infrastructure.ConfigurationContainer;
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.TagsMenuConfigurationModel;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
+import io.github.aivruu.teams.menu.application.ProcessedMenuItemValueObject;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
-import io.github.aivruu.teams.minimessage.application.MiniMessageHelper;
-import io.github.aivruu.teams.placeholder.application.PlaceholderHelper;
+import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
+import io.github.aivruu.teams.menu.infrastructure.util.MenuItemSetter;
+import io.github.aivruu.teams.player.application.PlayerManager;
 import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
+import io.github.aivruu.teams.util.application.PlaceholderParser;
+import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
 public final class TagSelectorMenuModel extends AbstractMenuModel {
+  private final PlayerManager playerManager;
   private final PlayerTagSelectorManager playerTagSelectorManager;
-  private ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer;
-  private ConfigurationContainer<TagsMenuConfigurationModel> tagsMenuModelConfiguration;
+  private final ConfigurationManager configurationManager;
 
   public TagSelectorMenuModel(
-    final @NotNull ActionManager actionManager,
-    final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer,
-    final @NotNull ConfigurationContainer<TagsMenuConfigurationModel> tagsMenuModelConfiguration,
-    final @NotNull PlayerTagSelectorManager playerTagSelectorManager) {
+     final @NotNull ActionManager actionManager,
+     final @NotNull PlayerManager playerManager,
+     final @NotNull PlayerTagSelectorManager playerTagSelectorManager,
+     final @NotNull ConfigurationManager configurationManager) {
     super(MenuConstants.TAGS_MENU_ID, actionManager);
-    this.messagesModelContainer = messagesModelContainer;
-    this.tagsMenuModelConfiguration = tagsMenuModelConfiguration;
+    this.playerManager = playerManager;
+    this.configurationManager = configurationManager;
     this.playerTagSelectorManager = playerTagSelectorManager;
-  }
-
-  public void messagesConfiguration(final @NotNull ConfigurationContainer<MessagesConfigurationModel> messagesModelContainer) {
-    this.messagesModelContainer = messagesModelContainer;
-  }
-
-  public void menuConfiguration(final @NotNull ConfigurationContainer<TagsMenuConfigurationModel> menuModelConfiguration) {
-    this.tagsMenuModelConfiguration = menuModelConfiguration;
   }
 
   @Override
   public void build() {
-    final TagsMenuConfigurationModel menu = this.tagsMenuModelConfiguration.model();
-    super.inventory = Bukkit.createInventory(this, menu.rows * 9, PlaceholderHelper.parseBoth(null, menu.title));
-    for (final TagsMenuConfigurationModel.ItemSection itemSection : menu.items) {
-      for (final byte slot : itemSection.slots) {
-        super.inventory.setItem(slot, this.prepareItem(itemSection));
-      }
+    final TagsMenuConfigurationModel menu = this.configurationManager.selector();
+    super.inventory = Bukkit.createInventory(this, menu.rows * 9,
+       PlaceholderParser.parseBoth(null, menu.title));
+    for (final TagsMenuConfigurationModel.MenuItem menuItem : menu.items) {
+      MenuItemSetter.placeItem(super.inventory, menuItem.itemInformation);
     }
   }
 
   @Override
-  public @Nullable String handleClickLogic(
-    final @NotNull Player player, final @Nullable ItemStack clicked, final @NotNull ClickType clickType
-  ) {
-    final String itemNbtKey = super.handleClickLogic(player, clicked, clickType);
-    if (itemNbtKey == null) {
+  public @Nullable ProcessedMenuItemValueObject handleClickLogic(
+     final @NotNull Player player,
+     final @Nullable ItemStack clicked,
+     final @NotNull ClickType clickType) {
+    final ProcessedMenuItemValueObject processedMenuItem = super.handleClickLogic(player, clicked,
+       clickType);
+    if (processedMenuItem == null) {
       return null;
     }
     // After that we know the item is valid and has the key assigned.
-    final ItemMeta meta = clicked.getItemMeta();
-    final int customModelData = meta.hasCustomModelData() ? meta.getCustomModelData() : 0;
-    for (final TagsMenuConfigurationModel.ItemSection itemSection : this.tagsMenuModelConfiguration.model().items) {
-      if (!itemNbtKey.equals(itemSection.id)) {
+    final int customModelData = processedMenuItem.meta().hasCustomModelData()
+       ? processedMenuItem.meta().getCustomModelData() : 0;
+    final String id = processedMenuItem.id();
+    for (final TagsMenuConfigurationModel.MenuItem menuItem : this.configurationManager.selector().items) {
+      if (menuItem.itemInformation.checkCustomModelData
+         && customModelData != menuItem.itemInformation.data) {
         continue;
       }
-      if (itemSection.checkCustomModelData && customModelData != itemSection.data) {
+      if (!id.equals(menuItem.itemInformation.id)) {
         continue;
       }
-      this.processInput(player, itemSection, clickType);
+      this.processInput(player, menuItem, clickType);
     }
-    return itemNbtKey;
+    return processedMenuItem;
   }
 
   private void processInput(
-    final @NotNull Player player,
-    final @NotNull TagsMenuConfigurationModel.ItemSection itemSection,
-    final @NotNull ClickType clickType
-  ) {
+     final @NotNull Player player,
+     final @NotNull TagsMenuConfigurationModel.MenuItem itemSection,
+     final @NotNull ClickType clickType) {
     // Execute item's actions and check if it should stop execution-flow.
-    super.processItemActions(player, clickType, itemSection.leftClickActions, itemSection.rightClickActions);
+    super.processItemActions(player, clickType, itemSection.itemInformation.leftClickActions,
+       itemSection.itemInformation.rightClickActions);
     if (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT) {
       return;
     }
@@ -115,60 +106,44 @@ public final class TagSelectorMenuModel extends AbstractMenuModel {
       return;
     }
     if (!itemSection.permission.isEmpty() && !player.hasPermission(itemSection.permission)) {
-      player.sendMessage(MiniMessageHelper.text(itemSection.permissionMessage));
+      player.sendMessage(MiniMessageParser.text(itemSection.permissionMessage));
       return;
     }
     this.processTagSelection(player, itemSection);
   }
 
+  @SuppressWarnings("ConstantConditions")
   private void processTagSelection(
-    final @NotNull Player player,
-    final @NotNull TagsMenuConfigurationModel.ItemSection itemSection
-  ) {
-    final MessagesConfigurationModel messages = this.messagesModelContainer.model();
+     final @NotNull Player player,
+     final @NotNull TagsMenuConfigurationModel.MenuItem itemSection) {
+    final MessagesConfigurationModel messages = this.configurationManager.messages();
     // Process status-code provided by the select-operation.
     switch (this.playerTagSelectorManager.select(player, itemSection.tag)) {
       case PlayerTagSelectorManager.PLAYER_IS_NOT_ONLINE ->
-        player.sendMessage(MiniMessageHelper.text(messages.playerUnknownInfo));
+         player.sendMessage(MiniMessageParser.text(messages.playerUnknownInfo));
       case PlayerAggregateRoot.TAG_IS_ALREADY_SELECTED ->
-        player.sendMessage(MiniMessageHelper.text(messages.alreadySelected));
+         player.sendMessage(MiniMessageParser.text(messages.alreadySelected));
       case PlayerTagSelectorManager.TAG_SPECIFIED_NOT_EXIST ->
-        player.sendMessage(MiniMessageHelper.text(messages.unknownTag));
-      case PlayerAggregateRoot.TAG_HAS_BEEN_CHANGED ->
-        player.sendMessage(MiniMessageHelper.text(messages.selected, Placeholder.parsed("tag-id", itemSection.tag)));
+         player.sendMessage(MiniMessageParser.text(messages.unknownTag));
+      case PlayerAggregateRoot.TAG_HAS_BEEN_CHANGED -> {
+        // Aggregate-root won't be null.
+        this.playerManager.handlePlayerAggregateRootSave(this.playerManager.playerAggregateRootOf(
+           player.getUniqueId().toString()));
+        player.sendMessage(MiniMessageParser.text(messages.selected, Placeholder.parsed("tag-id",
+           itemSection.tag)));
+      }
       default -> throw new UnsupportedOperationException("Unexpected status-code result.");
     }
   }
 
   @Override
   public void open(final @NotNull Player player) {
-    final TagsMenuConfigurationModel menu = this.tagsMenuModelConfiguration.model();
+    final TagsMenuConfigurationModel menu = this.configurationManager.selector();
     if (menu.useOpenActions) {
       for (final String action : menu.openActions) {
         this.actionManager.execute(player, action);
       }
     }
     super.open(player);
-  }
-
-  private @NotNull ItemStack prepareItem(final @NotNull TagsMenuConfigurationModel.ItemSection itemSection) {
-    final ItemStack item = new ItemStack(itemSection.material);
-    // Air material-type for an item in the menu shouldn't provide any custom-information.
-    if (itemSection.material != Material.AIR) {
-      item.editMeta(meta -> {
-        // Provide support for support only for legacy and modern global-placeholders.
-        meta.displayName(PlaceholderHelper.parseBoth(null, itemSection.displayName));
-        meta.lore(Arrays.asList(PlaceholderHelper.parseBoth(null, itemSection.lore)));
-        if (itemSection.data > 0) {
-          meta.setCustomModelData(itemSection.data);
-        }
-        if (itemSection.glow) {
-          meta.addEnchant(Enchantment.LURE, 1, false);
-          meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-        meta.getPersistentDataContainer().set(AbstractMenuModel.MENU_ITEM_NBT_KEY, PersistentDataType.STRING, itemSection.id);
-      });
-    }
-    return item;
   }
 }

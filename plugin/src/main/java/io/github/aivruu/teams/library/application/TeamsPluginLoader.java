@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ public final class TeamsPluginLoader implements PluginLoader {
     libraryResolver.addRepository(new RemoteRepository.Builder("central", "default", "https://repo1.maven.org/maven2/").build());
     libraryResolver.addDependency(new Dependency(new DefaultArtifact("org.spongepowered:configurate-hocon:4.1.2"), null));
     libraryResolver.addDependency(new Dependency(new DefaultArtifact("org.mongodb:mongodb-driver-sync:5.3.0"), null));
-    libraryResolver.addDependency(new Dependency(new DefaultArtifact("com.google.code.gson:gson:2.12.1"), null));
+    libraryResolver.addDependency(new Dependency(new DefaultArtifact("com.google.code.gson:gson:2.13.1"), null));
     libraryResolver.addDependency(new Dependency(new DefaultArtifact("com.github.ben-manes.caffeine:caffeine:3.1.8"), null));
     classpathBuilder.addLibrary(libraryResolver);
   }

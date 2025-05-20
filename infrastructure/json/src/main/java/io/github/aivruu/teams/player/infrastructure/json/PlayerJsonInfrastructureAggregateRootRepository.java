@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,77 +17,26 @@
 package io.github.aivruu.teams.player.infrastructure.json;
 
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
-import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
-import io.github.aivruu.teams.shared.infrastructure.util.JsonCodecHelper;
+import io.github.aivruu.teams.shared.infrastructure.json.JsonInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.json.JsonCoder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
-public final class PlayerJsonInfrastructureAggregateRootRepository implements InfrastructureAggregateRootRepository<PlayerAggregateRoot> {
-  private final Path directory;
-
+public final class PlayerJsonInfrastructureAggregateRootRepository
+   extends JsonInfrastructureAggregateRootRepository<PlayerAggregateRoot> {
   public PlayerJsonInfrastructureAggregateRootRepository(final @NotNull Path directory) {
-    this.directory = directory;
+    super(directory);
   }
 
   @Override
-  public boolean start() {
-    if (Files.exists(this.directory)) {
-      return true;
-    }
-    try {
-      Files.createDirectory(this.directory);
-      return true;
-    } catch (final IOException exception) {
-      return false;
-    }
-  }
-
-  @Override
-  public @NotNull CompletableFuture<@Nullable PlayerAggregateRoot> findInPersistenceAsync(final @NotNull String id) {
+  public @NotNull CompletableFuture<@Nullable PlayerAggregateRoot> findAsync(final @NotNull String id) {
     return CompletableFuture.supplyAsync(() -> {
       final Path file = this.directory.resolve(id + ".json");
-      return Files.notExists(file) ? null : JsonCodecHelper.read(file, PlayerAggregateRoot.class);
-    }, THREAD_POOL);
-  }
-
-  @Override
-  public @NotNull CompletableFuture<Boolean> existsAsync(final @NotNull String id) {
-    return CompletableFuture.supplyAsync(() -> Files.exists(this.directory.resolve(id + ".json")), THREAD_POOL);
-  }
-
-  @Override
-  public @NotNull CompletableFuture<Boolean> saveAsync(final @NotNull PlayerAggregateRoot aggregateRoot) {
-    return CompletableFuture.supplyAsync(() -> {
-      final Path file = this.directory.resolve(aggregateRoot.id() + ".json");
-      if (Files.notExists(file)) {
-        try {
-          Files.createFile(file);
-        } catch (final IOException exception) {
-          return false;
-        }
-      }
-      return JsonCodecHelper.write(file, aggregateRoot);
-    }, THREAD_POOL);
-  }
-
-  @Override
-  public @NotNull CompletableFuture<Boolean> deleteAsync(final @NotNull String id) {
-    return CompletableFuture.supplyAsync(() -> {
-      final Path file = this.directory.resolve(id + ".json");
-      if (Files.notExists(file)) {
-        return false;
-      }
-      try {
-        Files.delete(file);
-        return true;
-      } catch (final IOException exception) {
-        return false;
-      }
+      return Files.notExists(file) ? null : JsonCoder.read(file, PlayerAggregateRoot.class);
     }, THREAD_POOL);
   }
 }

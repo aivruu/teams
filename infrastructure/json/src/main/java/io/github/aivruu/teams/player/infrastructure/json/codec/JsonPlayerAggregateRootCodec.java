@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.PlayerModelEntity;
-import io.github.aivruu.teams.shared.infrastructure.adapter.JsonCodecAdapterContract;
+import io.github.aivruu.teams.shared.infrastructure.json.JsonCodecAdapterContract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -41,7 +41,8 @@ public enum JsonPlayerAggregateRootCodec implements JsonCodecAdapterContract<Pla
     final JsonObject jsonObject = json.getAsJsonObject();
     final String id = jsonObject.get("id").getAsString();
     final JsonElement tag = jsonObject.get("selected-tag");
-    return new PlayerAggregateRoot(id, new PlayerModelEntity(id, (tag == null) ? null : tag.getAsString()));
+    return new PlayerAggregateRoot(id, new PlayerModelEntity(id,
+       tag.isJsonNull() ? null : tag.getAsString()));
   }
 
   @Override

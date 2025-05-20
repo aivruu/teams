@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,30 +17,18 @@
 package io.github.aivruu.teams.tag.infrastructure.mongodb;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.result.UpdateResult;
-import io.github.aivruu.teams.shared.infrastructure.CloseableInfrastructureAggregateRootRepository;
+import io.github.aivruu.teams.shared.infrastructure.mongodb.MongoDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
-import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.CompletableFuture;
-
-public final class TagMongoInfrastructureAggregateRootRepository implements CloseableInfrastructureAggregateRootRepository<TagAggregateRoot> {
-  private final MongoClient client;
-  private final String databaseName;
-  private final String collectionName;
-  private MongoCollection<TagAggregateRoot> tagAggregateRootMongoCollection;
-
+public final class TagMongoInfrastructureAggregateRootRepository
+   extends MongoDBInfrastructureAggregateRootRepository<TagAggregateRoot> {
   public TagMongoInfrastructureAggregateRootRepository(
-    final MongoClient client,
-    final String databaseName,
-    final String collectionName) {
-    this.client = client;
-    this.databaseName = databaseName;
-    this.collectionName = collectionName;
+     final @NotNull MongoClient client,
+     final @NotNull String databaseName,
+     final @NotNull String collectionName) {
+    super(client, databaseName, collectionName);
   }
 
   @Override
@@ -51,42 +39,8 @@ public final class TagMongoInfrastructureAggregateRootRepository implements Clos
     } catch (final IllegalArgumentException exception) {
       return false;
     }
-    this.tagAggregateRootMongoCollection = database.getCollection(this.collectionName, TagAggregateRoot.class);
+    super.aggregateRootCollection = database.getCollection(this.collectionName,
+       TagAggregateRoot.class);
     return true;
-  }
-
-  @Override
-  public void close() {
-    this.client.close();
-  }
-
-  @Override
-  public @NotNull CompletableFuture<@Nullable TagAggregateRoot> findInPersistenceAsync(final @NotNull String id) {
-    return CompletableFuture.supplyAsync(() ->
-      this.tagAggregateRootMongoCollection.find(new Document("id", id)).first(), THREAD_POOL);
-  }
-
-  @Override
-  public @NotNull CompletableFuture<Boolean> existsAsync(final @NotNull String id) {
-    return CompletableFuture.supplyAsync(() ->
-      this.tagAggregateRootMongoCollection.find(new Document("id", id)).first() != null, THREAD_POOL);
-  }
-
-  @Override
-  public @NotNull CompletableFuture<Boolean> saveAsync(final @NotNull TagAggregateRoot aggregateRoot) {
-    return CompletableFuture.supplyAsync(() -> {
-      final UpdateResult result = this.tagAggregateRootMongoCollection.updateOne(
-        new Document("id", aggregateRoot.id()), new Document("$set", aggregateRoot));
-      // Check if the row exists (was matched).
-      return (result.getMatchedCount() == 0)
-        ? this.tagAggregateRootMongoCollection.insertOne(aggregateRoot).wasAcknowledged()
-        : result.wasAcknowledged();
-    }, THREAD_POOL);
-  }
-
-  @Override
-  public @NotNull CompletableFuture<Boolean> deleteAsync(final @NotNull String id) {
-    return CompletableFuture.supplyAsync(() ->
-      this.tagAggregateRootMongoCollection.deleteOne(new Document("id", id)).wasAcknowledged(), THREAD_POOL);
   }
 }

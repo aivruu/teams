@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,7 +34,9 @@ public final class TagModelEntity {
    * @param tagComponentProperties the tag's properties.
    * @since 0.0.1
    */
-  public TagModelEntity(final @NotNull String id, final @NotNull TagPropertiesValueObject tagComponentProperties) {
+  public TagModelEntity(
+     final @NotNull String id,
+     final @NotNull TagPropertiesValueObject tagComponentProperties) {
     this.id = id;
     this.tagComponentProperties = tagComponentProperties;
   }

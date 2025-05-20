@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.config.infrastructure.object;
 
-import io.github.aivruu.teams.config.infrastructure.ConfigurationInterface;
+import io.github.aivruu.teams.config.application.ConfigurationInterface;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 @ConfigSerializable
@@ -56,11 +56,11 @@ public final class MessagesConfigurationModel implements ConfigurationInterface 
 
   public String alreadyInModification = "<blue>[AldrTeams] <dark_gray><b>></b> <red>You're already in a modification process, wait 15 seconds.";
 
-  public String clearedTagProperty = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The property's content has been cleared.";
-
   public String modifiedTagProperty = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>The tag's property <property> has been modified successfully.";
 
-  public String tagModifyError = "<blue>[AldrTeams] <dark_gray><b>></b> <red>Something went wrong during property-modification, may event was cancelled, or value is already set.";
+  public String tagModifyError = "<blue>[AldrTeams] <dark_gray><b>></b> <red>Something went wrong during property-modification, may event was cancelled, or tag does not exist.";
+
+  public String valueIsSame = "<blue>[AldrTeams] <dark_gray><b>></b> <red>The value is the same as the current one, please specify a different value.";
 
   public String deleted = "<blue>[AldrTeams] <dark_gray><b>></b> <red>The tag <tag-id> has been deleted.";
 
@@ -75,4 +75,6 @@ public final class MessagesConfigurationModel implements ConfigurationInterface 
   public String noSelectedTag = "<blue>[AldrTeams] <dark_gray><b>></b> <red>You've no a tag selected.";
 
   public String unselected = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>Your current tag has been unselected.";
+
+  public String expiredModification = "<blue>[AldrTeams] <dark_gray><b>></b> <red>The modification process has expired (passed 15 seconds), try again please.";
 }

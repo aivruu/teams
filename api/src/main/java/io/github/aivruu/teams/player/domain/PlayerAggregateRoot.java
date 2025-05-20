@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 package io.github.aivruu.teams.player.domain;
 
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,11 +27,11 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class PlayerAggregateRoot extends AggregateRoot {
   /** The tag specified is already selected. */
-  public static final byte TAG_IS_ALREADY_SELECTED = -4;
+  public static final byte TAG_IS_ALREADY_SELECTED = 1;
   /** The current-tag has been cleared. */
-  public static final byte TAG_HAS_BEEN_CLEARED = -5;
+  public static final byte TAG_HAS_BEEN_CLEARED = 2;
   /** The current-tag has been changed by other one. */
-  public static final byte TAG_HAS_BEEN_CHANGED = -6;
+  public static final byte TAG_HAS_BEEN_CHANGED = 3;
   private final PlayerModelEntity playerModel;
 
   /**
@@ -76,18 +75,5 @@ public final class PlayerAggregateRoot extends AggregateRoot {
     }
     this.playerModel.tag(tag);
     return (tag == null) ? TAG_HAS_BEEN_CLEARED : TAG_HAS_BEEN_CHANGED;
-  }
-
-  /**
-   * Sets a new tag-selection for the player.
-   *
-   * @param tag the tag's id or {@code null} for unselect.
-   * @deprecated in favour of {@link #tagWithStatus(String)}
-   * @since 0.0.1
-   */
-  @Deprecated()
-  @ApiStatus.ScheduledForRemoval(inVersion = "4.0.0")
-  public void tag(final @Nullable String tag) {
-    this.playerModel.tag(tag);
   }
 }

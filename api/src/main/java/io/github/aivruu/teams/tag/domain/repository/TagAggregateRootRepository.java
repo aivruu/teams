@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,12 +16,28 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.domain.repository;
 
+import com.google.errorprone.annotations.DoNotCall;
 import io.github.aivruu.teams.aggregate.domain.repository.AggregateRootRepository;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A {@link AggregateRootRepository} interface-implementation for {@link TagAggregateRoot}s.
  *
  * @since 0.0.1
  */
-public interface TagAggregateRootRepository extends AggregateRootRepository<TagAggregateRoot> {}
+public interface TagAggregateRootRepository extends AggregateRootRepository<TagAggregateRoot> {
+  /**
+   * {@inheritDoc}
+   * <p>
+   * <b>NOTE: Not implemented by its interface-contract's implementation.</b>
+   *
+   * @throws UnsupportedOperationException because of not-implemented method.
+   * @since 4.0.0
+   */
+  @Override
+  @DoNotCall
+  default <V> void updateSync(final @NotNull String id, final @NotNull V value) {
+    throw NOT_IMPLEMENTED_EXCEPTION;
+  }
+}

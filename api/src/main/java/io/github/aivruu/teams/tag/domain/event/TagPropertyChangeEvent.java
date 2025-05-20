@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,7 +45,9 @@ public final class TagPropertyChangeEvent extends Event implements Cancellable {
    * @param context the modification's context.
    * @since 0.0.1
    */
-  public TagPropertyChangeEvent(final @NotNull String tag, final @NotNull ModificationContext context) {
+  public TagPropertyChangeEvent(
+     final @NotNull String tag,
+     final @NotNull ModificationContext context) {
     this.tag = tag;
     this.context = context;
   }

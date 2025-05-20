@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * An interface-contract with the methods required by implementations to proportionate
- * packet-level operations for the plugin.
+ * An interface-contract with the methods required by implementations to proportionate packet-level
+ * operations for the plugin.
  *
  * @since 0.0.1
  */
@@ -33,7 +33,7 @@ public interface PacketAdaptationContract {
   /**
    * Creates a new player-team with the given id and properties.
    *
-   * @param team the team's id.
+   * @param team       the team's id.
    * @param properties the team's properties.
    * @since 0.0.1
    */
@@ -51,21 +51,10 @@ public interface PacketAdaptationContract {
    * Adds the given player to the specified team's players-registry.
    *
    * @param player the player to add.
-   * @param team the team's id.
+   * @param team   the team's id.
    * @since 1.1.1
    */
   void addPlayerToTeam(final @NotNull Player player, final @NotNull String team);
-
-  /**
-   * Removes the player from the specified team's players-registry.
-   *
-   * @param player the player to remove.
-   * @param team the team's id.
-   * @deprecated in favour of {@link #removePlayerFromTeam(Player)}.
-   * @since 1.1.1
-   */
-  @Deprecated
-  void removePlayerFromTeam(final @NotNull Player player, final @NotNull String team);
 
   /**
    * Removes the player from the team where he's currently.
@@ -78,7 +67,7 @@ public interface PacketAdaptationContract {
   /**
    * Modifies the team's prefix by the given one.
    *
-   * @param team the team's id.
+   * @param team   the team's id.
    * @param prefix the new prefix.
    * @since 0.0.1
    */
@@ -87,7 +76,7 @@ public interface PacketAdaptationContract {
   /**
    * Modifies the team's suffix by the given one.
    *
-   * @param team the team's id.
+   * @param team   the team's id.
    * @param suffix the new suffix.
    * @since 0.0.1
    */
@@ -96,11 +85,22 @@ public interface PacketAdaptationContract {
   /**
    * Updates the team's color by the given one.
    *
-   * @param team the team's id.
+   * @param team           the team's id.
    * @param namedTextColor the new color.
    * @since 1.4.1
    */
   void updateTeamColor(final @NotNull String team, final @NotNull NamedTextColor namedTextColor);
+
+  /**
+   * Updates the team's general attributes (prefix, suffix and color).
+   *
+   * @param team       the team for attributes-updating.
+   * @param properties the new team's attributes.
+   * @since 4.0.0
+   */
+  void updateTeamAttributes(
+     final @NotNull String team,
+     final @NotNull TagPropertiesValueObject properties);
 
   /**
    * Returns the team's prefix {@link Component}.
@@ -109,7 +109,7 @@ public interface PacketAdaptationContract {
    * @return A {@link Component} or {@code null} if there's none.
    * @since 3.5.1
    */
-  @Nullable Component teamPrefix(final @NotNull String team);
+  @Nullable Component prefixOf(final @NotNull String team);
 
   /**
    * Returns the team's suffix {@link Component}.
@@ -118,15 +118,15 @@ public interface PacketAdaptationContract {
    * @return A {@link Component} or {@code null} if there's none.
    * @since 3.5.1
    */
-  @Nullable Component teamSuffix(final @NotNull String team);
+  @Nullable Component suffixOf(final @NotNull String team);
 
   /**
    * Returns the team's color.
    *
    * @param team the team specified.
-   * @return A {@link NamedTextColor} or {@link NamedTextColor#WHITE} if team not exist, or color-value
-   * of the team is not valid.
+   * @return A {@link NamedTextColor} or {@link NamedTextColor#WHITE} if team not exist, or
+   * color-value of the team is not valid.
    * @since 3.5.1
    */
-  @NotNull NamedTextColor teamColor(final @NotNull String team);
+  @NotNull NamedTextColor colorOf(final @NotNull String team);
 }

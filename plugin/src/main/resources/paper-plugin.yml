@@ -35,3 +35,5 @@ permissions:
         description: Allows to modify tag's prefix or suffix.
       teams.command.menu:
         description: Opens tags-selector menu.
+      teams.updates:
+        description: Notifies the player about new updates.

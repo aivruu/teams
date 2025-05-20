@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024 aivruu
+// Copyright (c) 2024-2025 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ public interface AsyncAggregateRootRepository<A extends AggregateRoot> {
    * @return A {@link CompletableFuture} with the {@link AggregateRoot} if found, otherwise {@code null}.
    * @since 0.0.1
    */
-  @NotNull CompletableFuture<@Nullable A> findInPersistenceAsync(final @NotNull String id);
+  @NotNull CompletableFuture<@Nullable A> findAsync(final @NotNull String id);
 
   /**
    * Checks if the {@link AggregateRoot} specified exists in repository.
