@@ -43,7 +43,7 @@ public final class TagModificationCacheInvalidationListener
      final @Nullable String id,
      final @Nullable ModificationInProgressValueObject modification,
      final @NotNull RemovalCause cause) {
-    if (id == null) {
+    if (id == null || cause != RemovalCause.EXPIRED) {
       return;
     }
     final Player player = Bukkit.getPlayer(UUID.fromString(id));
