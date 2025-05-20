@@ -30,11 +30,13 @@ import io.github.aivruu.teams.command.infrastructure.MainCommand;
 import io.github.aivruu.teams.command.infrastructure.TagsCommand;
 import io.github.aivruu.teams.command.application.suggestion.AvailableTagSuggestionProvider;
 import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigurationModel;
+import io.github.aivruu.teams.util.application.UpdateChecker;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.repository.MenuCacheRepository;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
+import io.github.aivruu.teams.player.application.listener.PlayerUpdateNotifyListener;
 import io.github.aivruu.teams.tag.infrastructure.modification.TagModificationProcessorImpl;
-import io.github.aivruu.teams.util.PlaceholderParser;
+import io.github.aivruu.teams.util.application.PlaceholderParser;
 import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.menu.application.MenuManager;
 import io.github.aivruu.teams.menu.application.listener.MenuInteractionListener;
@@ -194,8 +196,9 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.infrastructureRepositoryController = new InfrastructureRepositoryController(
        super.getDataPath(), this.configurationManager);
     if (!this.infrastructureRepositoryController.selectAndInitialize()) {
-      this.logger.error("One, or both infrastructure-repositories couldn't be initialized " +
-         "correctly, the plugin won't continue with start-up process!");
+      this.logger.error("""
+         One, or both infrastructure-repositories couldn't be initialized correctly, the plugin
+         won't continue with start-up process!""");
       return;
     }
     this.playerAggregateRootRepository = new PlayerCacheAggregateRootRepository();
@@ -217,7 +220,8 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.tagManager = new TagManager(this.tagAggregateRootRegistry, this.packetAdaptation);
     ((TagCacheAggregateRootRepository) this.tagAggregateRootRepository).buildCache(this.tagManager);
     this.tagModificationProcessor = new TagModificationProcessorImpl(
-       this, this.tagAggregateRootRegistry, this.tagManager, this.configurationManager);
+       this, this.tagAggregateRootRegistry, this.tagManager, this.configurationManager,
+       this.packetAdaptation);
 
     this.logger.info("Initializing player-management services and registries.");
     this.playerAggregateRootRegistry = new PlayerAggregateRootRegistryImpl(
@@ -246,6 +250,14 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
        this.tagModificationRepository, this.configurationManager));
     this.logger.info("Registered menus successfully.");
 
+    UpdateChecker.searchUpdates();
+    if (UpdateChecker.isRunningLatest()) {
+      this.logger.info("[Updates] No newer-updates found, running latest-version.");
+    } else {
+      this.logger.info("[Updates] New Version Available, release {} has been published!",
+         UpdateChecker.getLatestVersion());
+      this.logger.info("[Updates] It is recommended to upgrade for latest-features and fixes!");
+    }
     this.logger.info("Registering plugin event-listener and commands.");
     // Commands, listeners and hooks registration and API initialization.
     final PluginManager pluginManager = super.getServer().getPluginManager();
@@ -254,6 +266,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     pluginManager.registerEvents(new TagModificationChatInputListener(
        this.tagModificationRepository, this.tagModificationProcessor), this);
     pluginManager.registerEvents(new MenuInteractionListener(), this);
+    pluginManager.registerEvents(new PlayerUpdateNotifyListener(), this);
     this.registerCommands(
        new MainCommand(this, this.configurationManager),
        new TagsCommand(this.configurationManager, this.tagManager, this.menuManager,
