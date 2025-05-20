@@ -21,6 +21,7 @@ import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.event.TagPropertyChangeEvent;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,6 +55,7 @@ public abstract class TagModificationProcessor {
    * Any of these checks can return a different status through a {@link ProcessedContextResultValueObject},
    * as well, the reference to the tag's aggregate-root (can be null).
    *
+   * @param player       who's modifying the tag.
    * @param modification the {@link ModificationInProgressValueObject} for the tag's modification.
    * @param input        the edit-mode's input for modification.
    * @return A {@link ProcessedContextResultValueObject}, which can be.
@@ -68,6 +70,7 @@ public abstract class TagModificationProcessor {
    * @since 4.0.0
    */
   public @NotNull ProcessedContextResultValueObject process(
+     final @NotNull Player player,
      final @NotNull ModificationInProgressValueObject modification,
      final @NotNull String input) {
     if (input.equals("cancel")) {
