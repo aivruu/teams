@@ -42,7 +42,7 @@ public final class TagModificationCacheRepository implements TagModificationRepo
       return;
     }
     this.cache = Caffeine.newBuilder()
-       .expireAfterWrite(15, TimeUnit.SECONDS)
+       .expireAfterWrite(30, TimeUnit.SECONDS)
        .scheduler(Scheduler.systemScheduler())
        .removalListener(new TagModificationCacheInvalidationListener(configurationManager))
        .build();
