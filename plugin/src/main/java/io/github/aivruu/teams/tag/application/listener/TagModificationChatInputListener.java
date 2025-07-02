@@ -46,11 +46,14 @@ public final class TagModificationChatInputListener implements Listener {
       return;
     }
     event.setCancelled(true);
-    // Delegate input-processing logic for validation before actual tag's property-modification.
-    //
-    // And ignore boolean-result as process-notifying for the player is made by the processor's
-    // implementation.
+    /*
+     * Delegate input-processing to processor which will decide what implementation assign for the
+     * input.
+     *
+     * And we ignore the result as the notifications about the process are handled by an
+     * implementation of the processor.
+     */
     this.tagModificationProcessor.process(player, modification,
-       PlainComponentParser.plain(event.message()));
+       PlainComponentParser.plain(event.message()).replace("\"", ""));
   }
 }
