@@ -24,6 +24,9 @@ import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
 import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
 import io.github.aivruu.teams.tag.application.modification.context.ProcessedContextResultValueObject;
+import io.github.aivruu.teams.tag.application.modification.property.type.ColorPropertyProcessor;
+import io.github.aivruu.teams.tag.application.modification.property.type.PrefixPropertyProcessor;
+import io.github.aivruu.teams.tag.application.modification.property.type.SuffixPropertyProcessor;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
@@ -73,12 +76,14 @@ public final class TagModificationProcessorImpl extends TagModificationProcessor
       player.sendMessage(MiniMessageParser.text(messages.tagModifyError));
       return processedContextResult;
     }
-    final ModificationContext context = modification.context();
     final TagAggregateRoot tagAggregateRoot = processedContextResult.tagAggregateRoot();
-    // result (aggregate-root) won't be null at this point as its status-code was
-    // [PENDING_FOR_MODIFICATION_PROCESSING]
-    final TagPropertiesValueObject newProperties = this.handleInputByContext(input, context,
-       tagAggregateRoot);
+    final TagPropertiesValueObject properties = tagAggregateRoot.tagModel().tagComponentProperties();
+    final TagPropertiesValueObject newProperties = switch (modification.context()) {
+      case PREFIX -> PrefixPropertyProcessor.INSTANCE.handle(input, properties, properties.prefix());
+      case SUFFIX -> SuffixPropertyProcessor.INSTANCE.handle(input, properties, properties.suffix());
+      case COLOR -> ColorPropertyProcessor.INSTANCE.handle(input, properties, properties.color());
+      case NONE -> null; // non-reachable case at this point.
+    };
     if (newProperties == null) {
       player.sendMessage(MiniMessageParser.text(messages.valueIsSame));
     } else {
@@ -88,52 +93,8 @@ public final class TagModificationProcessorImpl extends TagModificationProcessor
       // Save tag's information as it was modified.
       this.tagManager.handleTagAggregateRootSave(tagAggregateRoot);
       player.sendMessage(MiniMessageParser.text(messages.modifiedTagProperty,
-         Placeholder.parsed("property", context.name().toLowerCase(Locale.ROOT))));
+         Placeholder.parsed("property", modification.context().name().toLowerCase(Locale.ROOT))));
     }
     return processedContextResult;
-  }
-
-  private @Nullable TagPropertiesValueObject handleInputByContext(
-     final @NotNull String input,
-     final @NotNull ModificationContext context,
-     final @NotNull TagAggregateRoot tagAggregateRoot) {
-    final TagPropertiesValueObject properties = tagAggregateRoot.tagModel().tagComponentProperties();
-    final boolean propertyShouldBeCleared = input.equals("clear");
-    return switch (context) {
-      case PREFIX -> this.handleComponentModification(input, properties, properties.prefix(), true,
-         propertyShouldBeCleared);
-      case SUFFIX -> this.handleComponentModification(input, properties, properties.suffix(), false,
-         propertyShouldBeCleared);
-      case COLOR -> this.handleColorModification(input, properties);
-      default -> null;
-    };
-  }
-
-  private @Nullable TagPropertiesValueObject handleComponentModification(
-     final @NotNull String input,
-     final @NotNull TagPropertiesValueObject properties,
-     final @Nullable Component oldValue,
-     final boolean changePrefix,
-     final boolean propertyShouldBeCleared) {
-    if (propertyShouldBeCleared && oldValue == null) {
-      return null;
-    }
-    Component newValue = null;
-    if (!propertyShouldBeCleared) {
-      newValue = MiniMessageParser.text(changePrefix ? input + " " : " " + input);
-    }
-    return ((newValue != null) && newValue.equals(oldValue)) ? null : new TagPropertiesValueObject(
-       changePrefix ? newValue : properties.prefix(),
-       !changePrefix ? newValue : properties.suffix(),
-       properties.color());
-  }
-
-  private @Nullable TagPropertiesValueObject handleColorModification(
-     final @NotNull String input,
-     final @NotNull TagPropertiesValueObject properties) {
-    final NamedTextColor newColor = NamedTextColor.NAMES.value(input.toLowerCase(Locale.ROOT));
-    return (newColor == null || newColor == properties.color())
-       ? null
-       : new TagPropertiesValueObject(properties.prefix(), properties.suffix(), newColor);
   }
 }
