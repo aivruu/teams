@@ -77,4 +77,13 @@ public final class MessagesConfigurationModel implements ConfigurationInterface 
   public String unselected = "<blue>[AldrTeams] <dark_gray><b>></b> <gradient:green:yellow>Your current tag has been unselected.";
 
   public String expiredModification = "<blue>[AldrTeams] <dark_gray><b>></b> <red>The modification process has expired (passed 15 seconds), try again please.";
+
+  public String[] fetchedTagInformation = {
+     "<green>Available Information for Tag: <id>",
+     "",
+     "<gray>-></gray> ID: <yellow><id>",
+     "<gray>-></gray> Prefix: <prefix>",
+     "<gray>-></gray> Suffix: <suffix>",
+     "<gray>-></gray> Color: <color><id>"
+  };
 }
