@@ -23,6 +23,7 @@ public enum Permissions {
   DELETE("teams.command.delete"),
   SELECT("teams.command.select"),
   MODIFY("teams.command.modify"),
+  FETCH("teams.command.fetch"),
   MENU("teams.command.menu"),
   RELOAD("teams.command.reload"),
   HELP("teams.command.help"),
