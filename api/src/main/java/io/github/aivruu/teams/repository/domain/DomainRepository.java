@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Map;
 
 public interface DomainRepository<T> {
   /** Cached-exception for implementations that does not support all interface's methods. */
@@ -47,10 +48,12 @@ public interface DomainRepository<T> {
   /**
    * Returns all objects stored by this repository until this moment.
    * <p>
-   * This method won't consider changes made to these objects, or if more objects were added
-   * or removed.
+   * This method returns a {@link Collection} with all the objects that this repository contains
+   * until the moment of the call, but also, it reflects when an object is added, updated or
+   * removed as well, but it does not make changes to the original collection
+   * (returned by {@link Map#values()}).
    *
-   * @return A {@link Collection} with the objects that this repository has
+   * @return A "viewer" {@link Collection} with the objects that this repository has.
    * @since 4.0.0
    */
   @NotNull Collection<T> findAllSync();
