@@ -19,6 +19,7 @@ package io.github.aivruu.teams.aggregate.domain.registry;
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
 import io.github.aivruu.teams.aggregate.domain.repository.AggregateRootRepository;
 import io.github.aivruu.teams.aggregate.domain.repository.AsyncAggregateRootRepository;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,8 +27,8 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This interface defines the set of methods that subclasses must implement to perform
- * any operation with {@link AggregateRoot}'s registries related.
+ * This interface defines the set of methods that subclasses must implement to perform any operation
+ * with {@link AggregateRoot}'s registries related.
  *
  * @param <A> an aggregate-root type.
  * @since 0.0.1
@@ -47,8 +48,8 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
    * Returns the {@link AggregateRoot} specified from the infrastructure-repository if found.
    *
    * @param id the aggregate-root's identifier.
-   * @return A {@link CompletableFuture} with the {@link AggregateRoot} or {@code null} if not found in
-   * infrastructure.
+   * @return A {@link CompletableFuture} with the {@link AggregateRoot} or {@code null} if not found
+   * in infrastructure.
    * @see AsyncAggregateRootRepository#findAsync(String)
    * @since 0.0.1
    */
@@ -66,12 +67,16 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
   /**
    * Checks if the aggregate-root specified is cached or saved at the infrastructure.
    *
+   * @deprecated if you need to check by aggregate-root existence either in-cache or infrastructure,
+   * use {@link #existsInCache(String)} or {@link #existsInInfrastructure(String)} methods.
    * @param id the aggregate-root's identifier.
    * @return Whether the aggregate-root is cached or at the infrastructure.
+   * @since 0.0.1
    * @see #existsInCache(String)
    * @see #existsInInfrastructure(String)
-   * @since 0.0.1
    */
+  @Deprecated
+  @ApiStatus.ScheduledForRemoval(inVersion = "4.2.0")
   boolean existsGlobally(final @NotNull String id);
 
   /**
@@ -104,8 +109,7 @@ public interface AggregateRootRegistry<A extends AggregateRoot> {
   void register(final @NotNull A aggregateRoot);
 
   /**
-   * Removes the {@link AggregateRoot} mapping from cache-repository and return
-   * its reference.
+   * Removes the {@link AggregateRoot} mapping from cache-repository and return its reference.
    *
    * @param id the aggregate-root's identifier.
    * @return The {@link AggregateRoot} or {@code null} if no found.
