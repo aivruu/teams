@@ -22,6 +22,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.github.aivruu.teams.permission.application.Permissions;
 import io.github.aivruu.teams.tag.application.TagManager;
+import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -38,16 +39,14 @@ public final class AvailableTagSuggestionProvider implements SuggestionProvider<
 
   @Override
   public @NotNull CompletableFuture<@NotNull Suggestions> getSuggestions(
-    final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder
-  ) {
+     final CommandContext<CommandSourceStack> context,
+     final SuggestionsBuilder builder) {
     final CommandSender sender = context.getSource().getSender();
-    // This suggestion-provider is supposed to be used for 'edit' and 'delete' subcommands, so we should
-    // check by these permissions for the sender before suggesting.
-    if (!sender.hasPermission(Permissions.MODIFY.node()) || !sender.hasPermission(Permissions.DELETE.node())) {
-      return builder.buildFuture();
-    }
-    for (final String tag : this.tagManager.findAllLoadedTagIds()) {
-      builder.suggest(tag);
+    if (sender.hasPermission(Permissions.MODIFY.node())
+       || sender.hasPermission(Permissions.DELETE.node())) {
+      for (final TagAggregateRoot tagAggregateRoot : this.tagManager.getCachedTags()) {
+        builder.suggest(tagAggregateRoot.id());
+      }
     }
     return builder.buildFuture();
   }

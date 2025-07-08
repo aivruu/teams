@@ -16,6 +16,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.application;
 
+import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
+import io.github.aivruu.teams.repository.domain.DomainRepository;
 import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
@@ -24,6 +26,7 @@ import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import io.github.aivruu.teams.tag.domain.event.TagCreateEvent;
 import io.github.aivruu.teams.tag.domain.event.TagDeleteEvent;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
+import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -41,6 +44,7 @@ import java.util.List;
  * @since 0.0.1
  */
 public final class TagManager {
+  private final List<String> existingTagsIds = new ArrayList<>();
   private final TagAggregateRootRegistry tagAggregateRootRegistry;
   private final PacketAdaptationContract packetAdaptation;
 
@@ -71,12 +75,27 @@ public final class TagManager {
   }
 
   /**
+   * Returns a viewer-collection with all the {@link TagAggregateRoot}s loaded in-cache until now.
+   * <p>
+   * See documentation for {@link DomainRepository#findAllSync()} method to know how it works the
+   * returned objects-collection.
+   *
+   * @return A viewer {@link Collection} of {@link TagAggregateRoot}.
+   * @since 4.1.0
+   */
+  public @NotNull Collection<@NotNull TagAggregateRoot> getCachedTags() {
+    return this.tagAggregateRootRegistry.findAllInCache();
+  }
+
+  /**
    * Returns a {@link List} with all in-cache currently tags' ids.
    *
+   * @deprecated in favour of {@link #getCachedTags()}.
    * @return A {@link List} with ids or an empty and immutable-list if there are no loaded tags.
    * @see TagAggregateRootRegistry#findAllInCache()
    * @since 3.5.1
    */
+  @Deprecated(forRemoval = true)
   public @NotNull List<@NotNull String> findAllLoadedTagIds() {
     final Collection<TagAggregateRoot> tagAggregateRoots =
        this.tagAggregateRootRegistry.findAllInCache();
@@ -94,13 +113,83 @@ public final class TagManager {
    * Checks whether the specified {@link TagAggregateRoot}'s information exists in the
    * infrastructure.
    *
+   * @deprecated in favour of {@link #existsAtList(String)}.
    * @param id the tag's id.
    * @return Whether the {@link TagAggregateRoot} exists.
    * @see TagAggregateRootRegistry#existsInInfrastructure(String)
    * @since 2.3.1
    */
+  @Deprecated(forRemoval = true)
   public boolean exists(final @NotNull String id) {
     return this.tagAggregateRootRegistry.existsInInfrastructure(id);
+  }
+
+  /**
+   * Returns whether the tag with the specified id is contained by the {@link #existingTagsIds} list.
+   *
+   * @param id the tag's id to check.
+   * @return {@code true} if the tag exists in the list, {@code false} otherwise.
+   * @see List#contains(Object)
+   * @since 1.0.0
+   */
+  public boolean existsAtList(final @NotNull String id) {
+    return this.existingTagsIds.contains(id);
+  }
+
+  /**
+   * Creates a new tag with the provided information, and registers and save it in the
+   * infrastructure.
+   * <p>
+   * This method will unregister and delete any existing tag or scoreboard-team (of a tag) with the
+   * given tag-id, as well will decide the final-values for both tag's prefix and suffix.
+   * <p>
+   * If some exception occurs during tag's saving-process
+   * (at method {@link TagAggregateRootRegistry#save(AggregateRoot)}), the plugin will continue with
+   * the execution-flow and continue to perform required operations, but the tag's information won't
+   * be saved.
+   * <p>
+   * This method will stop execution and return false if the tag-id already exists in the
+   * {@link #existingTagsIds} list.
+   *
+   * @param player the player who creates the tag.
+   * @param id     the tag's id.
+   * @param prefix the tag's prefix, empty for unset.
+   * @param suffix the tag's suffix, empty for unset.
+   * @return {@code true} if the tag was added successfully, {@code false} otherwise.
+   * @see Collection#add(Object)
+   * @since 4.1.0
+   */
+  @SuppressWarnings("ConstantConditions") // for method's first-condition.
+  public boolean create(
+     final @NotNull Player player,
+     final @NotNull String id,
+     final @NotNull String prefix,
+     final @NotNull String suffix,
+     final @Nullable NamedTextColor color) {
+    if (!this.existingTagsIds.add(id)) { // tag already exists in the infrastructure?
+      return false;
+    }
+    /*
+     * Due to we provide access to the tag-repository and registry through the API, might someone
+     * had deleted the tag's information from the infrastructure, but not from the memory, and may
+     * that reference be still loaded, so we need to remove it.
+     */
+    this.tagAggregateRootRegistry.unregister(id);
+    this.packetAdaptation.deleteTeam(id); // the same for the tag's sb-team.
+
+    final Component prefixComponent = prefix.isEmpty() ? null : MiniMessageParser.text(prefix);
+    final Component suffixComponent = suffix.isEmpty() ? null : MiniMessageParser.text(suffix);
+
+    final TagPropertiesValueObject properties = new TagPropertiesValueObject(prefixComponent,
+       suffixComponent, (color == null) ? NamedTextColor.WHITE : color);
+    final TagAggregateRoot tagAggregateRoot = new TagAggregateRoot(id,
+       new TagModelEntity(id, properties));
+    this.tagAggregateRootRegistry.register(tagAggregateRoot);
+    this.handleTagAggregateRootSave(tagAggregateRoot);
+
+    this.packetAdaptation.createTeam(id, properties);
+    Bukkit.getPluginManager().callEvent(new TagCreateEvent(player, id));
+    return true;
   }
 
   /**
@@ -113,7 +202,9 @@ public final class TagManager {
    * @return Whether the tag was created.
    * @see TagAggregateRootRegistry#existsInInfrastructure(String)
    * @since 0.0.1
+   * @deprecated in favour of {@link #create(Player, String, String, String, NamedTextColor)}.
    */
+  @Deprecated(forRemoval = true)
   public boolean createTag(
      final @NotNull Player player,
      final @NotNull String id,
@@ -176,8 +267,8 @@ public final class TagManager {
          return false;
        })
        .thenAccept(deleted -> Debugger.write(deleted
-          ? "Tag '{}' information has been deleted."
-          : "The tag's information couldn't be deleted.", id));
+          ? "Tag '{}' information has been deleted." : "The tag's information couldn't be deleted.",
+          id));
     return true;
   }
 }
