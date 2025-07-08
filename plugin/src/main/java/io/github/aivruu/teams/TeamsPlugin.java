@@ -27,6 +27,7 @@ import io.github.aivruu.teams.action.application.type.TitleActionModel;
 import io.github.aivruu.teams.action.infrastructure.ActionCacheRepository;
 import io.github.aivruu.teams.command.application.RegistrableCommandContract;
 import io.github.aivruu.teams.command.infrastructure.MainCommand;
+import io.github.aivruu.teams.command.infrastructure.TagFetchCommand;
 import io.github.aivruu.teams.command.infrastructure.TagsCommand;
 import io.github.aivruu.teams.command.application.suggestion.AvailableTagSuggestionProvider;
 import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigurationModel;
@@ -193,6 +194,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     final ConfigurationConfigurationModel config = this.configurationManager.config();
     Debugger.enable(config.debugMode);
     PluginExecutor.build(config.threadPoolSize);
+
     this.infrastructureRepositoryController = new InfrastructureRepositoryController(
        super.getDataPath(), this.configurationManager);
     if (!this.infrastructureRepositoryController.selectAndInitialize()) {
@@ -216,7 +218,6 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
        this.infrastructureRepositoryController.tagInfrastructureAggregateRootRepository());
     this.tagModificationRepository = new TagModificationCacheRepository();
     ((TagModificationCacheRepository) this.tagModificationRepository).buildCache(this.configurationManager);
-
     this.tagManager = new TagManager(this.tagAggregateRootRegistry, this.packetAdaptation);
     ((TagCacheAggregateRootRepository) this.tagAggregateRootRepository).buildCache(this.tagManager);
     this.tagModificationProcessor = new TagModificationProcessorImpl(
@@ -227,7 +228,6 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     this.playerAggregateRootRegistry = new PlayerAggregateRootRegistryImpl(
        this.playerAggregateRootRepository,
        this.infrastructureRepositoryController.playerInfrastructureAggregateRootRepository());
-
     this.playerManager = new PlayerManager(this.playerAggregateRootRegistry);
     this.playerTagSelectorManager = new PlayerTagSelectorManager(
        this.playerAggregateRootRegistry, this.tagAggregateRootRegistry, this.packetAdaptation);
@@ -243,6 +243,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
        new TitleActionModel()
     );
     this.logger.info("Initializing menu-manager service for menu-types building and registering.");
+
     this.menuManager = new MenuManager(new MenuCacheRepository());
     this.menuManager.register(new TagSelectorMenuModel(this.actionManager, this.playerManager,
        this.playerTagSelectorManager, this.configurationManager));
@@ -258,6 +259,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
          UpdateChecker.getLatestVersion());
       this.logger.info("[Updates] It is recommended to upgrade for latest-features and fixes!");
     }
+
     this.logger.info("Registering plugin event-listener and commands.");
     // Commands, listeners and hooks registration and API initialization.
     final PluginManager pluginManager = super.getServer().getPluginManager();
@@ -267,12 +269,17 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
        this.tagModificationRepository, this.tagModificationProcessor), this);
     pluginManager.registerEvents(new MenuInteractionListener(), this);
     pluginManager.registerEvents(new PlayerUpdateNotifyListener(), this);
+
+    final AvailableTagSuggestionProvider availableTagSuggestionProvider =
+       new AvailableTagSuggestionProvider(this.tagManager);
     this.registerCommands(
        new MainCommand(this, this.configurationManager),
        new TagsCommand(this.configurationManager, this.tagManager, this.menuManager,
           this.playerTagSelectorManager,
-          this.tagModificationRepository, new AvailableTagSuggestionProvider(this.tagManager))
+          this.tagModificationRepository, availableTagSuggestionProvider),
+       new TagFetchCommand(this.tagManager, this.configurationManager, availableTagSuggestionProvider)
     );
+
     // Avoid exception due to hook-registry try when PlaceholderAPI not being present in the server.
     if (PlaceholderParser.LEGACY_PLACEHOLDERS_HOOKED) {
       this.registerHook(new PlaceholderAPIHookImpl(this.playerManager, this.packetAdaptation));
@@ -290,6 +297,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
       return false;
     }
     Debugger.enable(this.configurationManager.config().debugMode);
+
     final AbstractMenuModel selectorMenu = this.menuManager.menuModelOf(MenuConstants.TAGS_MENU_ID);
     if (selectorMenu == null) {
       return false;
