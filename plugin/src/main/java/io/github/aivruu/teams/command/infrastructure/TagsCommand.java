@@ -119,23 +119,30 @@ public final class TagsCommand implements RegistrableCommandContract {
                      this.configurationManager.messages().modifyUsage));
                   return Command.SINGLE_SUCCESS;
                 })
-                .then(Commands.argument("suffix", StringArgumentType.string()).executes(ctx -> {
-                  final Player player = (Player) ctx.getSource().getSender();
-                  final String id = ctx.getArgument("id", String.class);
-                  final String prefix = ctx.getArgument("prefix", String.class);
-                  final String suffix = ctx.getArgument("suffix", String.class);
-                  final MessagesConfigurationModel messages = this.configurationManager.messages();
-                  final boolean wasCreated = this.tagManager.createTag(player, id,
-                     prefix.isEmpty() ? null : MiniMessageParser.text(prefix),
-                     suffix.isEmpty() ? null : MiniMessageParser.text(suffix), NamedTextColor.WHITE);
-                  if (wasCreated) {
-                    player.sendMessage(MiniMessageParser.text(messages.created,
-                       Placeholder.parsed("tag-id", id)));
-                  } else {
-                    player.sendMessage(MiniMessageParser.text(messages.alreadyExists));
-                  }
-                  return Command.SINGLE_SUCCESS;
-                }))
+                .then(Commands.argument("suffix", StringArgumentType.string())
+                   .executes(ctx -> {
+                     ctx.getSource().getSender().sendMessage(MiniMessageParser.text(
+                        this.configurationManager.messages().modifyUsage));
+                     return Command.SINGLE_SUCCESS;
+                   })
+                   .then(Commands.argument("color", StringArgumentType.word())
+                      .executes(ctx -> {
+                        final Player player = (Player) ctx.getSource().getSender();
+                        final String id = ctx.getArgument("id", String.class);
+                        final MessagesConfigurationModel messages = this.configurationManager.messages();
+                        if (this.tagManager.create(player, id,
+                           ctx.getArgument("prefix", String.class),
+                           ctx.getArgument("suffix", String.class),
+                           NamedTextColor.NAMES.value(ctx.getArgument("color", String.class)))) {
+                          player.sendMessage(MiniMessageParser.text(messages.created,
+                             Placeholder.parsed("tag-id", id)));
+                        } else {
+                          player.sendMessage(MiniMessageParser.text(messages.alreadyExists));
+                        }
+                        return Command.SINGLE_SUCCESS;
+                      })
+                   )
+                )
              )
           )
        )
@@ -147,7 +154,7 @@ public final class TagsCommand implements RegistrableCommandContract {
                final MessagesConfigurationModel messages = this.configurationManager.messages();
                final Player player = (Player) ctx.getSource().getSender();
                final String tag = ctx.getArgument("id", String.class);
-               if (!this.tagManager.exists(tag)) {
+               if (!this.tagManager.existsAtList(tag)) {
                  player.sendMessage(MiniMessageParser.text(messages.unknownTag));
                  return Command.SINGLE_SUCCESS;
                }
