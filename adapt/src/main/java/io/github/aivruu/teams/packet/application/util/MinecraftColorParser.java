@@ -65,6 +65,7 @@ public final class MinecraftColorParser {
    * Returns a {@link NamedTextColor} that represents the color provided by the Minecraft's
    * {@link ChatFormatting}.
    *
+   * @deprecated in favor of {@link #asModern(ChatFormatting)}.
    * @param chatFormatting the {@link ChatFormatting} to process.
    * @return A {@link NamedTextColor} or {@code null} if color-value isn't available or is
    * not valid.
@@ -72,10 +73,42 @@ public final class MinecraftColorParser {
    * @see NamedTextColor#namedColor(int)
    * @since 2.3.1
    */
+  @Deprecated
   public static @Nullable NamedTextColor modern(final @NotNull ChatFormatting chatFormatting) {
     // Check if the [ChatFormatting] provided color-value is valid to get a [NamedTextColor] object.
     final Integer colorValue = chatFormatting.getColor();
     return (colorValue != null) ? NamedTextColor.namedColor(colorValue) : NamedTextColor.WHITE;
+  }
+
+  /**
+   * Returns a {@link NamedTextColor} that represents the color provided by the given {@link ChatFormatting}.
+   *
+   * @param chatFormatting the chat-format object from which to extract the color.
+   * @return the parsed-color or {@link NamedTextColor#WHITE} as default, check {@link #asModernOrElse(ChatFormatting, NamedTextColor)}.
+   * @see #asModernOrElse(ChatFormatting, NamedTextColor)
+   * @since 4.1.0
+   */
+  public static @NotNull NamedTextColor asModern(final @NotNull ChatFormatting chatFormatting) {
+    return asModernOrElse(chatFormatting, NamedTextColor.WHITE);
+  }
+
+  /**
+   * Returns a {@link NamedTextColor} that represents the color provided by the given {@link ChatFormatting}, otherwise, returns the specified
+   * color as default.
+   *
+   * @param chatFormatting the chat-format object from which to extract the color.
+   * @param defaultColor the default color to return if the parsing fails.
+   * @return the parsed-color or the specified default color if the color-value wasn't available, or was invalid.
+   * @see NamedTextColor#namedColor(int)
+   * @since 4.1.0
+   */
+  public static @NotNull NamedTextColor asModernOrElse(final @NotNull ChatFormatting chatFormatting, final @NotNull NamedTextColor defaultColor) {
+    final Integer colorValue = chatFormatting.getColor();
+    if (colorValue == null) {
+       return defaultColor;
+    }
+    final NamedTextColor parsedColor = NamedTextColor.namedColor(colorValue);
+    return (parsedColor != null) ? parsedColor : defaultColor;
   }
 
   /**
