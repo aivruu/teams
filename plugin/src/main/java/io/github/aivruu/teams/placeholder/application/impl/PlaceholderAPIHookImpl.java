@@ -21,9 +21,10 @@ import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
 import io.github.aivruu.teams.player.application.PlayerManager;
 import io.github.aivruu.teams.util.application.PlaceholderParser;
-import io.github.aivruu.teams.util.application.component.LegacyComponentParser;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,14 +88,19 @@ public final class PlaceholderAPIHookImpl extends PlaceholderExpansion implement
   }
 
   private @Nullable String validateTagPlaceholder(final @NotNull String tagId, final @NotNull String params) {
-    final String prefix = LegacyComponentParser.legacy(this.packetAdaptation.prefixOf(tagId));
-    final String suffix = LegacyComponentParser.legacy(this.packetAdaptation.suffixOf(tagId));
     return switch (params) {
-      case "prefix" -> (prefix == null) ? "" : prefix;
-      case "suffix" -> (suffix == null) ? "" : suffix;
-      case "color" -> LegacyComponentParser.legacy(Component.text()
-        .style(builder -> builder.color(this.packetAdaptation.colorOf(tagId)))
-        .build());
+      case "prefix" -> {
+        final Component prefix = this.packetAdaptation.extractProperty(tagId, PacketAdaptationContract.PropertyType.PREFIX);
+        yield (prefix == null) ? null : LegacyComponentSerializer.legacyAmpersand().serialize(prefix);
+      }
+      case "suffix" -> {
+        final Component suffix = this.packetAdaptation.extractProperty(tagId, PacketAdaptationContract.PropertyType.SUFFIX);
+        yield (suffix == null) ? null : LegacyComponentSerializer.legacyAmpersand().serialize(suffix);
+      }
+      case "color" -> {
+        final NamedTextColor color = this.packetAdaptation.extractProperty(tagId, PacketAdaptationContract.PropertyType.COLOR);
+        yield (color == null) ? null : LegacyComponentSerializer.legacyAmpersand().serialize(Component.text().color(color).build());
+      }
       default -> null;
     };
   }

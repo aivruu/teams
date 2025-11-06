@@ -16,6 +16,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.placeholder.application.impl;
 
+import io.github.aivruu.teams.Constants;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
 import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
 import io.github.aivruu.teams.player.application.PlayerManager;
@@ -23,6 +24,7 @@ import io.github.aivruu.teams.util.application.PlaceholderParser;
 import io.github.miniplaceholders.api.Expansion;
 import io.github.miniplaceholders.api.utils.TagsUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -44,52 +46,60 @@ public final class MiniPlaceholdersHookImpl implements PlaceholderHookContract {
 
   @Override
   public boolean hook() {
-    if (!PlaceholderParser.MODERN_PLACEHOLDERS_HOOKED) {
-      return false;
-    }
+    if (!PlaceholderParser.MODERN_PLACEHOLDERS_HOOKED) return false;
+
     final Expansion expansion = Expansion.builder("aldrteams")
-      .filter(Player.class)
-      .audiencePlaceholder("tag", (audience, queue, ctx) -> {
-        // At this point the player's information should be loaded into the cache, so the model won't be null.
-        final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
-          .playerModel()
-          .tag();
-        return (tagId == null) ? TagsUtils.EMPTY_TAG : Tag.selfClosingInserting(Component.text(tagId));
-      })
-      .audiencePlaceholder("prefix", (audience, queue, ctx) -> {
-        // At this point the player's information should be loaded into the cache, so the model won't be null.
-        final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
-          .playerModel()
-          .tag();
-        return (tagId == null) ? TagsUtils.EMPTY_TAG : this.validateTagPlaceholder(tagId, "prefix");
-      })
-      .audiencePlaceholder("suffix", (audience, queue, ctx) -> {
-        // At this point the player's information should be loaded into the cache, so the model won't be null.
-        final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
-          .playerModel()
-          .tag();
-        return (tagId == null) ? TagsUtils.EMPTY_TAG : this.validateTagPlaceholder(tagId, "suffix");
-      })
-      .audiencePlaceholder("color", (audience, queue, ctx) -> {
-        // At this point the player's information should be loaded into the cache, so the model won't be null.
-        final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
-          .playerModel()
-          .tag();
-        return (tagId == null) ? TagsUtils.EMPTY_TAG : this.validateTagPlaceholder(tagId, "color");
-      })
-      .build();
-    // Register the expansion to MiniPlaceholders.
+       .author("aivruu")
+       .version(Constants.VERSION)
+       .filter(Player.class)
+       .audiencePlaceholder("tag", (audience, queue, ctx) -> {
+         // At this point the player's information should be loaded into the cache, so the model won't be null.
+         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
+            .playerModel()
+            .tag();
+         return (tagId == null) ? TagsUtils.EMPTY_TAG : Tag.selfClosingInserting(Component.text(tagId));
+       })
+       .audiencePlaceholder("prefix", (audience, queue, ctx) -> {
+         // At this point the player's information should be loaded into the cache, so the model won't be null.
+         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
+            .playerModel()
+            .tag();
+         return (tagId == null) ? TagsUtils.EMPTY_TAG : this.validateTagPlaceholder(tagId, "prefix");
+       })
+       .audiencePlaceholder("suffix", (audience, queue, ctx) -> {
+         // At this point the player's information should be loaded into the cache, so the model won't be null.
+         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
+            .playerModel()
+            .tag();
+         return (tagId == null) ? TagsUtils.EMPTY_TAG : this.validateTagPlaceholder(tagId, "suffix");
+       })
+       .audiencePlaceholder("color", (audience, queue, ctx) -> {
+         // At this point the player's information should be loaded into the cache, so the model won't be null.
+         final String tagId = this.playerManager.playerAggregateRootOf(((Player) audience).getUniqueId().toString())
+            .playerModel()
+            .tag();
+         return (tagId == null) ? TagsUtils.EMPTY_TAG : this.validateTagPlaceholder(tagId, "color");
+       })
+       .build();
     expansion.register();
     return true;
   }
 
   private @Nullable Tag validateTagPlaceholder(final @NotNull String tagId, final @NotNull String type) {
-    final Component prefix = this.packetAdaptation.prefixOf(tagId);
-    final Component suffix = this.packetAdaptation.suffixOf(tagId);
     return switch (type) {
-      case "prefix" -> (prefix == null) ? null : Tag.selfClosingInserting(prefix);
-      case "suffix" -> (suffix == null) ? null : Tag.selfClosingInserting(suffix);
-      case "color" -> Tag.styling(builder -> builder.color(this.packetAdaptation.colorOf(tagId)));
+      case "prefix" -> {
+        final Component prefix = this.packetAdaptation.extractProperty(tagId, PacketAdaptationContract.PropertyType.PREFIX);
+        yield (prefix == null) ? null : Tag.selfClosingInserting(prefix);
+      }
+      case "suffix" -> {
+        final Component suffix = this.packetAdaptation.extractProperty(tagId, PacketAdaptationContract.PropertyType.SUFFIX);
+        yield (suffix == null) ? null : Tag.selfClosingInserting(suffix);
+      }
+      case "color" -> {
+        final NamedTextColor color = this.packetAdaptation.extractProperty(tagId, PacketAdaptationContract.PropertyType.COLOR);
+        // function's result can be null if the tag doesn't exist, otherwise, white is returned by default.
+        yield (color == null) ? null : Tag.styling(color);
+      }
       default -> null;
     };
   }
