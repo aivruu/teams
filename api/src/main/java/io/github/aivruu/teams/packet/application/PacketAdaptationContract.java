@@ -105,28 +105,55 @@ public interface PacketAdaptationContract {
   /**
    * Returns the team's prefix {@link Component}.
    *
+   * @deprecated in favor of {@link #extractProperty(String, PropertyType)}
    * @param team the team specified.
    * @return A {@link Component} or {@code null} if there's none.
    * @since 3.5.1
    */
+  @Deprecated
   @Nullable Component prefixOf(final @NotNull String team);
 
   /**
    * Returns the team's suffix {@link Component}.
    *
+   * @deprecated in favor of {@link #extractProperty(String, PropertyType)}
    * @param team the team specified.
    * @return A {@link Component} or {@code null} if there's none.
    * @since 3.5.1
    */
+  @Deprecated
   @Nullable Component suffixOf(final @NotNull String team);
 
   /**
    * Returns the team's color.
    *
+   * @deprecated in favor of {@link #extractProperty(String, PropertyType)}
    * @param team the team specified.
    * @return A {@link NamedTextColor} or {@link NamedTextColor#WHITE} if team not exist, or
    * color-value of the team is not valid.
    * @since 3.5.1
    */
+  @Deprecated
   @NotNull NamedTextColor colorOf(final @NotNull String team);
+
+  /**
+   * Extracts the content for the specified property from the given team.
+   *
+   * @param team the team to extract the property from.
+   * @param type the type of property to extract.
+   * @return the property's value or {@code null} if either the team doesn't exist, or the property is not set.
+   * @since 4.1.0
+   */
+  <T> @Nullable T extractProperty(final @NotNull String team, final @NotNull PropertyType type);
+
+  /**
+   * Represents the modifiable properties a tag/team can have.
+   *
+   * @since 4.1.0
+   */
+  enum PropertyType {
+    PREFIX,
+    SUFFIX,
+    COLOR
+  }
 }

@@ -22,6 +22,7 @@ import io.papermc.paper.adventure.AdventureComponent;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
@@ -102,9 +103,7 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
   }
 
   @Override
-  public void updateTeamAttributes(
-     final @NotNull String team,
-     final @NotNull TagPropertiesValueObject properties) {
+  public void updateTeamAttributes(final @NotNull String team, final @NotNull TagPropertiesValueObject properties) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     if (playerTeam == null) {
       return;
@@ -115,23 +114,40 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
   }
 
   @Override
+  @Deprecated
   public @Nullable Component prefixOf(final @NotNull String team) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     return (playerTeam == null) ? null : PaperAdventure.asAdventure(playerTeam.getPlayerPrefix());
   }
 
   @Override
+  @Deprecated
   public @Nullable Component suffixOf(final @NotNull String team) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     return (playerTeam == null) ? null : PaperAdventure.asAdventure(playerTeam.getPlayerSuffix());
   }
 
   @Override
+  @Deprecated
   @SuppressWarnings("ConstantConditions")
   public @NotNull NamedTextColor colorOf(final @NotNull String team) {
     final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
     return (playerTeam == null)
        // modern() method's result won't be null as we give to it a own named-text-color reference.
        ? NamedTextColor.WHITE : MinecraftColorParser.modern(playerTeam.getColor());
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> @Nullable T extractProperty(final @NotNull String team, final @NotNull PropertyType type) {
+    final PlayerTeam playerTeam = this.scoreboard.getPlayerTeam(PLUGIN_SCOREBOARD_TEAM_IDENTIFIER + team);
+    if (playerTeam == null) {
+      return null;
+    }
+    if (type == PropertyType.COLOR) {
+      return (T) MinecraftColorParser.asModern(playerTeam.getColor());
+    }
+    final net.minecraft.network.chat.Component component = (type == PropertyType.PREFIX) ? playerTeam.getPlayerPrefix() : playerTeam.getPlayerSuffix();
+    return (component == CommonComponents.EMPTY) ? null : (T) PaperAdventure.WRAPPER_AWARE_SERIALIZER.deserialize(component);
   }
 }
