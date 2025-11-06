@@ -69,6 +69,7 @@ public final class ActionManager {
     if (action.isEmpty()) {
       return;
     }
+    // TODO: redo actions system.
     final ActionModelContract actionModel = this.actionRepository.findSync(
        StringUtils.substringBetween(action, "[", "]").toUpperCase(Locale.ROOT));
     if (actionModel == null) {
