@@ -23,10 +23,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 public final class UpdateChecker {
-  private static final String PROJECT_VERSION_ACCESS_API_URL =
-     "https://api.modrinth.com/v2/project/RKRkter9/version";
+  private static final String PROJECT_VERSION_ACCESS_API_URL = "https://api.modrinth.com/v2/project/RKRkter9/version";
   private static boolean runningLatest;
   private static String latestVersion;
 
@@ -39,11 +39,9 @@ public final class UpdateChecker {
   }
 
   public static void searchUpdates() {
-    final String latest = retrieveVersionNumberFormatted(
-       requestBodyResponse(PROJECT_VERSION_ACCESS_API_URL));
+    final String latest = retrieveVersionNumberFormatted(requestBodyResponse(PROJECT_VERSION_ACCESS_API_URL));
     latestVersion = latest; // Assign latest-version for later use.
-    runningLatest = Integer.parseInt(Constants.VERSION.replace(".", ""))
-       == Integer.parseInt(latest.replace(".", ""));
+    runningLatest = Integer.parseInt(Constants.VERSION.replace(".", "")) == Integer.parseInt(latest.replace(".", ""));
   }
 
   private static @NotNull String retrieveVersionNumberFormatted(final @NotNull String json) {
@@ -56,13 +54,15 @@ public final class UpdateChecker {
       ++delimiterCharIndex;
     }
     // it should be something like, e.g. ["version_number":"4.0.0"] -> "4.0.0"
-    final String versionNumber = json.substring(desiredFieldIndex, delimiterCharIndex);
     // output -> 400
-    return versionNumber.replace("\"", "");
+    return json.substring(desiredFieldIndex, delimiterCharIndex).replace("\"", "");
   }
 
   private static @NotNull String requestBodyResponse(final @NotNull String url) {
-    final HttpClient client = HttpClient.newHttpClient();
+    final HttpClient client = HttpClient.newBuilder()
+       .executor(PluginExecutor.get())
+       .connectTimeout(Duration.ofSeconds(30))
+       .build();
     final HttpResponse<String> response = client.sendAsync(HttpRequest.newBuilder()
           .GET()
           .uri(URI.create(url))
