@@ -28,14 +28,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public final class PlayerUpdateNotifyListener implements Listener {
-  private final Component[] notifyMessages = new Component[]{
+  private final List<Component> notifyMessages = List.of(
      MiniMessageParser.text("<gradient:blue:green>[AldrTeams] A new update has been published!"),
      MiniMessageParser.text("<green>Current: <aqua><current></aqua>, Latest: <aqua><latest></aqua>.",
         Placeholder.parsed("current", Constants.VERSION),
         Placeholder.parsed("latest", UpdateChecker.getLatestVersion())),
      MiniMessageParser.text("<yellow><hover:show_text:'<green>Click to check github-release information.'><click:open_url:'https://github.com/aivruu/teams/releases/latest'>Check the changelog for more information!</click></hover>")
-  };
+  );
 
   @EventHandler
   public void onJoin(final @NotNull PlayerJoinEvent event) {
@@ -43,8 +45,6 @@ public final class PlayerUpdateNotifyListener implements Listener {
     if (!player.hasPermission(Permissions.NOTIFY.node())) {
       return;
     }
-    for (final Component notifyMessage : this.notifyMessages) {
-      player.sendMessage(notifyMessage);
-    }
+    this.notifyMessages.forEach(player::sendMessage);
   }
 }
