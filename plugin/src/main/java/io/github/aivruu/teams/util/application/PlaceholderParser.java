@@ -16,12 +16,12 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.util.application;
 
-import io.github.aivruu.teams.util.application.component.LegacyComponentParser;
 import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -50,7 +50,7 @@ public final class PlaceholderParser {
     // legacy-format for PlaceholderAPI placeholders correct-parsing, and finally we convert it into
     // a [Component].
     final Component modern = MiniMessageParser.text(text, parseModern(player));
-    return LegacyComponentParser.modern(parseLegacy(player, LegacyComponentParser.legacy(modern)));
+    return LegacyComponentSerializer.legacyAmpersand().deserialize(parseLegacy(player, LegacyComponentSerializer.legacyAmpersand().serialize(modern)));
   }
 
   public static @NotNull Component[] parseBoth(final @Nullable Player player, final @NotNull String[] text) {
