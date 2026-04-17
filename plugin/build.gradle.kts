@@ -1,10 +1,23 @@
 plugins {
+  id("teams.common-conventions")
   alias(libs.plugins.blossom)
+  alias(libs.plugins.shadow)
 }
 
 tasks {
   compileJava {
     options.encoding = "UTF-8"
+  }
+
+  shadowJar {
+    archiveExtension.set("")
+    destinationDirectory.set(file("$rootDir/jars"))
+
+    relocate("org.bstats", "${findProperty("group") as String}.bstats")
+  }
+
+  clean {
+    delete(shadowJar.get().destinationDirectory)
   }
 
   processResources {
@@ -26,22 +39,17 @@ sourceSets {
 
 dependencies {
   api(project(":${rootProject.name}-api"))
-  api(project(":${rootProject.name}-adapt"))
+  api(project(":${rootProject.name}-adapt-wrapper"))
   includeInfrastructureImplementations()
 
   compileOnlyApi(libs.paper)
   compileOnlyApi(libs.configurate)
-  compileOnlyApi(libs.caffeine)
+  implementation(libs.bstats)
 
   compileOnlyApi(libs.placeholder.legacy)
   compileOnlyApi(libs.placeholder.modern)
 }
 
-fun includeInfrastructureImplementations() {
-  val implementations = setOf("json", "mongodb", "mariadb")
-  dependencies {
-    for (implementation in implementations) {
-      api(project(":${rootProject.name}-infrastructure-$implementation"))
-    }
-  }
+fun DependencyHandlerScope.includeInfrastructureImplementations() {
+  sequenceOf("json", "mongodb", "mariadb").forEach { api(project(":${rootProject.name}-infrastructure-$it")) }
 }

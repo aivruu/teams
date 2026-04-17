@@ -5,5 +5,5 @@ plugins {
 dependencies {
   api(project(":${rootProject.name}-api"))
 
-  compileOnly(libs.paper) // use shaded GSON version
+  compileOnly(libs.packetevents)
 }

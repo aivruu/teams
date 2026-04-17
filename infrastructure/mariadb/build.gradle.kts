@@ -1,7 +1,10 @@
+plugins {
+  id("teams.common-conventions")
+}
+
 dependencies {
   api(project(":${rootProject.name}-infrastructure"))
 
-  compileOnlyApi(libs.annotations)
-  compileOnlyApi(libs.mariadb.driver)
-  compileOnlyApi(libs.hikaricp)
+  compileOnly(libs.mariadb.driver)
+  compileOnly(libs.hikaricp)
 }

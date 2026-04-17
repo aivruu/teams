@@ -28,9 +28,12 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
 public final class PacketAdaptationModule implements PacketAdaptationContract {
   private static final String PLUGIN_SCOREBOARD_TEAM_IDENTIFIER = "teams-player-team-";
   private final Scoreboard scoreboard = MinecraftServer.getServer().getScoreboard();
@@ -73,6 +76,16 @@ public final class PacketAdaptationModule implements PacketAdaptationContract {
       return;
     }
     this.scoreboard.removePlayerFromTeam(name, playersCurrentTeam);
+  }
+
+  @Override
+  public void removePlayerFromTeam(final @NotNull Player player, final @NotNull String team) {
+    final PlayerTeam playersCurrentTeam = this.scoreboard.getPlayerTeam(team);
+    // May the team was deleted prior to this action.
+    if (playersCurrentTeam == null) {
+      return;
+    }
+    this.scoreboard.removePlayerFromTeam(player.getName(), playersCurrentTeam);
   }
 
   @Override

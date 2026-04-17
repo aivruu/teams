@@ -1,6 +1,9 @@
+plugins {
+  id("teams.common-conventions")
+}
+
 dependencies {
   api(project(":${rootProject.name}-infrastructure"))
 
-  compileOnlyApi(libs.annotations)
-  compileOnlyApi(libs.mongodb)
+  compileOnly(libs.mongodb)
 }

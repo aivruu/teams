@@ -20,6 +20,7 @@ import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,10 +60,22 @@ public interface PacketAdaptationContract {
   /**
    * Removes the player from the team where he's currently.
    *
+   * @deprecated use {@link #removePlayerFromTeam(Player, String)} instead.
    * @param player the player to remove from some team.
    * @since 3.5.1
    */
+  @Deprecated
+  @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
   void removePlayerFromTeam(final @NotNull Player player);
+
+  /**
+   * Removes the player from the specified team.
+   *
+   * @param player the player to remove from thet eam.
+   * @param team the team from where the player.
+   * @since 4.1.0
+   */
+  void removePlayerFromTeam(final @NotNull Player player, final @NotNull String team);
 
   /**
    * Modifies the team's prefix by the given one.
@@ -111,6 +124,7 @@ public interface PacketAdaptationContract {
    * @since 3.5.1
    */
   @Deprecated
+  @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
   @Nullable Component prefixOf(final @NotNull String team);
 
   /**
@@ -122,6 +136,7 @@ public interface PacketAdaptationContract {
    * @since 3.5.1
    */
   @Deprecated
+  @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
   @Nullable Component suffixOf(final @NotNull String team);
 
   /**
@@ -134,6 +149,7 @@ public interface PacketAdaptationContract {
    * @since 3.5.1
    */
   @Deprecated
+  @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
   @NotNull NamedTextColor colorOf(final @NotNull String team);
 
   /**
@@ -144,7 +160,7 @@ public interface PacketAdaptationContract {
    * @return the property's value or {@code null} if either the team doesn't exist, or the property is not set.
    * @since 4.1.0
    */
-  <T> @Nullable T extractProperty(final @NotNull String team, final @NotNull PropertyType type);
+  <T> @NotNull T extractProperty(final @NotNull String team, final @NotNull PropertyType type);
 
   /**
    * Represents the modifiable properties a tag/team can have.
