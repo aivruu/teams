@@ -1,7 +1,7 @@
 [versions]
 # Versions set-up for gradle-plugins and required APIs and libraries.
 shadow = "9.4.1"
-spotless = "8.4.0"
+spotless = "8.2.1"
 indra = "4.0.0"
 paperweight = "2.0.0-beta.21"
 blossom = "2.2.0"
@@ -11,7 +11,7 @@ packetevents = "2.12.0"
 configurate = "4.2.0"
 
 placeholder-legacy = "2.12.0"
-placeholder-modern = "3.2.0"
+placeholder-modern = "3.1.0"
 bstats = "3.2.1"
 
 annotations = "26.1.0"
