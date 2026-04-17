@@ -19,6 +19,7 @@ package io.github.aivruu.teams.packet.application.util;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextColor;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +31,8 @@ import java.awt.*;
  *
  * @since 2.3.1
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
 public final class MinecraftColorParser {
   private MinecraftColorParser() {
     throw new UnsupportedOperationException("This class is for utility.");
