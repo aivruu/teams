@@ -1,4 +1,5 @@
 plugins {
+  id("teams.common-conventions")
   alias(libs.plugins.paperweight)
 }
 
