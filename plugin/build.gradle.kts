@@ -17,7 +17,7 @@ tasks {
   }
 
   clean {
-    delete(file("$rootDir/jars"))
+    delete(shadowJar.get().destinationDirectory)
   }
 
   processResources {
