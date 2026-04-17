@@ -45,7 +45,7 @@ import io.github.aivruu.teams.menu.infrastructure.TagEditorMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.TagSelectorMenuModel;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.packet.application.PacketAdaptationContract;
-import io.github.aivruu.teams.packet.application.PacketAdaptationModule;
+import io.github.aivruu.teams.packet.infrastructure.PacketEventsAdapter;
 import io.github.aivruu.teams.persistence.infrastructure.InfrastructureRepositoryController;
 import io.github.aivruu.teams.placeholder.application.PlaceholderHookContract;
 import io.github.aivruu.teams.placeholder.application.impl.MiniPlaceholdersHookImpl;
@@ -70,13 +70,14 @@ import io.github.aivruu.teams.tag.infrastructure.modification.TagModificationCac
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 public final class TeamsPlugin extends JavaPlugin implements Teams {
   private final ComponentLogger logger = super.getComponentLogger();
-  private final PacketAdaptationContract packetAdaptation = new PacketAdaptationModule();
+  private final PacketAdaptationContract packetAdaptation = new PacketEventsAdapter();
   private final ConfigurationManager configurationManager =
      new ConfigurationManager(super.getDataPath(), this.logger);
   private TagAggregateRootRepository tagAggregateRootRepository;
@@ -280,6 +281,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
        new TagFetchCommand(this.tagManager, this.configurationManager, availableTagSuggestionProvider)
     );
 
+    TeamsProvider.set(this);
     // Avoid exception due to hook-registry try when PlaceholderAPI not being present in the server.
     if (PlaceholderParser.LEGACY_PLACEHOLDERS_HOOKED) {
       this.registerHook(new PlaceholderAPIHookImpl(this.playerManager, this.packetAdaptation));
@@ -287,7 +289,7 @@ public final class TeamsPlugin extends JavaPlugin implements Teams {
     if (PlaceholderParser.MODERN_PLACEHOLDERS_HOOKED) {
       this.registerHook(new MiniPlaceholdersHookImpl(this.playerManager, this.packetAdaptation));
     }
-    TeamsProvider.set(this);
+    new Metrics(this, 30786);
     this.logger.info("The plugin has been enabled successfully!");
   }
 
