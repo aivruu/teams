@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,10 +24,9 @@ import io.github.aivruu.teams.permission.application.Permissions;
 import io.github.aivruu.teams.tag.application.TagManager;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import java.util.concurrent.CompletableFuture;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class AvailableTagSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
@@ -42,8 +41,7 @@ public final class AvailableTagSuggestionProvider implements SuggestionProvider<
      final CommandContext<CommandSourceStack> context,
      final SuggestionsBuilder builder) {
     final CommandSender sender = context.getSource().getSender();
-    if (sender.hasPermission(Permissions.MODIFY.node())
-       || sender.hasPermission(Permissions.DELETE.node())) {
+    if (sender.hasPermission(Permissions.MODIFY.node()) || sender.hasPermission(Permissions.DELETE.node())) {
       for (final TagAggregateRoot tagAggregateRoot : this.tagManager.getCachedTags()) {
         builder.suggest(tagAggregateRoot.id());
       }

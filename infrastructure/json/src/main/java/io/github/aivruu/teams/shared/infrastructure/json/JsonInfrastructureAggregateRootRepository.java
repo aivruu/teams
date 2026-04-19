@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,12 +18,11 @@ package io.github.aivruu.teams.shared.infrastructure.json;
 
 import io.github.aivruu.teams.aggregate.domain.AggregateRoot;
 import io.github.aivruu.teams.shared.infrastructure.InfrastructureAggregateRootRepository;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class JsonInfrastructureAggregateRootRepository<A extends AggregateRoot>
    extends InfrastructureAggregateRootRepository<A> {

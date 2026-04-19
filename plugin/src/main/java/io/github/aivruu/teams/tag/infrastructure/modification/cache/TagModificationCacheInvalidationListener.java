@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,15 +19,14 @@ package io.github.aivruu.teams.tag.infrastructure.modification.cache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
-import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
+import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.util.application.component.MiniMessageParser;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 public final class TagModificationCacheInvalidationListener
    implements RemovalListener<String, ModificationInProgressValueObject> {

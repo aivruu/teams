@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,11 +19,10 @@ package io.github.aivruu.teams.tag.application.modification.property.type;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
 import io.github.aivruu.teams.tag.application.modification.property.PropertyProcessorContract;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
+import java.util.Locale;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
 
 public enum ColorPropertyProcessor implements PropertyProcessorContract<NamedTextColor> {
   INSTANCE;
@@ -40,7 +39,7 @@ public enum ColorPropertyProcessor implements PropertyProcessorContract<NamedTex
      final @Nullable NamedTextColor oldValue) {
     final NamedTextColor newColor = NamedTextColor.NAMES.value(input.toLowerCase(Locale.ROOT));
     return (newColor != null)
-       ? new TagPropertiesValueObject(properties.prefix(), properties.suffix(), newColor)
+       ? new TagPropertiesValueObject(properties.prefix(), properties.suffix(), newColor, properties.glowForMembers())
        : null;
   }
 }

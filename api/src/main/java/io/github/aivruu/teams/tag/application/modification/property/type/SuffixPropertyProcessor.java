@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -47,6 +47,6 @@ public enum SuffixPropertyProcessor implements PropertyProcessorContract<Compone
     }
     return (newSuffix != null && newSuffix.equals(oldValue))
        ? null
-       : new TagPropertiesValueObject(properties.prefix(), newSuffix, properties.color());
+       : new TagPropertiesValueObject(properties.prefix(), newSuffix, properties.color(), properties.glowForMembers());
   }
 }

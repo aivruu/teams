@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
 package io.github.aivruu.teams.menu.infrastructure;
 
 import io.github.aivruu.teams.action.application.ActionManager;
+import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
 import io.github.aivruu.teams.config.infrastructure.object.TagEditorMenuConfigurationModel;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.menu.application.ProcessedMenuItemValueObject;
 import io.github.aivruu.teams.menu.infrastructure.shared.MenuConstants;
 import io.github.aivruu.teams.menu.infrastructure.util.MenuItemSetter;
-import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
-import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import io.github.aivruu.teams.tag.application.modification.ModificationContext;
+import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import io.github.aivruu.teams.util.application.PlaceholderParser;
 import io.github.aivruu.teams.util.application.component.MiniMessageParser;
 import net.kyori.adventure.text.Component;
@@ -52,8 +52,7 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
   @Override
   public void build() {
     final TagEditorMenuConfigurationModel menu = this.configurationManager.editor();
-    super.inventory = Bukkit.createInventory(this, menu.rows * 9,
-       PlaceholderParser.parseBoth(null, menu.title));
+    super.inventory = Bukkit.createInventory(this, menu.rows * 9, PlaceholderParser.parseBoth(null, menu.title));
     for (final TagEditorMenuConfigurationModel.MenuItem menuItem : menu.items) {
       MenuItemSetter.placeItem(super.inventory, menuItem.itemInformation);
     }
@@ -64,18 +63,15 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
      final @NotNull Player player,
      final @Nullable ItemStack clicked,
      final @NotNull ClickType clickType) {
-    final ProcessedMenuItemValueObject processedMenuItem = super.handleClickLogic(player, clicked,
-       clickType);
+    final ProcessedMenuItemValueObject processedMenuItem = super.handleClickLogic(player, clicked, clickType);
     if (processedMenuItem == null) {
       return null;
     }
     // After that we know the item is valid and has the key assigned.
-    final int customModelData = processedMenuItem.meta().hasCustomModelData()
-       ? processedMenuItem.meta().getCustomModelData() : 0;
+    final int customModelData = processedMenuItem.meta().hasCustomModelData() ? processedMenuItem.meta().getCustomModelData() : 0;
     final String id = processedMenuItem.id();
     for (final TagEditorMenuConfigurationModel.MenuItem menuItem : this.configurationManager.editor().items) {
-      if (menuItem.itemInformation.checkCustomModelData
-         && customModelData != menuItem.itemInformation.data) {
+      if (menuItem.itemInformation.checkCustomModelData && customModelData != menuItem.itemInformation.data) {
         continue;
       }
       if (!id.equals(menuItem.itemInformation.id)) {
@@ -91,8 +87,7 @@ public final class TagEditorMenuModel extends AbstractMenuModel {
      final @NotNull TagEditorMenuConfigurationModel.MenuItem itemSection,
      final @NotNull ClickType clickType) {
     // Execute item's actions and check if it should stop execution-flow.
-    super.processItemActions(player, clickType, itemSection.itemInformation.leftClickActions,
-       itemSection.itemInformation.rightClickActions);
+    super.processItemActions(player, clickType, itemSection.itemInformation.leftClickActions, itemSection.itemInformation.rightClickActions);
     if (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT) {
       return;
     }

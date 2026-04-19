@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,9 +19,8 @@ package io.github.aivruu.teams.menu.application.repository;
 import com.google.errorprone.annotations.DoNotCall;
 import io.github.aivruu.teams.menu.application.AbstractMenuModel;
 import io.github.aivruu.teams.repository.domain.DomainRepository;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
+import org.jetbrains.annotations.NotNull;
 
 public interface MenuRepository extends DomainRepository<AbstractMenuModel> {
   /**

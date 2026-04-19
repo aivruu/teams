@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,13 +17,12 @@
 package io.github.aivruu.teams.action.application.type;
 
 import io.github.aivruu.teams.action.application.ActionModelContract;
-import io.github.aivruu.teams.util.application.PlaceholderParser;
 import io.github.aivruu.teams.util.application.Debugger;
+import io.github.aivruu.teams.util.application.PlaceholderParser;
+import java.time.Duration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.time.Duration;
 
 public final class TitleActionModel implements ActionModelContract {
   @Override

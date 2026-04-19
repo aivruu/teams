@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,11 +20,10 @@ import io.github.aivruu.teams.aggregate.domain.repository.AsyncAggregateRootRepo
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.registry.PlayerAggregateRootRegistry;
 import io.github.aivruu.teams.player.domain.repository.PlayerAggregateRootRepository;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRootRegistry {
   private final PlayerAggregateRootRepository playerAggregateRootRepository;
@@ -53,9 +52,9 @@ public final class PlayerAggregateRootRegistryImpl implements PlayerAggregateRoo
   }
 
   @Override
+  @Deprecated(since = "4.1.0")
   public boolean existsGlobally(final @NotNull String id) {
-    return this.playerAggregateRootRepository.existsSync(id)
-       || this.playerAsyncAggregateRootRepository.existsAsync(id).join();
+    return this.playerAggregateRootRepository.existsSync(id) || this.playerAsyncAggregateRootRepository.existsAsync(id).join();
   }
 
   @Override

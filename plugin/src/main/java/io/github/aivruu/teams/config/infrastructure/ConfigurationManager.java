@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,11 +20,10 @@ import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigur
 import io.github.aivruu.teams.config.infrastructure.object.MessagesConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.TagEditorMenuConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.object.TagsMenuConfigurationModel;
+import java.nio.file.Path;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.nio.file.Path;
 
 @SuppressWarnings({"ConstantConditions", "rawtypes"})
 public final class ConfigurationManager {

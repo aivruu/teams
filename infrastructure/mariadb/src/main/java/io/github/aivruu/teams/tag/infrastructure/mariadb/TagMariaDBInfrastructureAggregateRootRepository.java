@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,21 +16,20 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.infrastructure.mariadb;
 
-import io.github.aivruu.teams.util.application.Debugger;
 import io.github.aivruu.teams.persistence.infrastructure.utils.StatementConstants;
-import io.github.aivruu.teams.shared.infrastructure.mariadb.MariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.json.JsonCoder;
+import io.github.aivruu.teams.shared.infrastructure.mariadb.MariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
 import io.github.aivruu.teams.tag.domain.TagModelEntity;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
+import io.github.aivruu.teams.util.application.Debugger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class TagMariaDBInfrastructureAggregateRootRepository extends MariaDBInfrastructureAggregateRootRepository<TagAggregateRoot> {
   private final Connection connectionPool;

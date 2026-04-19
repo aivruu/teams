@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,15 +16,14 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.infrastructure.json;
 
-import io.github.aivruu.teams.shared.infrastructure.json.JsonInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.shared.infrastructure.json.JsonCoder;
+import io.github.aivruu.teams.shared.infrastructure.json.JsonInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.domain.TagAggregateRoot;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class TagJsonInfrastructureAggregateRootRepository extends JsonInfrastructureAggregateRootRepository<TagAggregateRoot> {
   public TagJsonInfrastructureAggregateRootRepository(final @NotNull Path directory) {

@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -91,8 +91,7 @@ public abstract class AbstractMenuModel implements InventoryHolder {
       return null;
     }
     final ItemMeta meta = clicked.getItemMeta();
-    final String id = meta.getPersistentDataContainer()
-       .get(MENU_ITEM_NBT_KEY, PersistentDataType.STRING);
+    final String id = meta.getPersistentDataContainer().get(MENU_ITEM_NBT_KEY, PersistentDataType.STRING);
     return (id == null) ? null : new ProcessedMenuItemValueObject(id, meta);
   }
 
@@ -111,8 +110,7 @@ public abstract class AbstractMenuModel implements InventoryHolder {
      final @NotNull ClickType clickType,
      final @NotNull String[] leftClickActions,
      final @NotNull String[] rightClickActions) {
-    for (final String action : (clickType == ClickType.LEFT || clickType == ClickType.SHIFT_LEFT)
-       ? leftClickActions : rightClickActions) {
+    for (final String action : (clickType == ClickType.LEFT || clickType == ClickType.SHIFT_LEFT) ? leftClickActions : rightClickActions) {
       this.actionManager.execute(player, action);
     }
   }

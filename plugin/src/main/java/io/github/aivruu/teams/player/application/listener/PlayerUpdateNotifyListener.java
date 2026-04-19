@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,9 +17,10 @@
 package io.github.aivruu.teams.player.application.listener;
 
 import io.github.aivruu.teams.Constants;
-import io.github.aivruu.teams.util.application.UpdateChecker;
 import io.github.aivruu.teams.permission.application.Permissions;
+import io.github.aivruu.teams.util.application.UpdateChecker;
 import io.github.aivruu.teams.util.application.component.MiniMessageParser;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
@@ -27,8 +28,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public final class PlayerUpdateNotifyListener implements Listener {
   private final List<Component> notifyMessages = List.of(

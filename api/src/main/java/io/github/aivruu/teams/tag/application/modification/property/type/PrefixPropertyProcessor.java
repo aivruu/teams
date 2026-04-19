@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -47,6 +47,6 @@ public enum PrefixPropertyProcessor implements PropertyProcessorContract<Compone
     }
     return (newPrefix != null && newPrefix.equals(oldValue))
        ? null
-       : new TagPropertiesValueObject(newPrefix, properties.suffix(), properties.color());
+       : new TagPropertiesValueObject(newPrefix, properties.suffix(), properties.color(), properties.glowForMembers());
   }
 }

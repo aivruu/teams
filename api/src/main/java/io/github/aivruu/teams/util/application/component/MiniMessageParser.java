@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,8 +32,7 @@ public final class MiniMessageParser {
   private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
   private MiniMessageParser() {
-    throw new UnsupportedOperationException(
-       "This class is for utility and cannot be instantiated.");
+    throw new UnsupportedOperationException("This class is for utility and cannot be instantiated.");
   }
 
   /**

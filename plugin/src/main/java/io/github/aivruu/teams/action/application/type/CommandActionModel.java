@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,8 +37,7 @@ public final class CommandActionModel implements ActionModelContract {
     final String type = parameters[0];
     // The message could include specific message or placeholders.
     // Not available MiniPlaceholders support here, by now.
-    final String command = PlainComponentParser.plain(
-       PlaceholderParser.parseBoth(player, parameters[1]));
+    final String command = PlainComponentParser.plain(PlaceholderParser.parseBoth(player, parameters[1]));
     if (type.equals("PLAYER")) {
       player.performCommand(command);
     } else if (type.equals("CONSOLE")) {

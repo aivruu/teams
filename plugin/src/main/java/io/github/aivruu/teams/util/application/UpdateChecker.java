@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,13 +17,12 @@
 package io.github.aivruu.teams.util.application;
 
 import io.github.aivruu.teams.Constants;
-import org.jetbrains.annotations.NotNull;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import org.jetbrains.annotations.NotNull;
 
 public final class UpdateChecker {
   private static final String PROJECT_VERSION_ACCESS_API_URL = "https://api.modrinth.com/v2/project/RKRkter9/version";

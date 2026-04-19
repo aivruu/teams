@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.tag.application.listener;
 
-import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import io.github.aivruu.teams.tag.application.modification.ModificationInProgressValueObject;
 import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
+import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import io.github.aivruu.teams.util.application.component.PlainComponentParser;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.entity.Player;
@@ -53,7 +53,6 @@ public final class TagModificationChatInputListener implements Listener {
      * And we ignore the result as the notifications about the process are handled by an
      * implementation of the processor.
      */
-    this.tagModificationProcessor.process(player, modification,
-       PlainComponentParser.plain(event.message()).replace("\"", ""));
+    this.tagModificationProcessor.process(player, modification, PlainComponentParser.plain(event.message()).replace("\"", ""));
   }
 }
