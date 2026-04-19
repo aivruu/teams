@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,28 +16,37 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.player.infrastructure;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
 import io.github.aivruu.teams.player.domain.repository.PlayerAggregateRootRepository;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 public final class PlayerCacheAggregateRootRepository implements PlayerAggregateRootRepository {
-  private final Object2ObjectMap<String, PlayerAggregateRoot> cache = new Object2ObjectOpenHashMap<>();
   private final Collection<PlayerAggregateRoot> valuesView = new ArrayList<>();
+  private final Cache<String, PlayerAggregateRoot> cache;
+
+  public PlayerCacheAggregateRootRepository(final long entryExpirationTime, final TimeUnit expirationTimeUnit) {
+    this.cache = Caffeine.newBuilder()
+       .expireAfterAccess(entryExpirationTime, expirationTimeUnit)
+       .scheduler(Scheduler.systemScheduler())
+       .maximumSize(1000)
+       .build();
+  }
 
   @Override
   public @Nullable PlayerAggregateRoot findSync(final @NotNull String id) {
-    return this.cache.get(id);
+    return this.cache.getIfPresent(id);
   }
 
   @Override
   public boolean existsSync(final @NotNull String id) {
-    return this.cache.containsKey(id);
+    return this.cache.asMap().containsKey(id);
   }
 
   @Override
@@ -53,17 +62,17 @@ public final class PlayerCacheAggregateRootRepository implements PlayerAggregate
 
   @Override
   public @Nullable PlayerAggregateRoot deleteSync(final @NotNull String id) {
-    final PlayerAggregateRoot playerAggregateRoot = this.cache.remove(id);
-    if (playerAggregateRoot == null) {
-      return null;
+    final PlayerAggregateRoot playerAggregateRoot = this.cache.getIfPresent(id);
+    if (playerAggregateRoot != null) {
+      this.cache.invalidate(id);
+      this.valuesView.remove(playerAggregateRoot);
     }
-    this.valuesView.remove(playerAggregateRoot);
     return playerAggregateRoot;
   }
 
   @Override
   public void clearSync() {
-    this.cache.clear();
+    this.cache.invalidateAll();
     this.valuesView.clear();
   }
 }
