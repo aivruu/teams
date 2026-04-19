@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,10 +24,9 @@ import com.google.gson.JsonSerializationContext;
 import io.github.aivruu.teams.shared.infrastructure.json.JsonCodecAdapterContract;
 import io.github.aivruu.teams.tag.domain.TagPropertiesValueObject;
 import io.github.aivruu.teams.util.application.component.PlainComponentParser;
+import java.lang.reflect.Type;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Type;
 
 public enum JsonTagPropertiesValueObjectCodec implements JsonCodecAdapterContract<TagPropertiesValueObject> {
   INSTANCE;
@@ -38,15 +37,19 @@ public enum JsonTagPropertiesValueObjectCodec implements JsonCodecAdapterContrac
   }
 
   @Override
-  public @NotNull TagPropertiesValueObject deserialize(final JsonElement json, final Type type, final JsonDeserializationContext ctx) throws JsonParseException {
+  public @NotNull TagPropertiesValueObject deserialize(
+     final JsonElement json,
+     final Type type,
+     final JsonDeserializationContext ctx) throws JsonParseException {
     final JsonObject jsonObject = json.getAsJsonObject();
     final JsonElement prefix = jsonObject.get("prefix");
     final JsonElement suffix = jsonObject.get("suffix");
     return new TagPropertiesValueObject(
-      prefix.isJsonNull() ? null : PlainComponentParser.modern(prefix.getAsString()),
-      suffix.isJsonNull() ? null : PlainComponentParser.modern(suffix.getAsString()),
-      // This will never be null.
-      NamedTextColor.namedColor(jsonObject.get("color-value").getAsInt())
+       prefix.isJsonNull() ? null : PlainComponentParser.modern(prefix.getAsString()),
+       suffix.isJsonNull() ? null : PlainComponentParser.modern(suffix.getAsString()),
+       // This will never be null.
+       NamedTextColor.namedColor(jsonObject.get("color-value").getAsInt()),
+       jsonObject.get("has-glow").getAsBoolean()
     );
   }
 
@@ -56,6 +59,7 @@ public enum JsonTagPropertiesValueObjectCodec implements JsonCodecAdapterContrac
     jsonObject.addProperty("prefix", PlainComponentParser.plainOrNull(properties.prefix()));
     jsonObject.addProperty("suffix", PlainComponentParser.plainOrNull(properties.suffix()));
     jsonObject.addProperty("color-value", properties.color().value());
+    jsonObject.addProperty("has-glow", properties.glowForMembers());
     return jsonObject;
   }
 }
