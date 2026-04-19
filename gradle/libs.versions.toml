@@ -5,6 +5,7 @@ spotless = "8.2.1"
 indra = "4.0.0"
 paperweight = "2.0.0-beta.21"
 blossom = "2.2.0"
+pluginyml = "0.9.0"
 
 paper = "1.21.3-R0.1-SNAPSHOT"
 packetevents = "2.12.0"
@@ -44,3 +45,4 @@ build-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", vers
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
 blossom = { id = "net.kyori.blossom", version.ref = "blossom"}
+paper-plugin = { id = "de.eldoria.plugin-yml.paper", version.ref = "pluginyml" }
