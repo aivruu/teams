@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,12 +38,14 @@ public enum MongoTagPropertiesValueObjectCodec implements Codec<TagPropertiesVal
     final String prefix = (reader.getCurrentBsonType() == BsonType.NULL) ? null : reader.readString("prefix");
     final String suffix = (reader.getCurrentBsonType() == BsonType.NULL) ? null : reader.readString("suffix");
     final int colorValue = reader.readInt32("color-value");
+    final boolean hasGlowEffect = reader.readBoolean("has-glow");
     reader.readEndDocument();
     return new TagPropertiesValueObject(
-      (prefix == null) ? null : PlainComponentParser.modern(prefix),
-      (suffix == null) ? null : PlainComponentParser.modern(suffix),
-      // This will never be null.
-      NamedTextColor.namedColor(colorValue)
+       (prefix == null) ? null : PlainComponentParser.modern(prefix),
+       (suffix == null) ? null : PlainComponentParser.modern(suffix),
+       // This will never be null.
+       NamedTextColor.namedColor(colorValue),
+       hasGlowEffect
     );
   }
 
@@ -63,6 +65,7 @@ public enum MongoTagPropertiesValueObjectCodec implements Codec<TagPropertiesVal
       writer.writeString("suffix", PlainComponentParser.plain(suffix));
     }
     writer.writeInt32("color-value", properties.color().value());
+    writer.writeBoolean("has-glow", properties.glowForMembers());
     writer.writeEndDocument();
   }
 
