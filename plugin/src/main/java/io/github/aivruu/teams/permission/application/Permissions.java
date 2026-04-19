@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ public enum Permissions {
   SELECT("teams.command.select"),
   MODIFY("teams.command.modify"),
   FETCH("teams.command.fetch"),
-  MENU("teams.command.menu"),
   RELOAD("teams.command.reload"),
   HELP("teams.command.help"),
   NOTIFY("teams.updates");
