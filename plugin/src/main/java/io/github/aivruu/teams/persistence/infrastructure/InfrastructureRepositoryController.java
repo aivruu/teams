@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,9 +17,8 @@
 package io.github.aivruu.teams.persistence.infrastructure;
 
 import com.mongodb.client.MongoClient;
-import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigurationModel;
 import io.github.aivruu.teams.config.infrastructure.ConfigurationManager;
-import io.github.aivruu.teams.util.application.Debugger;
+import io.github.aivruu.teams.config.infrastructure.object.ConfigurationConfigurationModel;
 import io.github.aivruu.teams.persistence.infrastructure.utils.HikariInstanceProvider;
 import io.github.aivruu.teams.persistence.infrastructure.utils.MongoClientHelper;
 import io.github.aivruu.teams.player.domain.PlayerAggregateRoot;
@@ -35,10 +34,10 @@ import io.github.aivruu.teams.tag.infrastructure.json.codec.JsonTagAggregateRoot
 import io.github.aivruu.teams.tag.infrastructure.json.codec.JsonTagPropertiesValueObjectCodec;
 import io.github.aivruu.teams.tag.infrastructure.mariadb.TagMariaDBInfrastructureAggregateRootRepository;
 import io.github.aivruu.teams.tag.infrastructure.mongodb.TagMongoInfrastructureAggregateRootRepository;
-import org.jetbrains.annotations.NotNull;
-
+import io.github.aivruu.teams.util.application.Debugger;
 import java.nio.file.Path;
 import java.sql.Connection;
+import org.jetbrains.annotations.NotNull;
 
 public final class InfrastructureRepositoryController {
   private final Path dataFolder;
@@ -63,7 +62,7 @@ public final class InfrastructureRepositoryController {
         HikariInstanceProvider.buildDataSource(config.host, config.mariaDbPort, config.username,
            config.database, config.password);
         // Check if parameters are valid.
-        if (HikariInstanceProvider.get() == null) {
+        if (!HikariInstanceProvider.available()) {
           Debugger.write("HikariDataSource couldn't be initialized correctly, stopping infrastructure repositories initialization.");
           return false;
         }
