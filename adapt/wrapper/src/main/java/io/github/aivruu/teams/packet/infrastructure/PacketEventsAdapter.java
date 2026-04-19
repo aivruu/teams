@@ -1,3 +1,19 @@
+// This file is part of teams, licensed under the GNU License.
+//
+// Copyright (c) 2024-2026 aivruu
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
 package io.github.aivruu.teams.packet.infrastructure;
 
 import com.github.retrooper.packetevents.PacketEvents;
@@ -9,15 +25,14 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import java.util.UUID;
+import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.UUID;
-import java.util.function.Consumer;
 
 public final class PacketEventsAdapter implements PacketAdaptationContract {
   private final PlayerManager playerManager = PacketEvents.getAPI().getPlayerManager();
@@ -144,12 +159,13 @@ public final class PacketEventsAdapter implements PacketAdaptationContract {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public @NotNull <T> T extractProperty(final @NotNull String team, final @NotNull PropertyType type) {
     final WrapperPlayServerTeams.ScoreBoardTeamInfo teamInfo = this.internalTeams.get(team);
-    return (T) switch (type) {
-      case PREFIX -> teamInfo.getPrefix();
-      case SUFFIX -> teamInfo.getSuffix();
-      case COLOR -> teamInfo.getColor();
+    return switch (type) {
+      case PREFIX -> (T) teamInfo.getPrefix();
+      case SUFFIX -> (T) teamInfo.getSuffix();
+      case COLOR -> (T) teamInfo.getColor();
     };
   }
 }
