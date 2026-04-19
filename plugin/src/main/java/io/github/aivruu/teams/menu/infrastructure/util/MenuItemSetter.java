@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,15 +34,14 @@ public final class MenuItemSetter {
       Debugger.write("Skipping item placing due to no-defined slots.");
       return;
     }
+    final ItemStack item = MenuItemCreator.prepareFrom(menuItem);
     // We check if this item will be placed on multiple-slots in the menu (such as decoration with
     // glass-pane items), so we can reuse its reference for the following slots' items, otherwise,
     // just create a new one and put it there.
     if (menuItem.slots.length == 1) {
-      inventory.setItem(menuItem.slots[0], MenuItemCreator.prepareFrom(menuItem));
+      inventory.setItem(menuItem.slots[0], item);
       return;
     }
-    // Just a single object that will be used for multiple slots.
-    final ItemStack item = MenuItemCreator.prepareFrom(menuItem);
     for (final byte slot : menuItem.slots) {
       inventory.setItem(slot, item);
     }
