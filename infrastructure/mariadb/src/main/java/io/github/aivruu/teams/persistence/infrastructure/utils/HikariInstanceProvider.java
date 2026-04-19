@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,11 +19,10 @@ package io.github.aivruu.teams.persistence.infrastructure.utils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.aivruu.teams.util.application.Debugger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.sql.Connection;
 import java.sql.SQLException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This utility-class is used as {@link HikariDataSource} instance builder and provider.
@@ -42,6 +41,16 @@ public final class HikariInstanceProvider {
    */
   public static @Nullable HikariDataSource get() {
     return (hikariDataSource == null || hikariDataSource.isClosed()) ? null : hikariDataSource;
+  }
+
+  /**
+   * Checks if the {@link HikariDataSource} instance is still available for use.
+   *
+   * @return {@code true} if it's available, {@code false} otherwise.
+   * @since 4.1.0
+   */
+  public static boolean available() {
+    return hikariDataSource != null && !hikariDataSource.isClosed();
   }
 
   /**
