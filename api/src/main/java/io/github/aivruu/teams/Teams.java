@@ -1,6 +1,6 @@
 // This file is part of teams, licensed under the GNU License.
 //
-// Copyright (c) 2024-2025 aivruu
+// Copyright (c) 2024-2026 aivruu
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,10 +23,11 @@ import io.github.aivruu.teams.player.application.PlayerTagSelectorManager;
 import io.github.aivruu.teams.player.domain.registry.PlayerAggregateRootRegistry;
 import io.github.aivruu.teams.player.domain.repository.PlayerAggregateRootRepository;
 import io.github.aivruu.teams.tag.application.TagManager;
-import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import io.github.aivruu.teams.tag.application.modification.TagModificationProcessor;
+import io.github.aivruu.teams.tag.application.modification.repository.TagModificationRepository;
 import io.github.aivruu.teams.tag.domain.registry.TagAggregateRootRegistry;
 import io.github.aivruu.teams.tag.domain.repository.TagAggregateRootRepository;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -40,18 +41,24 @@ public interface Teams {
    * Returns the {@link TagAggregateRootRepository} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
+   * @deprecated use {@link #tagManager()} instead.
    * @return The {@link TagAggregateRootRepository}.
    * @since 0.0.1
    */
+  @Deprecated(since = "4.1.0")
+  @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
   @NotNull TagAggregateRootRepository tagCacheRepository();
 
   /**
    * Returns the {@link TagAggregateRootRegistry} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
+   * @deprecated use {@link #tagManager()} instead.
    * @return The {@link TagAggregateRootRegistry}.
    * @since 0.0.1
    */
+  @Deprecated(since = "4.1.0")
+  @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
   @NotNull TagAggregateRootRegistry tagsRegistry();
 
   /**
@@ -67,9 +74,12 @@ public interface Teams {
    * Returns the {@link TagModificationRepository} instance, will throw an
    * {@link IllegalStateException} if the instance is not initialized.
    *
+   * @deprecated no direct modifications to internal repositories should be allowed.
    * @return The {@link TagModificationRepository}.
    * @since 2.3.1
    */
+  @Deprecated(since = "4.1.0")
+  @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
   @NotNull TagModificationRepository tagModificationRepository();
 
   /**
@@ -88,15 +98,20 @@ public interface Teams {
    * @return The {@link PlayerAggregateRootRepository}.
    * @since 0.0.1
    */
+  @Deprecated(since = "4.1.0")
+  @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
   @NotNull PlayerAggregateRootRepository playerCacheRepository();
 
   /**
    * Returns the {@link PlayerAggregateRootRegistry} instance, will throw an {@link IllegalStateException}
    * if the instance is not initialized.
    *
+   * @deprecated use {@link #playerManager()} instead.
    * @return The {@link PlayerAggregateRootRegistry}.
    * @since 0.0.1
    */
+  @Deprecated(since = "4.1.0")
+  @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
   @NotNull PlayerAggregateRootRegistry playersRegistry();
 
   /**
